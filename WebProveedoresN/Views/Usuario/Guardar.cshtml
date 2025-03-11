@@ -1,0 +1,40 @@
+﻿@model UsuarioModel
+@{
+    ViewData["Title"] = "Guardar ";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    var mensaje = TempData["Mensaje"] as string; 
+}
+<div class="card">
+    <div class="card-header">
+        <h3>Crear Contacto</h3>
+    </div>
+    <div class="card-body">
+        <form asp-action="Guardar" asp-controller="Usuario" method="post">
+            @if (!string.IsNullOrEmpty(mensaje))
+            {
+                <div class="alert alert-info">
+                    @mensaje
+                </div>
+            }
+            <div class="mb-3">
+                <label class="form-label">Nombre </label>
+                <input asp-for="Nombre" type="text" class="form-control" required>
+            </div>
+            <div class="mb-3">
+                <label class="form-label">Empresa</label>
+                <input asp-for="Empresa" type="text" class="form-control" required>
+            </div>
+            <div class="mb-3">
+                <label class="form-label">Correo</label>
+                <input asp-for="Correo" type="text" class="form-control" required>
+            </div>
+            <div class="mb-3">
+                <label class="form-label">Contraseña</label>
+                <input asp-for="Clave" type="password" class="form-control" required>
+            </div>
+            <button type="submit" class="btn btn-outline-primary">Guardar</button>
+            <a> | Volver a la lista</a>
+        </form>
+    </div>
+</div>
+
