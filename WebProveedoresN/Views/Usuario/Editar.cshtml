@@ -1,15 +1,18 @@
 ﻿@model UsuarioModel
 @{
-    ViewData["Title"] = "Guardar";
+    ViewData["Title"] = "Editar";
     Layout = "~/Views/Shared/_Layout.cshtml";
     var mensaje = TempData["Mensaje"] as string; 
 }
 <div class="card">
     <div class="card-header">
-        <h3>Crear Contacto</h3>
+        <h3>Editar Usuario</h3>
     </div>
     <div class="card-body">
-        <form asp-action="Guardar" asp-controller="Usuario" method="post">
+        <form asp-action="Editar" asp-controller="Usuario" method="post">
+            <input asp-for="Token" type="hidden" class="form-control"/>
+            <input asp-for="Clave" type="hidden" class="form-control"/>
+            <input asp-for="Empresa" type="hidden" class="form-control"/>
             @if (!string.IsNullOrEmpty(mensaje))
             {
                 <div class="alert alert-info">
@@ -22,19 +25,9 @@
                 <span asp-validation-for="Nombre" class="text-danger"></span>
             </div>
             <div class="mb-3">
-                <label class="form-label">Empresa</label>
-                <input asp-for="Empresa" type="text" class="form-control" >
-                <span asp-validation-for="Empresa" class="text-danger"></span>
-            </div>
-            <div class="mb-3">
                 <label class="form-label">Correo</label>
-                <input asp-for="Correo" type="text" class="form-control" >
+                <input asp-for="Correo" type="email" class="form-control" >
                 <span asp-validation-for="Correo" class="text-danger"></span>
-            </div>
-            <div class="mb-3">
-                <label class="form-label">Contraseña</label>
-                <input asp-for="Clave" type="password" class="form-control" >
-                <span asp-validation-for="Clave" class="text-danger"></span>
             </div>
             <div class="mb-3">
                 <label for="Acc">Acceso</label>
@@ -55,10 +48,8 @@
                 </select>
                 <span asp-validation-for="IdStatus" class="text-danger"></span>
             </div>
-
             <button type="submit" class="btn btn-outline-primary">Guardar</button>
             <a asp-action="Listar" asp-controller="Usuario" class="btn btn-outline-warning"> | Volver a la lista</a>
         </form>
     </div>
 </div>
-

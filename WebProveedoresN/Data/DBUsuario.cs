@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.Data.SqlClient;
+using NuGet.Common;
 using System.Data;
 using WebProveedoresN.Conexion;
 using WebProveedoresN.Models;
@@ -17,26 +18,28 @@ namespace WebProveedoresN.Data
             {
                 try
                 {
-                    using (var conexion = DBConexion.ObtenerConexion())
+                    using var conexion = DBConexion.ObtenerConexion();
+                    conexion.Open();
+                    var storedProcedure = "sp_Listar";
+                    var cmd = new SqlCommand(storedProcedure, conexion)
                     {
-                        conexion.Open();
-                        var storedProcedure = "sp_Listar";
-                        var cmd = new SqlCommand(storedProcedure, conexion);
-                        cmd.CommandType = CommandType.StoredProcedure;
-                        using var dr = cmd.ExecuteReader();
-                        while (dr.Read())
+                        CommandType = CommandType.StoredProcedure
+                    };
+                    using var dr = cmd.ExecuteReader();
+                    while (dr.Read())
+                    {
+                        lista.Add(new UsuarioModel()
                         {
-                            lista.Add(new UsuarioModel()
-                            {
-                                Id = Convert.ToInt32(dr["Id"]),
-                                Empresa = dr["Empresa"].ToString(),
-                                Nombre = dr["Nombre"].ToString(),
-                                Correo = dr["Correo"].ToString(),
-                                Clave = dr["Clave"].ToString(),
-                                Restablecer = Convert.ToBoolean(dr["Restablecer"]),
-                                Confirmado = Convert.ToBoolean(dr["Confirmado"]),
-                            });
-                        }
+                            Empresa = dr["Empresa"].ToString(),
+                            Nombre = dr["Nombre"].ToString(),
+                            Correo = dr["Correo"].ToString(),
+                            Clave = dr["Clave"].ToString(),
+                            Token = dr["Token"].ToString(),
+                            Restablecer = Convert.ToBoolean(dr["Restablecer"]),
+                            Confirmado = Convert.ToBoolean(dr["Confirmado"]),
+                            IdAcceso = Convert.ToInt32(dr["IdAcceso"]),
+                            IdStatus = Convert.ToInt32(dr["IdStatus"]),
+                        });
                     }
                     break; // Sale del loop if funciona correctamente
                 }
@@ -57,30 +60,38 @@ namespace WebProveedoresN.Data
                 return lista;
         }
 
-        public static UsuarioModel Obtener(int id)
+        public static UsuarioModel Obtener(string token)
         {
             var usuario = new UsuarioModel();
-            using (var conexion = DBConexion.ObtenerConexion())
+            try
             {
-                conexion.Open();
-                var storedProcedure = "sp_Obtener";
-                var cmd = new SqlCommand(storedProcedure, conexion);
-                cmd.Parameters.AddWithValue("@Id", id);
-                cmd.CommandType = CommandType.StoredProcedure;
-                using var dr = cmd.ExecuteReader();
-                while (dr.Read())
+                using (var conexion = DBConexion.ObtenerConexion())
                 {
-                    usuario.Id = Convert.ToInt32(dr["Id"]);
-                    usuario.Empresa = dr["Empresa"].ToString();
-                    usuario.Nombre = dr["Nombre"].ToString();
-                    usuario.Correo = dr["Correo"].ToString();
-                    usuario.Clave = dr["Clave"].ToString();
-                    usuario.Restablecer = Convert.ToBoolean(dr["Restablecer"]);
-                    usuario.Confirmado = Convert.ToBoolean(dr["Confirmado"]);
-                    usuario.Token = dr["Token"].ToString();
-                    usuario.IdAcceso = Convert.ToInt32(dr["IdAcceso"]);
-                    usuario.IdStatus = Convert.ToInt32(dr["IdState"]);
+                    conexion.Open();
+                    var storedProcedure = "sp_Obtener";
+                    var cmd = new SqlCommand(storedProcedure, conexion);
+                    cmd.Parameters.AddWithValue("@Token", token);
+                    cmd.CommandType = CommandType.StoredProcedure;
+                    using var dr = cmd.ExecuteReader();
+                    while (dr.Read())
+                    {
+                        usuario.Empresa = dr["Empresa"].ToString();
+                        usuario.Nombre = dr["Nombre"].ToString();
+                        usuario.Correo = dr["Correo"].ToString();
+                        usuario.Clave = dr["Clave"].ToString();
+                        usuario.Token = dr["Token"].ToString();
+                        usuario.Restablecer = Convert.ToBoolean(dr["Restablecer"]);
+                        usuario.Confirmado = Convert.ToBoolean(dr["Confirmado"]);
+                        usuario.IdAcceso = Convert.ToInt32(dr["IdAcceso"]);
+                        usuario.IdStatus = Convert.ToInt32(dr["IdStatus"]);
+                    }
                 }
+
+            }
+            catch (Exception)
+            {
+
+                throw;
             }
             return usuario;
         }
@@ -110,6 +121,7 @@ namespace WebProveedoresN.Data
             {
                 var error = ex.Message;
                 return $"Error al guardar los datos en SQL Server - {error}";
+
             }
             catch (Exception ex)
             {
@@ -118,42 +130,34 @@ namespace WebProveedoresN.Data
             }
         }
 
-        public static bool Editar(UsuarioModel usuario)
+        public static string Editar(UsuarioModel usuario)
         {
-            bool rpta;
-
             try
             {
                 using var conexion = DBConexion.ObtenerConexion();
                 conexion.Open();
                 var storedProcedure = "sp_Editar";
-                using (var cmd = new SqlCommand(storedProcedure, conexion))
-                {
-                    cmd.CommandType = CommandType.StoredProcedure;
-                    cmd.Parameters.AddWithValue("@Empresa", usuario.Empresa);
-                    cmd.Parameters.AddWithValue("@Nombre", usuario.Nombre);
-                    cmd.Parameters.AddWithValue("@Correo", usuario.Correo);
-                    cmd.Parameters.AddWithValue("@Clave", usuario.Clave);
-                    cmd.Parameters.AddWithValue("@Restablecer", usuario.Restablecer);
-                    cmd.Parameters.AddWithValue("@Confirmado", usuario.Confirmado);
-                    cmd.Parameters.AddWithValue("@Token", usuario.Token);
-                    cmd.Parameters.AddWithValue("@IdAcceso", usuario.IdAcceso);
-                    cmd.Parameters.AddWithValue("@IdStatus", usuario.IdStatus);
-                    cmd.ExecuteNonQuery();
-                }
-                rpta = true;
+                using var cmd = new SqlCommand(storedProcedure, conexion);
+                cmd.CommandType = CommandType.StoredProcedure;
+                cmd.Parameters.AddWithValue("@Nombre", usuario.Nombre);
+                cmd.Parameters.AddWithValue("@Correo", usuario.Correo);
+                cmd.Parameters.AddWithValue("@IdAcceso", usuario.IdAcceso);
+                cmd.Parameters.AddWithValue("@IdStatus", usuario.IdStatus);
+                cmd.Parameters.AddWithValue("@Token", usuario.Token);
+                cmd.ExecuteNonQuery();
+                return "Usuario guardado exitosamente.";
             }
             catch (SqlException ex)
             {
-                Console.WriteLine($"Error al guardar los datos en SQL Server {ex.Message}");
-                rpta = false;
+                var error = ex.Message;
+                return $"Error al guardar los datos en SQL Server - {error}";
+
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Error inesperado al guardar los datos en SQL Server {ex.Message}");
-                rpta = false;
+                var error = ex.Message;
+                return $"Error inesperado al guardar los datos en SQL Server - {error}";
             }
-            return rpta;
         }
 
         public static bool ChangeStatus(string Token, int Status)

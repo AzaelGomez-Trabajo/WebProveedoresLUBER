@@ -24,13 +24,18 @@ namespace WebProveedoresN.Controllers
         [HttpPost]
         public IActionResult Guardar(UsuarioModel usuario)
         {
+            if (!ModelState.IsValid)
+            {
+                return View(usuario);
+            }
+
             if (usuario.Clave != null)
             {
                 usuario.Clave = UtilityService.ConvertirSHA256(usuario.Clave);
             }
             usuario.Token = UtilityService.GenerarToken();
-            usuario.IdAcceso = 2;
-            usuario.IdStatus = 1;
+            //usuario.IdAcceso = 2;
+            //usuario.IdStatus = 1;
             usuario.Restablecer = false;
             usuario.Confirmado = false;
 
@@ -43,11 +48,34 @@ namespace WebProveedoresN.Controllers
             {
                 return RedirectToAction("Listar");
             }
-            else 
-            {
                 return RedirectToAction("Guardar"); 
-            }
         }
 
+        public IActionResult Editar(string token)
+        {
+            // Metodo solo devuelve la vista
+            var usuario = DBUsuario.Obtener(token);
+            return View(usuario);
+        }
+
+        [HttpPost]
+        public IActionResult Editar(UsuarioModel model)
+        {
+            if (!ModelState.IsValid)
+            {
+                return View();
+            }
+            var respuesta = DBUsuario.Editar(model);
+
+            TempData["Mensaje"] = respuesta;
+            if (respuesta.Contains("exitosamente"))
+            {
+                return RedirectToAction("Listar");
+            }
+            else
+            {
+                return View(model);
+            }
+        }
     }
 }
