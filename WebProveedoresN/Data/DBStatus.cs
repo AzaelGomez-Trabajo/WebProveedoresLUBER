@@ -6,9 +6,9 @@ namespace WebProveedoresN.Data
 {
     public class DBStatus
     {
-        public static List<StatusModel> ObtenerEstatus()
+        public static List<StatusDTO> ObtenerEstatus()
         {
-            var status = new List<StatusModel>();
+            var status = new List<StatusDTO>();
             using (var conexion = DBConexion.ObtenerConexion())
             {
                 conexion.Open();
@@ -19,7 +19,7 @@ namespace WebProveedoresN.Data
                     {
                         while (dr.Read())
                         {
-                            status.Add(new StatusModel
+                            status.Add(new StatusDTO
                             {
                                 IdStatus = Convert.ToInt32(dr["IdStatus"]),
                                 Status = dr["Status"].ToString()

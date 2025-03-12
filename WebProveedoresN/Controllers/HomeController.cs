@@ -4,7 +4,6 @@ using WebProveedoresN.Models;
 using Microsoft.AspNetCore.Authorization;
 
 namespace WebProveedoresN.Controllers;
-//[Authorize]
 public class HomeController : Controller
 {
     private readonly ILogger<HomeController> _logger;
@@ -19,11 +18,13 @@ public class HomeController : Controller
         return View();
     }
 
+    [Authorize(Roles = "Administrador")]
     public IActionResult Pagina1()
     {
         return View();
     }
 
+    [Authorize(Roles = "Administrador")]
     public IActionResult Pagina2()
     {
         return View();
@@ -33,7 +34,7 @@ public class HomeController : Controller
     {
         return View();
     }
-    
+
     public IActionResult Privacy()
     {
         return View();

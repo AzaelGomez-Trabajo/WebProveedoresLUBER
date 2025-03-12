@@ -1,9 +1,9 @@
-﻿@model UsuarioModel
+﻿@model UsuarioDTO
 @{
     ViewData["Title"] = "Guardar";
     Layout = "~/Views/Shared/_Layout.cshtml";
     var mensaje = TempData["Mensaje"] as string; 
-    var status = ViewBag.Status as List<StatusModel>;
+    var status = ViewBag.Status as List<StatusDTO>;
     var roles = ViewBag.Roles as List<string>;
 }
 <div class="card">

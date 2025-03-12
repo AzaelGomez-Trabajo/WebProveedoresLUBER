@@ -2,7 +2,7 @@
 
 namespace WebProveedoresN.Models
 {
-    public class StatusModel
+    public class StatusDTO
     {
         public int IdStatus { get; set; }
         [Required]

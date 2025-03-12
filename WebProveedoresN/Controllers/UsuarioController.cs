@@ -3,12 +3,13 @@ using WebProveedoresN.Data;
 using WebProveedoresN.Models;
 using WebProveedoresN.Services;
 using WebProveedoresN.Conexion;
+using Microsoft.AspNetCore.Authorization;
 
 namespace WebProveedoresN.Controllers
 {
     public class UsuarioController : Controller
     {
-        // Metodo que devuelve la vista con la lista de usuarios
+        [Authorize(Roles = "Administrador")]
         public IActionResult Listar()
         {
 
@@ -21,17 +22,16 @@ namespace WebProveedoresN.Controllers
             */
         }
 
+        [Authorize(Roles = "Administrador")]
         public IActionResult Guardar()
         {
-            // Metodo solo devuelve la vista
             ViewBag.Status = DBStatus.ObtenerEstatus();
             ViewBag.Roles = DBUsuario.ObtenerRoles();
             return View();
         }
 
-        // Metodo para guardar un usuario
         [HttpPost]
-        public IActionResult Guardar(UsuarioModel model)
+        public IActionResult Guardar(UsuarioDTO model)
         {
             if (!ModelState.IsValid)
             {
@@ -49,7 +49,6 @@ namespace WebProveedoresN.Controllers
             model.Confirmado = false;
 
             // Metodo que recibe un objeto de tipo UsuarioModel para guardar en la base de datos
-
             var respuesta = DBUsuario.GuardarUsuarioConRoles(model); ;
             //var respuesta = DBUsuario.Guardar(model);
 
@@ -61,6 +60,7 @@ namespace WebProveedoresN.Controllers
             return RedirectToAction("Guardar");
         }
 
+        [Authorize(Roles = "Administrador")]
         public IActionResult Editar(string token)
         {
             // Metodo solo devuelve la vista
@@ -71,7 +71,7 @@ namespace WebProveedoresN.Controllers
         }
 
         [HttpPost]
-        public IActionResult Editar(UsuarioModel model)
+        public IActionResult Editar(UsuarioDTO model)
         {
             if (!ModelState.IsValid)
             {

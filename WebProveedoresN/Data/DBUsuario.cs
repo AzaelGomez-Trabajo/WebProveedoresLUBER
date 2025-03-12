@@ -11,9 +11,9 @@ namespace WebProveedoresN.Data
     public static class DBUsuario
     {
         private const int MaxRetryCount = 3;
-        public static List<UsuarioModel> Listar()
+        public static List<UsuarioDTO> Listar()
         {
-            var lista = new List<UsuarioModel>();
+            var lista = new List<UsuarioDTO>();
             int retryCount = 0;
             while (retryCount < MaxRetryCount)
             {
@@ -29,7 +29,7 @@ namespace WebProveedoresN.Data
                     using var dr = cmd.ExecuteReader();
                     while (dr.Read())
                     {
-                        lista.Add(new UsuarioModel()
+                        lista.Add(new UsuarioDTO()
                         {
                             Empresa = dr["Empresa"].ToString(),
                             Nombre = dr["Nombre"].ToString(),
@@ -85,9 +85,9 @@ namespace WebProveedoresN.Data
             return roles;
         }
 
-        public static List<UsuarioModel> ListarUsuariosConRoles()
+        public static List<UsuarioDTO> ListarUsuariosConRoles()
         {
-            var usuarios = new List<UsuarioModel>();
+            var usuarios = new List<UsuarioDTO>();
             try
             {
                 using (var conexion = DBConexion.ObtenerConexion())
@@ -99,7 +99,7 @@ namespace WebProveedoresN.Data
                     using var dr = cmd.ExecuteReader();
                     while (dr.Read())
                     {
-                        var usuario = new UsuarioModel
+                        var usuario = new UsuarioDTO
                         {
                             Empresa = dr["Empresa"].ToString(),
                             Nombre = dr["Nombre"].ToString(),
@@ -126,9 +126,9 @@ namespace WebProveedoresN.Data
             return usuarios;
         }
 
-        public static UsuarioModel ObtenerUsuario(string token)
+        public static UsuarioDTO ObtenerUsuario(string token)
         {
-            var usuario = new UsuarioModel();
+            var usuario = new UsuarioDTO();
             try
             {
                 using (var conexion = DBConexion.ObtenerConexion())
@@ -141,7 +141,7 @@ namespace WebProveedoresN.Data
                     using var dr = cmd.ExecuteReader();
                     while (dr.Read())
                     {
-                        usuario = new UsuarioModel
+                        usuario = new UsuarioDTO
                         {
                             IdUsuario = Convert.ToInt32(dr["IdUsuario"]),
                             Empresa = dr["Empresa"].ToString(),
@@ -168,9 +168,9 @@ namespace WebProveedoresN.Data
             return usuario;
         }
 
-        public static UsuarioModel ValidarUsuario(string correo, string clave)
+        public static UsuarioDTO ValidarUsuario(string correo, string clave)
         {
-            var usuario = new UsuarioModel();
+            var usuario = new UsuarioDTO();
             try
             {
                 using (var conexion = DBConexion.ObtenerConexion())
@@ -203,7 +203,7 @@ namespace WebProveedoresN.Data
             return usuario;
         }
 
-        public static string GuardarUsuarioConRoles(UsuarioModel usuario)
+        public static string GuardarUsuarioConRoles(UsuarioDTO usuario)
         {
             using (var conexion = DBConexion.ObtenerConexion())
             {
@@ -250,7 +250,7 @@ namespace WebProveedoresN.Data
             }
         }
 
-        public static string Guardar(UsuarioModel usuario)
+        public static string Guardar(UsuarioDTO usuario)
         {
             try
             {
@@ -283,7 +283,7 @@ namespace WebProveedoresN.Data
             }
         }
 
-        public static string EditarUsuarioConRoles(UsuarioModel model)
+        public static string EditarUsuarioConRoles(UsuarioDTO model)
         {
             using (var conexion = DBConexion.ObtenerConexion())
             {
@@ -333,7 +333,7 @@ namespace WebProveedoresN.Data
             }
         }
 
-        public static string Editar(UsuarioModel usuario)
+        public static string Editar(UsuarioDTO usuario)
         {
             try
             {

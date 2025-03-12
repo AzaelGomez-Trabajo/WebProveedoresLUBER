@@ -3,7 +3,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace WebProveedoresN.Models
 {
-    public class UsuarioModel
+    public class UsuarioDTO
     {
         public int IdUsuario { get; set; }
 

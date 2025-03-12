@@ -17,7 +17,7 @@ namespace WebProveedoresN.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> Index(UsuarioModel model)
+        public async Task<IActionResult> Index(UsuarioDTO model)
         {
             var usuario = DBUsuario.ValidarUsuario(model.Correo, UtilityService.ConvertirSHA256(model.Clave));
             if (usuario != null)
