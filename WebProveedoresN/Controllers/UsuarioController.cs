@@ -18,6 +18,10 @@ namespace WebProveedoresN.Controllers
         public IActionResult Guardar()
         {
             // Metodo solo devuelve la vista
+            var accesos = AccesoService.ObtenerAccesos();
+            ViewBag.Accesos = accesos;
+            var status = DBStatus.ObtenerEstatus();
+            ViewBag.Status = status;
             return View();
         }
 
@@ -26,6 +30,10 @@ namespace WebProveedoresN.Controllers
         {
             if (!ModelState.IsValid)
             {
+                var accesos = AccesoService.ObtenerAccesos();
+                ViewBag.Accesos = accesos;
+                var status = DBStatus.ObtenerEstatus();
+                ViewBag.Status = status;
                 return View(usuario);
             }
 
@@ -48,7 +56,7 @@ namespace WebProveedoresN.Controllers
             {
                 return RedirectToAction("Listar");
             }
-                return RedirectToAction("Guardar"); 
+            return RedirectToAction("Guardar");
         }
 
         public IActionResult Editar(string token)

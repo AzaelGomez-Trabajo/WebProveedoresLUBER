@@ -90,7 +90,42 @@ namespace WebProveedoresN.Data
             }
             catch (Exception)
             {
+                throw;
+            }
+            return usuario;
+        }
 
+        public static UsuarioModel ValidarUsuario(string correo, string clave)
+        {
+            var usuario = new UsuarioModel();
+            try
+            {
+                using (var conexion = DBConexion.ObtenerConexion())
+                {
+                    conexion.Open();
+                    var storedProcedure = "sp_ValidateUser";
+                    var cmd = new SqlCommand(storedProcedure, conexion);
+                    cmd.Parameters.AddWithValue("@correo", correo);
+                    cmd.Parameters.AddWithValue("@clave", clave);
+                    cmd.CommandType = CommandType.StoredProcedure;
+                    using var dr = cmd.ExecuteReader();
+                    while (dr.Read())
+                    {
+                        usuario.Empresa = dr["Empresa"].ToString();
+                        usuario.Nombre = dr["Nombre"].ToString();
+                        usuario.Correo = dr["Correo"].ToString();
+                        usuario.Clave = dr["Clave"].ToString();
+                        usuario.Token = dr["Token"].ToString();
+                        usuario.Restablecer = Convert.ToBoolean(dr["Restablecer"]);
+                        usuario.Confirmado = Convert.ToBoolean(dr["Confirmado"]);
+                        usuario.IdAcceso = Convert.ToInt32(dr["IdAcceso"]);
+                        usuario.IdStatus = Convert.ToInt32(dr["IdStatus"]);
+                    }
+                }
+
+            }
+            catch (Exception)
+            {
                 throw;
             }
             return usuario;

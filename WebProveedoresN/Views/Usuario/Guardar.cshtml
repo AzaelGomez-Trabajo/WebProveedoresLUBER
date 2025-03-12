@@ -3,6 +3,8 @@
     ViewData["Title"] = "Guardar";
     Layout = "~/Views/Shared/_Layout.cshtml";
     var mensaje = TempData["Mensaje"] as string; 
+    var accesos = ViewBag.Accesos as List<AccesoModel>;
+    var status = ViewBag.Status as List<StatusModel>;
 }
 <div class="card">
     <div class="card-header">
@@ -39,19 +41,22 @@
             <div class="mb-3">
                 <label for="Acc">Acceso</label>
                 <select asp-for="IdAcceso" class="form-select" id="Acc">
-                    <option selected>Tipo de Acceso</option>
-                    <option value="1">Administrador</option>
-                    <option value="2">Usuario</option>
+                    <option value="">Selecione un acceso</option>
+                    @foreach (var items in accesos)
+                    {
+                        <option value="@items.IdAcceso">@items.Acceso</option>
+                    }
                 </select>
                 <span asp-validation-for="IdAcceso" class="text-danger"></span>
             </div>
             <div class="mb-3">
                 <label for="Esta">Estatus</label>
                 <select asp-for="IdStatus" class="form-select" id="Esta">
-                    <option selected>Tipo de Estatus</option>
-                    <option value="1">Activo</option>
-                    <option value="2">Inactivo</option>
-                    <option value="3">Eliminado</option>
+                    <option selected>Seleccione de estatus</option>
+                    @foreach (var items in status)
+                    {
+                        <option value="@items.IdStatus">@items.Status</option>
+                    }
                 </select>
                 <span asp-validation-for="IdStatus" class="text-danger"></span>
             </div>
