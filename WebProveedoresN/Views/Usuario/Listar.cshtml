@@ -19,8 +19,8 @@
                     <th>Nombre</th>
                     <th>Empresa</th>
                     <th>Correo</th>
-                    <th>Acceso</th>
                     <th>Estatus</th>
+                    <th>Roles</th>
                     <th>Acciones</th>
                 </tr>
             </thead>
@@ -31,7 +31,6 @@
                         <td>@item.Nombre</td>
                         <td>@item.Empresa</td>
                         <td>@item.Correo</td>
-                        <td>@(item.IdAcceso == 1 ? "Administrador" : "Usuario")</td>
                         <td>
                             @switch (item.IdStatus)
                             {
@@ -48,6 +47,8 @@
                                     @:Desconocido
                                     break;
                             }
+                        </td>
+                        <td>@string.Join(", ", item.Roles)</td>
                         <td>
                             <a asp-action="Editar" asp-controller="Usuario" class="btn btn-outline-primary btn-sm" asp-route-Token="@item.Token">Editar</a>
                             <a asp-action="Eliminar" asp-controller="Usuario" class="btn btn-outline-danger btn-sm" asp-route-Token="@item.Token">Eliminar</a>

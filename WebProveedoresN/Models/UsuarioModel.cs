@@ -5,7 +5,8 @@ namespace WebProveedoresN.Models
 {
     public class UsuarioModel
     {
-       
+        public int IdUsuario { get; set; }
+
         [Required(ErrorMessage = "El campo {0} es obligatorio.")]
         [MaxLength(100, ErrorMessage = "El campo {0} no puede tener más de {1} caracteres")]
         public string Empresa { get; set; }
@@ -28,13 +29,11 @@ namespace WebProveedoresN.Models
         public bool Confirmado { get; set; }
         public string Token { get; set; }
         
-        [Required(ErrorMessage = "El campo {0} es obligatorio.")]
-        public int IdAcceso { get; set; }
 
         [Required(ErrorMessage = "El campo {0} es obligatorio.")]
         public int IdStatus { get; set; }
 
-        public string[] Roles { get; set; }
-
+        [Required(ErrorMessage = "El campo {0} es obligatorio.")]
+        public List<string> Roles { get; set; } = [];
     }
 }

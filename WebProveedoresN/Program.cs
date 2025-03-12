@@ -1,9 +1,16 @@
+using Microsoft.AspNetCore.Authentication.Cookies;
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddControllersWithViews();
 builder.Services.AddRazorPages().AddRazorRuntimeCompilation(); // Para ver los cambios en tiempo real con el NUGET Microsoft.AspNetCore.Mvc.Razor.RuntimeCompilation
-
+builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme) // Para autenticación con cookies
+    .AddCookie(options =>
+    {
+        options.LoginPath = "/Access/Index";
+        options.ExpireTimeSpan = System.TimeSpan.FromMinutes(30);
+        options.AccessDeniedPath = "/Home/Privacy";
+    });
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
@@ -18,6 +25,8 @@ app.UseHttpsRedirection();
 app.UseStaticFiles();
 
 app.UseRouting();
+
+app.UseAuthentication(); // Para autenticación con cookies
 
 app.UseAuthorization();
 

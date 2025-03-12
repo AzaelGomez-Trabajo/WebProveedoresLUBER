@@ -8,48 +8,50 @@ namespace WebProveedoresN.Controllers
 {
     public class UsuarioController : Controller
     {
+        // Metodo que devuelve la vista con la lista de usuarios
         public IActionResult Listar()
         {
+
+            var usuarios = DBUsuario.ListarUsuariosConRoles();
+            return View(usuarios);
+            /*
             // Instanciar la clase DBUsuario
             var lista = DBUsuario.Listar();
             return View(lista);
+            */
         }
 
         public IActionResult Guardar()
         {
             // Metodo solo devuelve la vista
-            var accesos = AccesoService.ObtenerAccesos();
-            ViewBag.Accesos = accesos;
-            var status = DBStatus.ObtenerEstatus();
-            ViewBag.Status = status;
+            ViewBag.Status = DBStatus.ObtenerEstatus();
+            ViewBag.Roles = DBUsuario.ObtenerRoles();
             return View();
         }
 
+        // Metodo para guardar un usuario
         [HttpPost]
-        public IActionResult Guardar(UsuarioModel usuario)
+        public IActionResult Guardar(UsuarioModel model)
         {
             if (!ModelState.IsValid)
             {
-                var accesos = AccesoService.ObtenerAccesos();
-                ViewBag.Accesos = accesos;
-                var status = DBStatus.ObtenerEstatus();
-                ViewBag.Status = status;
-                return View(usuario);
+                ViewBag.Status = DBStatus.ObtenerEstatus();
+                ViewBag.Roles = DBUsuario.ObtenerRoles();
+                return View(model);
             }
 
-            if (usuario.Clave != null)
+            if (model.Clave != null)
             {
-                usuario.Clave = UtilityService.ConvertirSHA256(usuario.Clave);
+                model.Clave = UtilityService.ConvertirSHA256(model.Clave);
             }
-            usuario.Token = UtilityService.GenerarToken();
-            //usuario.IdAcceso = 2;
-            //usuario.IdStatus = 1;
-            usuario.Restablecer = false;
-            usuario.Confirmado = false;
+            model.Token = UtilityService.GenerarToken();
+            model.Restablecer = false;
+            model.Confirmado = false;
 
             // Metodo que recibe un objeto de tipo UsuarioModel para guardar en la base de datos
 
-            var respuesta = DBUsuario.Guardar(usuario);
+            var respuesta = DBUsuario.GuardarUsuarioConRoles(model); ;
+            //var respuesta = DBUsuario.Guardar(model);
 
             TempData["Mensaje"] = respuesta;
             if (respuesta.Contains("exitosamente"))
@@ -62,7 +64,9 @@ namespace WebProveedoresN.Controllers
         public IActionResult Editar(string token)
         {
             // Metodo solo devuelve la vista
-            var usuario = DBUsuario.Obtener(token);
+            ViewBag.Status = DBStatus.ObtenerEstatus() ?? [];
+            ViewBag.Roles = DBUsuario.ObtenerRoles() ?? [];
+            var usuario = DBUsuario.ObtenerUsuario(token);
             return View(usuario);
         }
 
@@ -71,9 +75,12 @@ namespace WebProveedoresN.Controllers
         {
             if (!ModelState.IsValid)
             {
+                ViewBag.Status = DBStatus.ObtenerEstatus();
+                ViewBag.Roles = DBUsuario.ObtenerRoles();
                 return View();
             }
-            var respuesta = DBUsuario.Editar(model);
+            var respuesta = DBUsuario.EditarUsuarioConRoles(model);
+            //var respuesta = DBUsuario.Editar(model);
 
             TempData["Mensaje"] = respuesta;
             if (respuesta.Contains("exitosamente"))

@@ -3,8 +3,8 @@
     ViewData["Title"] = "Guardar";
     Layout = "~/Views/Shared/_Layout.cshtml";
     var mensaje = TempData["Mensaje"] as string; 
-    var accesos = ViewBag.Accesos as List<AccesoModel>;
     var status = ViewBag.Status as List<StatusModel>;
+    var roles = ViewBag.Roles as List<string>;
 }
 <div class="card">
     <div class="card-header">
@@ -39,17 +39,6 @@
                 <span asp-validation-for="Clave" class="text-danger"></span>
             </div>
             <div class="mb-3">
-                <label for="Acc">Acceso</label>
-                <select asp-for="IdAcceso" class="form-select" id="Acc">
-                    <option value="">Selecione un acceso</option>
-                    @foreach (var items in accesos)
-                    {
-                        <option value="@items.IdAcceso">@items.Acceso</option>
-                    }
-                </select>
-                <span asp-validation-for="IdAcceso" class="text-danger"></span>
-            </div>
-            <div class="mb-3">
                 <label for="Esta">Estatus</label>
                 <select asp-for="IdStatus" class="form-select" id="Esta">
                     <option selected>Seleccione de estatus</option>
@@ -60,7 +49,16 @@
                 </select>
                 <span asp-validation-for="IdStatus" class="text-danger"></span>
             </div>
-
+            <div class="mb-3">
+                <label for="Roles">Roles</label>
+                <select asp-for="Roles" class="form-select" id="Roles">
+                    @foreach (var rol in roles)
+                    {
+                        <option value="@rol">@rol</option>
+                    }
+                </select>
+                <span asp-validation-for="Roles" class="text-danger"></span>
+            </div>
             <button type="submit" class="btn btn-outline-primary">Guardar</button>
             <a asp-action="Listar" asp-controller="Usuario" class="btn btn-outline-warning"> | Volver a la lista</a>
         </form>

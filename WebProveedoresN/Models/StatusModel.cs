@@ -6,6 +6,6 @@ namespace WebProveedoresN.Models
     {
         public int IdStatus { get; set; }
         [Required]
-        public string? Status { get; set; }
+        public string Status { get; set; }
     }
 }

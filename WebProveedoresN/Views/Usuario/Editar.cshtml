@@ -3,6 +3,8 @@
     ViewData["Title"] = "Editar";
     Layout = "~/Views/Shared/_Layout.cshtml";
     var mensaje = TempData["Mensaje"] as string; 
+    var status = ViewBag.Status as List<StatusModel>;
+    var roles = ViewBag.Roles as List<string>;
 }
 <div class="card">
     <div class="card-header">
@@ -13,6 +15,7 @@
             <input asp-for="Token" type="hidden" class="form-control"/>
             <input asp-for="Clave" type="hidden" class="form-control"/>
             <input asp-for="Empresa" type="hidden" class="form-control"/>
+            <input asp-for="IdUsuario" type="hidden" class="form-control"/>
             @if (!string.IsNullOrEmpty(mensaje))
             {
                 <div class="alert alert-info">
@@ -30,24 +33,27 @@
                 <span asp-validation-for="Correo" class="text-danger"></span>
             </div>
             <div class="mb-3">
-                <label for="Acc">Acceso</label>
-                <select asp-for="IdAcceso" class="form-select" id="Acc">
-                    <option selected>Tipo de Acceso</option>
-                    <option value="1">Administrador</option>
-                    <option value="2">Usuario</option>
-                </select>
-                <span asp-validation-for="IdAcceso" class="text-danger"></span>
-            </div>
-            <div class="mb-3">
                 <label for="Esta">Estatus</label>
                 <select asp-for="IdStatus" class="form-select" id="Esta">
-                    <option selected>Tipo de Estatus</option>
-                    <option value="1">Activo</option>
-                    <option value="2">Inactivo</option>
-                    <option value="3">Eliminado</option>
+                    <option selected>Seleccione de estatus</option>
+                    @foreach (var items in status)
+                    {
+                        <option value="@items.IdStatus">@items.Status</option>
+                    }
                 </select>
                 <span asp-validation-for="IdStatus" class="text-danger"></span>
             </div>
+            <div class="mb-3">
+                <label for="Roles">Roles</label>
+                <select asp-for="Roles" class="form-select" id="Roles" multiple>
+                    @foreach (var rol in roles)
+                    {
+                        <option value="@rol">@rol</option>
+                    }
+                </select>
+                <span asp-validation-for="Roles" class="text-danger"></span>
+            </div>
+
             <button type="submit" class="btn btn-outline-primary">Guardar</button>
             <a asp-action="Listar" asp-controller="Usuario" class="btn btn-outline-warning"> | Volver a la lista</a>
         </form>
