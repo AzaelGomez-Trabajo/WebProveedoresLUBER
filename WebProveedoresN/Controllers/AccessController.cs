@@ -1,32 +1,31 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using WebProveedoresN.Models;
-using WebProveedoresN.Data;
-using WebProveedoresN.Services;
+﻿using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
-using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
-using NuGet.Packaging;
+using WebProveedoresN.Data;
+using WebProveedoresN.Models;
+using WebProveedoresN.Services;
 
 namespace WebProveedoresN.Controllers
 {
     public class AccessController : Controller
     {
-        public IActionResult Index()
+        public IActionResult Login()
         {
             return View();
         }
 
         [HttpPost]
-        public async Task<IActionResult> Index(UsuarioDTO model)
+        public async Task<IActionResult> Login(UsuarioDTO model)
         {
-            var usuario = DBUsuario.ValidarUsuario(model.Correo, UtilityService.ConvertirSHA256(model.Clave));
+            var usuario = DBInicio.ValidarUsuario(model.Correo, UtilityService.ConvertirSHA256(model.Clave));
             if (usuario != null)
             {
                 // crear las claims para el usuario con las cookies
                 var claims = new List<Claim>
                     {
-                        new Claim(ClaimTypes.Name, usuario.Nombre),
-                        new Claim(ClaimTypes.Email, usuario.Correo),
+                        new(ClaimTypes.Name, usuario.Nombre),
+                        new(ClaimTypes.Email, usuario.Correo),
                     };
 
                 foreach (var rol in usuario.Roles)
@@ -39,7 +38,7 @@ namespace WebProveedoresN.Controllers
                 await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, new ClaimsPrincipal(claimsIdentity));
                 // termina la autenticación
 
-                return RedirectToAction("Listar", "Usuario");
+                return RedirectToAction("Index", "Orders", new { empresa = usuario.Empresa });
             }
             return View();
         }
@@ -48,7 +47,7 @@ namespace WebProveedoresN.Controllers
         {
             // elimiar la cookie de autenticación
             await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
-            return RedirectToAction("Index", "Access");
+            return RedirectToAction("Login", "Access");
         }
     }
 }

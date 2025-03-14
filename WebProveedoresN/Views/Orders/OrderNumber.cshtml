@@ -1,0 +1,49 @@
+﻿@model WebProveedoresN.Models.OrderDTO
+@{
+    ViewBag.Title = "Ingresar Número de Orden de Compra";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+
+@if (ViewBag.Message != null)
+{
+    <div class="alert alert-warning">
+        @ViewBag.Message
+    </div>
+}
+
+<div class="alert alert-info">
+    @Html.Encode(@ViewBag.NombreEmpresa)
+</div>
+
+
+@using (Html.BeginForm("ValidateOrderNumber", "Archivos", FormMethod.Post))
+{
+    @Html.AntiForgeryToken()
+    <div class="row justify-content-center mt-5">
+        <div class="col-5">
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="text-center">
+                        Orden de Compra @if (ViewBag.NombreEmpresa != null)
+                        {@ViewBag.NombreEmpresa}
+                    </h3>
+                </div>
+                <div class="card-body">
+
+                    <div class="form-group">
+                        @Html.LabelFor(model => model.OrderNumber, htmlAttributes: new { @class = "control-label" })
+                        @Html.TextBoxFor(model => model.OrderNumber, new { @class = "form-control" })
+                        @Html.ValidationMessageFor(model => model.OrderNumber, "", new { @class = "text-danger" })
+                    </div>
+                    <br />
+                    <div class="mb-3" style="text-align:center">
+                        <div class="d-grid">
+                            <input type="submit" value="Validar" class="btn btn-outline-primary" />
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+}

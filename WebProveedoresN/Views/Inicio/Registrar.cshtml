@@ -1,0 +1,75 @@
+﻿@model EmpresaDTO
+@{
+    ViewData["Title"] = "Registrar";
+    Layout = null;
+    var mensaje = TempData["Mensaje"] as string;
+    ViewBag.Message = mensaje;
+}
+<!DOCTYPE html>
+
+<html>
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <title>Login</title>
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+</head>
+<body>
+
+    <div class="row justify-content-center mt-5">
+        <div class="col-5">
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="text-center">
+                        Registro
+                    </h3>
+                </div>
+                <div class="card-body">
+
+                    @if (ViewBag.Creado == null)
+                    {
+                        <form action="@Url.Action("Registrar","Inicio")" method="post">
+
+                            <div class="mb-3">
+                                <label>Empresa</label>
+                                <input type="text" class="form-control" name="Empresa" required />
+                            </div>
+                            <div class="mb-3">
+                                <label>Contraseña</label>
+                                <input type="password" class="form-control" name="Clave" required />
+                            </div>
+                            <div class="mb-3">
+                                <label>Confirmar Contraseña</label>
+                                <input type="password" class="form-control" name="ConfirmarClave" required />
+                            </div>
+
+                            @if (ViewBag.Message != null)
+                            {
+                                <div class="alert alert-danger">
+                                    @ViewBag.Message
+                                </div>
+                            }
+
+                            <div class="mb-3">
+                                <div class="d-grid">
+                                    <button class="btn btn-outline-primary" type="submit">Registrarse </button>
+                                    <a class="btn btn-link" href="@Url.Action("Login","Access")">Ya tienes una cuenta? Inicia sesion</a>
+                                </div>
+                            </div>
+
+
+                        </form>
+                    }
+                    else
+                    {
+                        <div class="alert alert-success">
+                            <p>@ViewBag.Message</p>
+                            <a class="btn btn-outline-success" href="@Url.Action("Login","Inicio")">Ingresar</a>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

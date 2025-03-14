@@ -7,7 +7,7 @@ builder.Services.AddRazorPages().AddRazorRuntimeCompilation(); // Para ver los c
 builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme) // Para autenticación con cookies
     .AddCookie(options =>
     {
-        options.LoginPath = "/Access/Index";
+        options.LoginPath = "/Access/Login";
         options.ExpireTimeSpan = System.TimeSpan.FromMinutes(30);
         options.AccessDeniedPath = "/Home/Privacy";
     });
@@ -30,8 +30,10 @@ app.UseAuthentication(); // Para autenticación con cookies
 
 app.UseAuthorization();
 
+//app.UseSession(); // Para usar sesiones
+
 app.MapControllerRoute(
     name: "default",
-    pattern: "{controller=Access}/{action=Index}/{id?}");
+    pattern: "{controller=Access}/{action=Login}/{id?}");
 
 app.Run();

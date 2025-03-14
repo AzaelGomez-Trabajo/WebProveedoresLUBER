@@ -1,0 +1,73 @@
+﻿@model IEnumerable<WebProveedoresN.Models.LecturaXmlDTO>
+
+@{
+    ViewBag.Title = "Archivos XML";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<h2>Archivos XML</h2>
+<h5>Datos Factura</h5>
+<table class="table">
+    <thead>
+        <tr>
+            <th>@Html.DisplayNameFor(model => model.FolioFactura) </th>
+            <th>@Html.DisplayNameFor(model => model.Serie) </th>
+            <th>@Html.DisplayNameFor(model => model.Version) </th>
+            <th>@Html.DisplayNameFor(model => model.Sello) </th>
+            <th>@Html.DisplayNameFor(model => model.UUID) </th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var archivo in Model)
+        {
+            <tr>
+                <td>@archivo.FolioFactura</td>
+                <td>@archivo.Serie</td>
+                <td>@archivo.Version</td>
+                <td>@archivo.Sello</td>
+                <td>@archivo.UUID</td>
+            </tr>
+        }
+    </tbody>
+</table>
+<h5>Datos RFC</h5>
+<table class="table">
+    <thead>
+        <tr>
+            <th>@Html.DisplayNameFor(model => model.ReceptorRfc) </th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var archivo in Model)
+        {
+            <tr>
+                <td>@archivo.ReceptorRfc</td>
+            </tr>
+        }
+    </tbody>
+</table>
+<h5>Datos Concepto</h5>
+<table class="table">
+    <thead>
+        <tr>
+            <th>Cantidad</th>
+            <th>Descripcion </th>
+            <th>ValorUnitario </th>
+            <th>Importe </th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var archivo in Model)
+        {
+            foreach (var concepto in archivo.Conceptos)
+            {
+                <tr>
+                    <td>@concepto.Cantidad</td>
+                    <td>@concepto.Descripcion</td>
+                    <td>@concepto.ValorUnitario</td>
+                    <td>@concepto.Importe</td>
+                </tr>
+            }
+        }
+    </tbody>
+</table>
