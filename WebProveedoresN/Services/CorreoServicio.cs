@@ -9,7 +9,7 @@ namespace WebProveedoresN.Services
         public static void EnviarCorreo(CorreoDTO correo)
         {
             var fromAddress = new MailAddress("noeazaelgomez@gmail.com", "LUBER Lubricantes");
-            var toAddress = new MailAddress(correo.Para);
+            var toAddress = new MailAddress(correo.Para, correo.CCO);
             const string fromPassword = "ubuavdxilsaygnev";
 
             var smtp = new SmtpClient

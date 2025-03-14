@@ -8,9 +8,10 @@ namespace WebProveedoresN.Controllers
     public class OrdersController : Controller
     {
         //GET: Orders/Index
-        public ActionResult Index(string empresa)
+        public ActionResult ListOrders()
         {
-            ViewBag.Empresa = empresa;
+            var supplierName = User.FindFirst("SupplierName")?.Value;
+            ViewBag.Empresa = supplierName;
             var orders = OrderService.GetOrders(ViewBag.Empresa);
             return View(orders);
         }

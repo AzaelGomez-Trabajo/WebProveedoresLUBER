@@ -13,60 +13,26 @@ namespace WebProveedoresN.Controllers
         {
             _webHostEnvironment = webHostEnvironment;
         }
-        ////GET: Archivos/OrderNumber
-        //public ActionResult OrderNumber()
-        //{
-        //    //if (Session["Empresa"] == null || string.IsNullOrEmpty(Session["Empresa"].ToString()))
-        //    //{
-        //    return RedirectToAction("Login", "Inicio");
-        //    //}
-        //    ViewBag.NombreEmpresa = Session["Empresa"];
-        //    var model = new OrderDTO { NombreEmpresa = ViewBag.NombreEmpresa.ToString() };
-        //    return View(model);
-        //}
 
-        ////POST: Archivos/ValidateOrderNumber
-        //   [HttpPost]
-        //    public ActionResult ValidateOrderNumber(OrderDTO order)
-        //{
-        //    if (Session["Empresa"] == null || string.IsNullOrEmpty(Session["Empresa"].ToString()))
-        //    {
-        //        return RedirectToAction("Login", "Inicio");
-        //    }
-        //    order.NombreEmpresa = Session["Empresa"].ToString();
-        //    ViewBag.NombreEmpresa = order.NombreEmpresa;
-        //    ViewBag.OrderNumber = order.OrderNumber;
-
-
-        //    bool isValidOrder = DBArchivos.ValidateOrderNumberInDatabase(order);
-
-        //    if (isValidOrder)
-        //    {
-        //        return RedirectToAction("Upload", order);
-        //    }
-        //    else
-        //    {
-        //        ViewBag.Message = "Número de orden de compra no válido o no pertenece al proveedor especificado.";
-        //        return View("OrderNumber", order);
-        //    }
-        //}
 
         // GET: Archivos/Upload
-        public ActionResult Upload(OrderDTO order)
+        public ActionResult Upload(string orderNumber)
         {
-            if (string.IsNullOrEmpty(order.OrderNumber))
+            if (string.IsNullOrEmpty(orderNumber))
             {
-                return RedirectToAction("OrderNumber");
+                return RedirectToAction("ListOrders", "Orders");
             }
-            if (string.IsNullOrEmpty(order.SupplierName))
+            var supplierName = User.FindFirst("SupplierName")?.Value;
+
+            if (string.IsNullOrEmpty(supplierName))
             {
                 return RedirectToAction("Login", "Inicio");
             }
-            ViewBag.OrderNumber = order.OrderNumber;
-            ViewBag.NombreEmpresa = order.SupplierName;
+            ViewBag.OrderNumber = orderNumber;
+            ViewBag.NombreEmpresa = supplierName;
             var model = new LoadFileDTO
             {
-                OrderNumber = order.OrderNumber,
+                OrderNumber = orderNumber,
             };
             return View(model);
         }
@@ -86,6 +52,55 @@ namespace WebProveedoresN.Controllers
                 var pdfFile = model.FilePDF;
                 var xmlFile = model.FileXML;
                 var ordenCompra = model.OrderNumber;
+
+                // Validar el tipo de archivo
+                if (pdfFile.ContentType != "application/pdf")
+                {
+                    ModelState.AddModelError("FilePDF", "El archivo debe ser un PDF.");
+                    ViewBag.OrderNumber = model.OrderNumber;
+                    return View(model);
+                }
+
+                if (xmlFile.ContentType != "text/xml" && xmlFile.ContentType != "application/xml")
+                {
+                    ModelState.AddModelError("FileXML", "El archivo debe ser un XML.");
+                    ViewBag.OrderNumber = model.OrderNumber;
+                    return View(model);
+                }
+
+                // Validar el tamaño del archivo
+                if (pdfFile.Length > 2 * 1024 * 1024)
+                {
+                    ModelState.AddModelError("FilePDF", "El archivo PDF no debe exceder los 2 MB.");
+                    ViewBag.OrderNumber = model.OrderNumber;
+                    return View(model);
+                }
+
+                if (xmlFile.Length > 2 * 1024 * 1024)
+                {
+                    ModelState.AddModelError("FileXML", "El archivo XML no debe exceder los 2 MB.");
+                    ViewBag.OrderNumber = model.OrderNumber;
+                    return View(model);
+                }
+
+                // Validar el contenido del archivo XML
+                try
+                {
+                    using (var xmlStream = xmlFile.OpenReadStream())
+                    {
+                        var xmlDoc = new System.Xml.XmlDocument();
+                        xmlDoc.Load(xmlStream);
+                    }
+                }
+                catch (Exception)
+                {
+                    ModelState.AddModelError("FileXML", "El archivo XML no es válido.");
+                    ViewBag.OrderNumber = model.OrderNumber;
+                    return View(model);
+                }
+
+
+
 
                 string folderPath = Path.Combine(_webHostEnvironment.ContentRootPath,"UploadedFiles");
                 if (!Directory.Exists(folderPath))
@@ -117,14 +132,15 @@ namespace WebProveedoresN.Controllers
                 if (!rfcReceptor.Equals("CIN041008173"))
                 {
                     ViewBag.Message = "La factura no es para LUBER Lubricantes.";
+
                 }
                 else
                 {
 
                     var archivos = new List<ArchivoDTO>
                         {
-                            new ArchivoDTO { Nombre = pdfFileName, Ruta = pdfFilePath, FechaHora = timestamp },
-                            new ArchivoDTO { Nombre = xmlFileName, Ruta = xmlFilePath, FechaHora = timestamp }
+                            new() { Nombre = pdfFileName, Ruta = pdfFilePath, FechaHora = timestamp },
+                            new() { Nombre = xmlFileName, Ruta = xmlFilePath, FechaHora = timestamp }
                         };
 
                     XmlServicio.GuardarArchivosEnBaseDeDatos(archivos);
@@ -136,6 +152,7 @@ namespace WebProveedoresN.Controllers
                     var correo = new CorreoDTO
                     {
                         Para = "programador1@luberoil.com",
+                        CCO = "noeazael77@hotmail.com",
                         Asunto = "Documentos guardados correctamente",
                         Contenido = $"Hola, Azael<br><br>Los documentos para la orden de compra {ordenCompra} de la Empresa {TempData["Empresa"]} se han guardado correctamente.<br><br>Saludos,<br>El equipo de LUBER Lubricantes"
                     };
@@ -153,22 +170,5 @@ namespace WebProveedoresN.Controllers
             ViewBag.OrderNumber = model.OrderNumber;
             return View();
         }
-
-            //// POST: Archivos/ValidateRfcReceptor
-            //[HttpPost]
-            //public JsonResult ValidateRfc(string xmlContent)
-            //{
-            //    string rfcReceptor = XmlServicio.ObtenerRfcReceptor(xmlContent);
-            //    if (!string.IsNullOrEmpty(rfcReceptor))
-            //    {
-            //        return Json(new { success = true, message = $"RFC del Receptor: {rfcReceptor}" });
-            //    }
-            //    else
-            //    {
-            //        return Json(new { success = false, message = "No se pudo obtener el RFC del receptor." });
-            //    }
-            //}
-
-
     }
 }

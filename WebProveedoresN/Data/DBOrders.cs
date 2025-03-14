@@ -7,7 +7,7 @@ namespace WebProveedoresN.Data
 {
     public class DBOrders
     {
-        public static List<OrderDTO> Listar(string empresa)
+        public static List<OrderDTO> ListOrders(string empresa)
         {
             var orders = new List<OrderDTO>();
             try
@@ -24,9 +24,8 @@ namespace WebProveedoresN.Data
                     {
                         orders.Add(new OrderDTO()
                         {
-                            Id = Convert.ToInt32(dr["Id"]),
+                            Id = Convert.ToInt32(dr["IdOrder"]),
                             OrderNumber = dr["OrderNumber"].ToString(),
-                            SupplierName = dr["SupplierName"].ToString(),
                             OrderDate = (DateTime)dr["OrderDate"],
                             TotalAmount = (decimal)dr["TotalAmount"],
                             Status = dr["Status"].ToString()

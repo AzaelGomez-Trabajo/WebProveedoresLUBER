@@ -1,80 +1,57 @@
 ﻿@model WebProveedoresN.Models.LoadFileDTO
 @{
-    ViewBag.Title = "Subir Archivos";
+    ViewBag.Title = "Cargar Archivos";
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
-@if (ViewBag.NombreEmpresa == null)
-{
-    <div class="alert alert-warning">
-        No se ha proporcionado el proveedor.
-    </div>
-}
-else
-{
-    <div class="alert alert-info">
-        @Html.Encode(@ViewBag.NombreEmpresa)
-    </div>
+<form method="post" enctype="multipart/form-data">
+    @Html.AntiForgeryToken()
+    <div class="row justify-content-center mt-5">
+        <div class="col-5">
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="text-center">
+                        Subir Factura para la Orden de Compra @Html.Encode(@ViewBag.OrderNumber)
+                    </h3>
+                </div>
+                <div class="card-body">
 
-
-    using (Html.BeginForm("Upload", "Archivos", FormMethod.Post, new { enctype = "multipart/form-data" }))
-    {
-        @Html.AntiForgeryToken()
-        @Html.HiddenFor(model => model.OrderNumber)
-        <div class="row justify-content-center mt-5">
-            <div class="col-5">
-                <div class="card">
-                    <div class="card-header">
-                        <h3 class="text-center">
-                            Subir Factura para la Orden de Compra @if (ViewBag.OrderNumber != null)
-                            {
-                                @Html.Encode(@ViewBag.OrderNumber)
-                            }
-                        </h3>
+                    <div class="form-group">
+                        @Html.LabelFor(model => model.FilePDF, htmlAttributes: new { @class = "control-label" })
+                        <input type="file" id="pdfFile" name="FilePDF" class="form-control" accept=".pdf" />
+                        @Html.ValidationMessageFor(model => model.FilePDF, "", new { @class = "text-danger" })
+                        <p id="pdfFileName" class="text-info"></p>
                     </div>
-                    <div class="card-body">
-
-                        <div class="form-group">
-                            @Html.LabelFor(model => model.FilePDF, htmlAttributes: new { @class = "control-label" })
-                            <input type="file" id="pdfFile" name="FilePDF" class="form-control" accept=".pdf" />
-                            @Html.ValidationMessageFor(model => model.FilePDF, "", new { @class = "text-danger" })
-                            <p id="pdfFileName" class="text-info"></p>
-                        </div>
-                        <br />
-                        <div class="form-group">
-                            @Html.LabelFor(model => model.FileXML, htmlAttributes: new { @class = "control-label" })
-                            <input type="file" id="xmlFile" name="FileXML" class="form-control" accept=".xml" />
-                            @Html.ValidationMessageFor(model => model.FileXML, "", new { @class = "text-danger" })
-                            <p id="xmlFileName" class="text-info"></p>
-                            <pre id="xmlFileContent" class="text-info"></pre>
-                        </div>
-
-                        <div class="form-group" style="text-align:center">
-                        </div>
-
-                        @if (ViewBag.Message != null)
-                        {
-                            <div class="alert alert-danger" role="alert">
-                                @ViewBag.Message
-                            </div>
-                        }
-
-                        <div class="mb-3" style="text-align:center">
-                            <div class="d-grid">
-                                <input type="submit" value="Guardar" class="btn btn-outline-primary" />
-                            </div>
-                        </div>
-                        <div id="progressBar" class="progress" style="display:none;">
-                            <div class="progress-bar" role="progressbar" style="width: 0%;" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"></div>
-                        </div>
-
-
+                    <br />
+                    <div class="form-group">
+                        @Html.LabelFor(model => model.FileXML, htmlAttributes: new { @class = "control-label" })
+                        <input type="file" id="xmlFile" name="FileXML" class="form-control" accept=".xml" />
+                        @Html.ValidationMessageFor(model => model.FileXML, "", new { @class = "text-danger" })
+                        <p id="xmlFileName" class="text-info"></p>
                     </div>
+
+                    @if (ViewBag.Message != null)
+                    {
+                        <div class="alert alert-danger" role="alert">
+                            @ViewBag.Message
+                        </div>
+                    }
+
+                    <div class="mb-3" style="text-align:center">
+                        <div class="d-grid">
+                            <input type="submit" value="Guardar" class="btn btn-outline-primary" />
+                        </div>
+                    </div>
+                    <div id="progressBar" class="progress" style="display:none;">
+                        <div class="progress-bar" role="progressbar" style="width: 0%;" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"></div>
+                    </div>
+
+
                 </div>
             </div>
         </div>
-    }
-}
+    </div>
+</form>
 
 @section Scripts {
     <script>
@@ -108,7 +85,9 @@ else
                document.querySelector('form').addEventListener('submit', function (event) {
                    var progressBar = document.getElementById('progressBar');
                    var progressBarInner = progressBar.querySelector('.progress-bar');
+                   var submitButton = document.getElementById('submitButton');
                    progressBar.style.display = 'block';
+                   submitButton.disabled = true;
 
                    var formData = new FormData(this);
                    var xhr = new XMLHttpRequest();
@@ -123,11 +102,16 @@ else
                    xhr.onload = function () {
                        if (xhr.status === 200) {
                            alert('Archivos subidos exitosamente.');
-                           progressBar.style.display = 'none';
                        } else {
                            alert('Error al subir los archivos.');
-                           progressBar.style.display = 'none';
                        }
+                       progressBar.style.display = 'none';
+                       submitButton.disabled = false;
+                   };
+                   xhr.onerror = function () {
+                       alert('Error al subir los archivos.');
+                       progressBar.style.display = 'none';
+                       submitButton.disabled = false;
                    };
                    xhr.send(formData);
                    event.preventDefault();

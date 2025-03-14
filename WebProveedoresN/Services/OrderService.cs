@@ -8,7 +8,7 @@ namespace WebProveedoresN.Services
     {
         public static List<OrderDTO> GetOrders(string empresa)
         {
-            return DBOrders.Listar(empresa);
+            return DBOrders.ListOrders(empresa);
         }
 
     }

@@ -1,0 +1,45 @@
+﻿@model IEnumerable<WebProveedoresN.Models.OrderDTO>
+
+@{
+    ViewData["Title"] = "Órdenes de Compra";
+}
+@Html.AntiForgeryToken()
+
+<div class="card">
+    <div class="card-header">
+        <h1 class="text-center">Órdenes de Compra para: @ViewBag.Empresa</h1>
+    </div>
+    <div class="card-body">
+        <p>
+            <a asp-action="ListOrders" class="btn btn-outline-success"><i class="bi bi-arrow-clockwise"></i>  Actualizar</a>
+        </p>
+        <hr />
+        <table class="table text-center">
+            <thead>
+                <tr>
+                    <th>Número de Orden</th>
+                    <th>Fecha de Orden</th>
+                    <th>Monto Total</th>
+                    <th>Estado</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var item in Model)
+                {
+                    <tr>
+                        <td>@item.OrderNumber</td>
+                        <td>@item.OrderDate.ToShortDateString()</td>
+                        <td>@item.TotalAmount.ToString("C")</td>
+                        <td>@item.Status.ToString()</td>
+                        <td>
+                            <a asp-action="Upload" asp-controller="Archivos" asp-route-orderNumber="@item.OrderNumber" class="btn btn-outline-secondary btn-sm">
+                                <i class="bi bi-cloud-arrow-up"></i> Cargar Facturas
+                            </a>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>

@@ -19,13 +19,14 @@ namespace WebProveedoresN.Controllers
         public async Task<IActionResult> Login(UsuarioDTO model)
         {
             var usuario = DBInicio.ValidarUsuario(model.Correo, UtilityService.ConvertirSHA256(model.Clave));
-            if (usuario != null)
+            if (usuario.Nombre != null)
             {
                 // crear las claims para el usuario con las cookies
                 var claims = new List<Claim>
                     {
                         new(ClaimTypes.Name, usuario.Nombre),
                         new(ClaimTypes.Email, usuario.Correo),
+                        new("SupplierName", usuario.Empresa)
                     };
 
                 foreach (var rol in usuario.Roles)
@@ -38,8 +39,9 @@ namespace WebProveedoresN.Controllers
                 await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, new ClaimsPrincipal(claimsIdentity));
                 // termina la autenticación
 
-                return RedirectToAction("Index", "Orders", new { empresa = usuario.Empresa });
+                return RedirectToAction("ListOrders", "Orders", new { empresa = usuario.Empresa });
             }
+            ViewBag.Message = "Usuario o contraseña incorrectos";
             return View();
         }
 

@@ -15,14 +15,14 @@ namespace WebProveedoresN.Controllers
             _webHostEnvironment = webHostEnvironment;
         }
 
-        //[Authorize(Roles = "Administrador")]
+        [Authorize(Roles = "Administrador")]
         public IActionResult Listar()
         {
             var usuarios = DBInicio.ListarUsuariosConRoles();
             return View(usuarios);
         }
 
-        //[Authorize(Roles = "Administrador")]
+        [Authorize(Roles = "Administrador")]
         public IActionResult Guardar()
         {
             ViewBag.Status = DBStatus.ObtenerEstatus() ?? [];
@@ -60,7 +60,7 @@ namespace WebProveedoresN.Controllers
             return RedirectToAction("Guardar");
         }
 
-        //[Authorize(Roles = "Administrador")]
+        [Authorize(Roles = "Administrador")]
         public IActionResult Editar(string token)
         {
             // Metodo solo devuelve la vista
