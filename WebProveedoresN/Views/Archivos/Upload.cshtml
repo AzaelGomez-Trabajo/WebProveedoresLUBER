@@ -102,6 +102,7 @@
                    xhr.onload = function () {
                        if (xhr.status === 200) {
                            alert('Archivos subidos exitosamente.');
+                           clearInputs();
                        } else {
                            alert('Error al subir los archivos.');
                        }
@@ -116,5 +117,13 @@
                    xhr.send(formData);
                    event.preventDefault();
                });
+
+               function clearInputs() {
+                     document.getElementById('pdfFile').value = '';
+                     document.getElementById('xmlFile').value = '';
+                     document.getElementById('pdfFileName').textContent = '';
+                     document.getElementById('xmlFileName').textContent = '';
+                     document.getElementById('xmlFileContent').textContent = '';
+                }
     </script>
 }

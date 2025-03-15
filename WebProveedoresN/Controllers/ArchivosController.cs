@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using System.Security.Claims;
 using WebProveedoresN.Data;
 using WebProveedoresN.Models;
 using WebProveedoresN.Services;
@@ -102,7 +103,7 @@ namespace WebProveedoresN.Controllers
 
 
 
-                string folderPath = Path.Combine(_webHostEnvironment.ContentRootPath,"UploadedFiles");
+                string folderPath = Path.Combine(_webHostEnvironment.ContentRootPath, "UploadedFiles");
                 if (!Directory.Exists(folderPath))
                 {
                     Directory.CreateDirectory(folderPath);
@@ -132,31 +133,42 @@ namespace WebProveedoresN.Controllers
                 if (!rfcReceptor.Equals("CIN041008173"))
                 {
                     ViewBag.Message = "La factura no es para LUBER Lubricantes.";
-
+                    // Eliminar los archivos después de procesarlos
+                    System.IO.File.Delete(pdfFilePath);
+                    System.IO.File.Delete(xmlFilePath);
                 }
                 else
                 {
-
+                    var pdfName = Path.GetFileNameWithoutExtension(pdfFileName);
+                    var xmlName = Path.GetFileNameWithoutExtension(xmlFileName);
                     var archivos = new List<ArchivoDTO>
                         {
-                            new() { Nombre = pdfFileName, Ruta = pdfFilePath, FechaHora = timestamp },
-                            new() { Nombre = xmlFileName, Ruta = xmlFilePath, FechaHora = timestamp }
+                            new() { OrderNumber = ordenCompra, Name = pdfName, Route = folderPath, DateTime = timestamp, Extension = ".pdf", Converted = false },
+                            new() { OrderNumber = ordenCompra, Name = xmlName, Route = folderPath, DateTime = timestamp, Extension = ".xml", Converted = false }
                         };
 
                     XmlServicio.GuardarArchivosEnBaseDeDatos(archivos);
-                    XmlServicio.ConvertXmlToPdf(xmlContent, Path.Combine(folderPath, $"{timestamp}_Converted_{Path.GetFileNameWithoutExtension(xmlFileName)}.pdf"));
-
-                    XmlServicio.GuardarDatosXmlEnBaseDeDatos(xmlFilePath);
+                    var xmlConverted = XmlServicio.ConvertXmlToPdf(xmlContent, Path.Combine(folderPath, $"{timestamp}_Converted_{xmlName}.pdf"));
+                    var archiveConverted = new List<ArchivoDTO>
+                    {
+                        new() { OrderNumber = ordenCompra, Name = $"{xmlName}", Route = folderPath, DateTime = timestamp, Extension = ".pdf", Converted = true }
+                    };
+                    XmlServicio.GuardarArchivosEnBaseDeDatos(archiveConverted);
+                    var orderNumberId = OrderService.ObtenerOrderNumberIdInDatabase(ordenCompra);
+                    XmlServicio.GuardarDatosXmlEnBaseDeDatos(xmlFilePath, orderNumberId);
 
                     // Enviar correo de confirmación
+                    var userEmail = User.FindFirst(ClaimTypes.Email)?.Value;
+                    var nombre = User.FindFirst(ClaimTypes.Name)?.Value;
+                    var supplierName = User.FindFirst("SupplierName")?.Value;
                     var correo = new CorreoDTO
                     {
-                        Para = "programador1@luberoil.com",
+                        Para = userEmail,
                         CCO = "noeazael77@hotmail.com",
                         Asunto = "Documentos guardados correctamente",
-                        Contenido = $"Hola, Azael<br><br>Los documentos para la orden de compra {ordenCompra} de la Empresa {TempData["Empresa"]} se han guardado correctamente.<br><br>Saludos,<br>El equipo de LUBER Lubricantes"
+                        Contenido = $"Hola, {nombre}<br><br>Las facturas: <br><br> {Path.GetFileNameWithoutExtension(pdfFileName)} y <br> {Path.GetFileNameWithoutExtension(xmlFileName)}. <br><br> Para la orden de compra {ordenCompra} de la Empresa {supplierName} se han guardado correctamente.<br><br>Saludos,<br>El equipo de LUBER Lubricantes"
                     };
-                    CorreoServicio.EnviarCorreo(correo);
+                    CorreoServicio.EnviarCorreo(correo, nombre);
 
                     // Redirigir a la vista Index del controlador LecturaXml
                     return RedirectToAction("Index", "LecturaXml", new { xmlFilePath });

@@ -4,19 +4,29 @@ using System.ComponentModel.DataAnnotations;
 
 namespace WebProveedoresN.Models
 {
-	public class ArchivoDTO
-	{
+    public class ArchivoDTO
+    {
         [Required]
         [DisplayName("#")]
         public int Id { get; set; }
         [Required]
-        [DisplayName("Nombre Archivo")]
-        public string Nombre { get; set; }
+        [DisplayName("Nombre")]
+        public string Name { get; set; }
         [Required]
         [DisplayName("Ruta")]
-        public string Ruta { get; set; }
+        public string Route { get; set; }
         [Required]
         [DisplayName("Fecha y Hora")]
-        public string FechaHora { get; set; }
+        public string DateTime { get; set; }
+        [Required]
+        [DisplayName("Numero de Órden")]
+        public string OrderNumber { get; set; }
+        [Required]
+        [DisplayName("Extención")]
+        public string Extension { get; set; }
+        [Required]
+        [DisplayName("Convertido")]
+        public bool Converted { get; set; }
+
     }
 }

@@ -58,20 +58,25 @@ namespace WebProveedoresN.Data
         {
             using (SqlConnection connection = DBConexion.ObtenerConexion())
             {
-                string query = "INSERT INTO Archivos (Nombre, Ruta, FechaHora) VALUES (@Nombre, @Ruta, @FechaHora)";
+                string query = "INSERT INTO Archivos (Name, Route, DateTime, OrderNumber, Extension, Converted) VALUES (@Name, @Route, @DateTime, @OrderNumber, @Extension, @Converted)";
                 using (SqlCommand cmd = new SqlCommand(query, connection))
                 {
-                    cmd.Parameters.AddWithValue("@Nombre", archivo.Nombre);
-                    cmd.Parameters.AddWithValue("@Ruta", archivo.Ruta);
-                    cmd.Parameters.AddWithValue("@FechaHora", archivo.FechaHora);
+                    cmd.Parameters.AddWithValue("@Name", archivo.Name);
+                    cmd.Parameters.AddWithValue("@Route", archivo.Route);
+                    cmd.Parameters.AddWithValue("@DateTime", archivo.DateTime);
+                    cmd.Parameters.AddWithValue("@OrderNumber", archivo.OrderNumber);
+                    cmd.Parameters.AddWithValue("@Extension", archivo.Extension);
+                    cmd.Parameters.AddWithValue("@Converted", archivo.Converted);
                     cmd.CommandType = CommandType.Text;
                     connection.Open();
                     cmd.ExecuteNonQuery();
                     connection.Close();
                 }
+                //Insertar datos en la tabla 
             }
         }
-        public static void GuardarDatosEnSqlServer(List<LecturaXmlDTO> archivos)
+
+        public static void GuardarDatosEnSqlServer(List<LecturaXmlDTO> archivos, int orderNumberId)
         {
             try
             {
@@ -81,7 +86,7 @@ namespace WebProveedoresN.Data
                     foreach (var archivo in archivos)
                     {
                         // Insertar datos en la tabla ArchivosXml
-                        var queryArchivo = "INSERT INTO ArchivosXml (FolioFactura, Serie, Version, EmisorNombre, EmisorRfc, ReceptorRfc, SubTotal, Total) OUTPUT INSERTED.Id VALUES (@FolioFactura, @Serie, @Version, @EmisorNombre, @EmisorRfc, @ReceptorRfc, @SubTotal, @Total)";
+                        var queryArchivo = "INSERT INTO ArchivosXml (FolioFactura, Serie, Version, EmisorNombre, EmisorRfc, ReceptorRfc, SubTotal, Total, UUID) OUTPUT INSERTED.Id VALUES (@FolioFactura, @Serie, @Version, @EmisorNombre, @EmisorRfc, @ReceptorRfc, @SubTotal, @Total, @UUID)";
                         int archivoId;
                         using (var cmd = new SqlCommand(queryArchivo, connection))
                         {
@@ -93,6 +98,7 @@ namespace WebProveedoresN.Data
                             cmd.Parameters.AddWithValue("@ReceptorRfc", archivo.ReceptorRfc);
                             cmd.Parameters.AddWithValue("@SubTotal", archivo.SubTotal);
                             cmd.Parameters.AddWithValue("@Total", archivo.Total);
+                            cmd.Parameters.AddWithValue("@UUID", archivo.UUID);
                             cmd.CommandType = CommandType.Text;
                             archivoId = (int)cmd.ExecuteScalar();
                         }
@@ -112,6 +118,18 @@ namespace WebProveedoresN.Data
                                 cmd.ExecuteNonQuery();
                             }
                         }
+
+                        // Inserta datos en la tabla OrdersFacturas
+                        var queryOrderFactura = "INSERT INTO OrdersFacturas (IdOrders, IdFactura) VALUES (@IdOrders, @IdFactura)";
+                        using (var cmd = new SqlCommand(queryOrderFactura, connection))
+                        {
+                            cmd.CommandType = CommandType.Text;
+                            cmd.Parameters.Clear();
+                            cmd.Parameters.AddWithValue("@IdOrders", orderNumberId);
+                            cmd.Parameters.AddWithValue("@IdFactura", archivoId);
+                            cmd.ExecuteNonQuery();
+                        }
+
                     }
                     connection.Close();
                 }

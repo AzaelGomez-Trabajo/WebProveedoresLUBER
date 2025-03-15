@@ -154,7 +154,7 @@ namespace WebProveedoresN.Controllers
                         Contenido = htmlBody
                     };
 
-                    CorreoServicio.EnviarCorreo(correoDTO);
+                    CorreoServicio.EnviarCorreo(correoDTO, usuario.Nombre);
                     ViewBag.Restablecido = true;
                 }
                 else

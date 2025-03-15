@@ -239,7 +239,7 @@ namespace WebProveedoresN.Data
                     Contenido = $"Hola {usuario.Nombre},<br><br>Gracias por registrarte. Por favor, confirma tu correo electrónico haciendo clic en el siguiente enlace:<br><a href='https://tu-sitio.com/confirmar?token={usuario.Token}'>Confirmar correo</a><br><br>Saludos,<br>El equipo de LUBER Lubricantes"
                 };
 
-                CorreoServicio.EnviarCorreo(correo);
+                CorreoServicio.EnviarCorreo(correo, usuario.Nombre);
 
                 return "Usuario guardado exitosamente.";
 
@@ -503,7 +503,7 @@ namespace WebProveedoresN.Data
                             Contenido = $"Hola {usuario.Nombre},<br><br>Gracias por registrarte. Por favor, confirma tu correo electrónico haciendo clic en el siguiente enlace:<br><a href='https://tu-sitio.com/confirmar?token={usuario.Token}'>Confirmar correo</a><br><br>Saludos,<br>El equipo de LUBER Lubricantes"
                         };
 
-                        CorreoServicio.EnviarCorreo(correo);
+                        CorreoServicio.EnviarCorreo(correo, usuario.Nombre);
                     }
                 }
 

@@ -11,5 +11,10 @@ namespace WebProveedoresN.Services
             return DBOrders.ListOrders(empresa);
         }
 
+        public static string ObtenerOrderNumberIdInDatabase(string orderNumber)
+        {
+            return DBOrders.ObtenerOrderNumberId(orderNumber);
+        }
+
     }
 }

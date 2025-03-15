@@ -82,11 +82,11 @@ namespace WebProveedoresN.Services
             return archivos;
         }
 
-        public static void ConvertXmlToPdf(string xmlContent, string pdfFilePath)
+        public static string ConvertXmlToPdf(string xmlContent, string pdfFilePath)
         {
+            var document = new Document();
             using (var fs = new FileStream(pdfFilePath, FileMode.Create, FileAccess.Write, FileShare.None))
             {
-                var document = new Document();
                 var writer = PdfWriter.GetInstance(document, fs);
                 document.Open();
 
@@ -96,6 +96,7 @@ namespace WebProveedoresN.Services
                 document.Close();
                 writer.Close();
             }
+            return document.ToString();
         }
 
         public static void GuardarArchivosEnBaseDeDatos(List<ArchivoDTO> archivos)
@@ -106,10 +107,10 @@ namespace WebProveedoresN.Services
             }
         }
 
-        public static void GuardarDatosXmlEnBaseDeDatos(string xmlFilePath)
+        public static void GuardarDatosXmlEnBaseDeDatos(string xmlFilePath, string orderNumberId)
         {
             var archivos = ObtenerDatosDesdeXml(xmlFilePath);
-            DBArchivos.GuardarDatosEnSqlServer(archivos);
+            DBArchivos.GuardarDatosEnSqlServer(archivos, Convert.ToInt32(orderNumberId));
         }
     }
 }

@@ -31,7 +31,7 @@ namespace WebProveedoresN.Data
                             Status = dr["Status"].ToString()
                         });
                     }
-                 
+
                 }
                 conexion.Close();
             }
@@ -66,6 +66,23 @@ namespace WebProveedoresN.Data
             return isValid;
         }
 
+        public static string ObtenerOrderNumberId(string orderNumber)
+        {
+            var orderNumberId = string.Empty;
+            using (var connection = DBConexion.ObtenerConexion())
+            {
+                string query = "SELECT IdOrder FROM Orders WHERE OrderNumber = @OrderNumber";
+                using (var cmd = new SqlCommand(query, connection))
+                {
+                    cmd.Parameters.AddWithValue("@OrderNumber", orderNumber);
+                    cmd.CommandType = CommandType.Text;
+                    connection.Open();
+                    orderNumberId = cmd.ExecuteScalar().ToString();
+                    connection.Close();
+                }
+            }
+            return orderNumberId;
+        }
 
 
     }

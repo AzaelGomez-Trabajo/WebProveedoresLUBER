@@ -1,34 +1,38 @@
-﻿using System.Net;
-using System.Net.Mail;
+﻿using MimeKit;
 using WebProveedoresN.Models;
+using MailKit.Net.Smtp;
+using System.Security.Claims;
+
 
 namespace WebProveedoresN.Services
 {
     public static class CorreoServicio
     {
-        public static void EnviarCorreo(CorreoDTO correo)
+        public static void EnviarCorreo(CorreoDTO correo, string nombre)
         {
-            var fromAddress = new MailAddress("noeazaelgomez@gmail.com", "LUBER Lubricantes");
-            var toAddress = new MailAddress(correo.Para, correo.CCO);
-            const string fromPassword = "ubuavdxilsaygnev";
 
-            var smtp = new SmtpClient
-            {
-                Host = "smtp.gmail.com",
-                Port = 587,
-                EnableSsl = true,
-                DeliveryMethod = SmtpDeliveryMethod.Network,
-                UseDefaultCredentials = false,
-                Credentials = new NetworkCredential(fromAddress.Address, fromPassword)
-            };
-            using var message = new MailMessage(fromAddress, toAddress)
-            {
-                Subject = correo.Asunto,
-                Body = correo.Contenido,
-                IsBodyHtml = true
-            };
-            smtp.Send(message);
+            var message = new MimeMessage();
+            message.From.Add(new MailboxAddress("LUBER Lubricantes", "noeazaelgomez@gmail.com"));
+            message.To.Add(new MailboxAddress("", correo.Para));
 
+            if (!string.IsNullOrEmpty(correo.CCO))
+            {
+                message.Bcc.Add(new MailboxAddress("", correo.CCO));
+            }
+
+            message.Subject = correo.Asunto;
+            message.Body = new TextPart("html")
+            {
+                Text = correo.Contenido
+            };
+
+            using (var client = new SmtpClient())
+            {
+                client.Connect("smtp.gmail.com", 587, false);
+                client.Authenticate("noeazaelgomez@gmail.com", "ubuavdxilsaygnev");
+                client.Send(message);
+                client.Disconnect(true);
+            }
         }
     }
 }
