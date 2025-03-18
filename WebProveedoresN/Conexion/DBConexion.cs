@@ -5,8 +5,6 @@ namespace WebProveedoresN.Conexion
 {
     public static class DBConexion
     {
-
-
         private static readonly List<string> cadenasSQL;
 
         static DBConexion()
@@ -25,9 +23,9 @@ namespace WebProveedoresN.Conexion
         {
             foreach (var cadena in cadenasSQL)
             {
+                    var conexion = new SqlConnection(cadena);
                 try
                 {
-                    var conexion = new SqlConnection(cadena);
                     conexion.Open();
                     conexion.Close();
                     return new SqlConnection(cadena);

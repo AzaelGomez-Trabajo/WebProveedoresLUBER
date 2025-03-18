@@ -66,7 +66,7 @@ namespace WebProveedoresN.Data
                             IdStatus = Convert.ToInt32(dr["IdStatus"]),
                         });
                     }
-                    break; // Sale del loop if funciona correctamente
+                    break; // Sale del loop si funciona correctamente
                 }
                 catch (SqlException ex)
                 {
