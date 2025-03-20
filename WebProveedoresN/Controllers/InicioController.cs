@@ -22,12 +22,17 @@ namespace WebProveedoresN.Controllers
             return View(usuarios);
         }
 
-        [Authorize(Roles = "Administrador")]
+        [HttpGet]
         public IActionResult Guardar()
         {
-            ViewBag.Status = DBStatus.ObtenerEstatus() ?? [];
+            ViewBag.Empresa = TempData["Empresa"]?.ToString();
+            var usuarioDTO = new UsuarioDTO()
+            {
+                Empresa = ViewBag.Empresa
+            };
+            //ViewBag.Status = DBStatus.ObtenerEstatus() ?? [];
             ViewBag.Roles = DBRoles.ObtenerRoles() ?? [];
-            return View();
+            return View(usuarioDTO);
         }
 
         [HttpPost]
@@ -35,7 +40,7 @@ namespace WebProveedoresN.Controllers
         {
             if (!ModelState.IsValid)
             {
-                ViewBag.Status = DBStatus.ObtenerEstatus() ?? [];
+                //ViewBag.Status = DBStatus.ObtenerEstatus() ?? [];
                 ViewBag.Roles = DBRoles.ObtenerRoles() ?? [];
                 return View(model);
             }
@@ -47,6 +52,7 @@ namespace WebProveedoresN.Controllers
             model.Token = UtilityService.GenerarToken();
             model.Restablecer = false;
             model.Confirmado = false;
+            model.IdStatus = 1;
 
             // Metodo que recibe un objeto de tipo UsuarioModel para guardar en la base de datos
             var respuesta = DBInicio.GuardarUsuarioConRoles(model); ;
@@ -55,6 +61,23 @@ namespace WebProveedoresN.Controllers
             TempData["Mensaje"] = respuesta;
             if (respuesta.Contains("exitosamente"))
             {
+                string path =Path.Combine(_webHostEnvironment.ContentRootPath,"Plantilla","Confirmar.html");
+                string content = System.IO.File.ReadAllText(path);
+                string url = string.Format("{0}://{1}{2}", Request.Scheme, Request.Host, "/Inicio/Confirmar?token=" + model.Token);
+
+                string htmlBody = string.Format(content, model.Nombre, url);
+
+                var correoDTO = new CorreoDTO()
+                {
+                    Para = model.Correo,
+                    Asunto = "Correo confirmacion",
+                    Contenido = htmlBody
+                };
+
+                CorreoServicio.EnviarCorreo(correoDTO, model.Nombre);
+                ViewBag.Creado = true;
+                ViewBag.Mensaje = $"Su cuenta ha sido creada. Hemos enviado un mensaje al correo {model.Correo} para confirmar su cuenta";
+
                 return RedirectToAction("Listar");
             }
             return RedirectToAction("Guardar");
@@ -112,11 +135,13 @@ namespace WebProveedoresN.Controllers
 
             if (respuesta)
             {
+                TempData["Empresa"] = empresaDTO.Empresa;
                 return RedirectToAction("Guardar");
             }
             TempData["Mensaje"] = $"Ya existe un Administrador para la empresa {empresaDTO.Empresa}, solicite se le envíe una Invitación.";
             return View(empresaDTO);
-            //return RedirectToAction("Login", "Access");
+
+
         }
 
         public ActionResult Confirmar(string token)

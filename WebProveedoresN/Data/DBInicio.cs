@@ -218,28 +218,28 @@ namespace WebProveedoresN.Data
                 cmd.Parameters.AddWithValue("@Restablecer", usuario.Restablecer);
                 cmd.Parameters.AddWithValue("@Confirmado", usuario.Confirmado);
                 cmd.Parameters.AddWithValue("@Token", usuario.Token);
-                cmd.Parameters.AddWithValue(@"IdStatus", usuario.IdStatus);
+                cmd.Parameters.AddWithValue("@IdStatus", usuario.IdStatus);
                 var idUsuario = Convert.ToInt32(cmd.ExecuteScalar());
 
-                foreach (var rol in usuario.Roles)
-                {
-                    storedProcedure = "sp_GuardarUsuarioRol";
-                    cmd.CommandText = storedProcedure;
-                    cmd.Parameters.Clear();
-                    cmd.Parameters.AddWithValue("@IdUsuario", idUsuario);
-                    cmd.Parameters.AddWithValue("@RolNombre", rol);
-                    cmd.ExecuteNonQuery();
-                }
+                //foreach (var rol in usuario.Roles)
+                //{
+                storedProcedure = "sp_GuardarUsuarioRol";
+                cmd.CommandText = storedProcedure;
+                cmd.Parameters.Clear();
+                cmd.Parameters.AddWithValue("@IdUsuario", idUsuario);
+                cmd.Parameters.AddWithValue("@RolNombre", "Administrador");
+                cmd.ExecuteNonQuery();
+                //}
                 transaction.Commit();
                 // Enviar correo de confirmación
-                var correo = new CorreoDTO
-                {
-                    Para = usuario.Correo,
-                    Asunto = "Confirmación de registro",
-                    Contenido = $"Hola {usuario.Nombre},<br><br>Gracias por registrarte. Por favor, confirma tu correo electrónico haciendo clic en el siguiente enlace:<br><a href='https://tu-sitio.com/confirmar?token={usuario.Token}'>Confirmar correo</a><br><br>Saludos,<br>El equipo de LUBER Lubricantes"
-                };
+                //var correo = new CorreoDTO
+                //{
+                //    Para = usuario.Correo,
+                //    Asunto = "Confirmación de registro",
+                //    Contenido = $"Hola {usuario.Nombre},<br><br>Gracias por registrarte. Por favor, confirma tu correo electrónico haciendo clic en el siguiente enlace:<br><a href='https://tu-sitio.com/confirmar?token={usuario.Token}'>Confirmar correo</a><br><br>Saludos,<br>El equipo de LUBER Lubricantes"
+                //};
 
-                CorreoServicio.EnviarCorreo(correo, usuario.Nombre);
+                //CorreoServicio.EnviarCorreo(correo, usuario.Nombre);
 
                 return "Usuario guardado exitosamente.";
 

@@ -1,4 +1,6 @@
 using Microsoft.AspNetCore.Authentication.Cookies;
+using WebProveedoresN.Interfaces;
+using WebProveedoresN.Services;
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
@@ -11,6 +13,11 @@ builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationSc
         options.ExpireTimeSpan = System.TimeSpan.FromMinutes(30);
         options.AccessDeniedPath = "/Home/Privacy";
     });
+//Registrar IHttpContextAccessor
+builder.Services.AddHttpContextAccessor();
+//Registrar IIPService
+builder.Services.AddScoped<IIPService, IPService>();
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.

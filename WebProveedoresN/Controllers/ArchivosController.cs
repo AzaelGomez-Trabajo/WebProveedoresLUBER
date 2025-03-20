@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
 using WebProveedoresN.Data;
+using WebProveedoresN.Interfaces;
 using WebProveedoresN.Models;
 using WebProveedoresN.Services;
 
@@ -9,12 +10,12 @@ namespace WebProveedoresN.Controllers
     public class ArchivosController : Controller
     {
         private readonly IWebHostEnvironment _webHostEnvironment;
-
-        public ArchivosController(IWebHostEnvironment webHostEnvironment)
+        private readonly IIPService _ipService;
+        public ArchivosController(IWebHostEnvironment webHostEnvironment, IIPService ipService)
         {
             _webHostEnvironment = webHostEnvironment;
+            _ipService = ipService;
         }
-
 
         // GET: Archivos/Upload
         public ActionResult Upload(string orderNumber)
@@ -31,6 +32,7 @@ namespace WebProveedoresN.Controllers
             }
             ViewBag.OrderNumber = orderNumber;
             ViewBag.NombreEmpresa = supplierName;
+            ViewBag.UserIpAddress = _ipService.GetUserIpAddress();
             var model = new LoadFileDTO
             {
                 OrderNumber = orderNumber,
@@ -47,6 +49,7 @@ namespace WebProveedoresN.Controllers
                 ViewBag.OrderNumber = model.OrderNumber;
                 return View(model);
             }
+            ViewBag.UserIpAddress = _ipService.GetUserIpAddress();
 
             try
             {
@@ -100,9 +103,6 @@ namespace WebProveedoresN.Controllers
                     return View(model);
                 }
 
-
-
-
                 string folderPath = Path.Combine(_webHostEnvironment.ContentRootPath, "UploadedFiles");
                 if (!Directory.Exists(folderPath))
                 {
@@ -142,17 +142,17 @@ namespace WebProveedoresN.Controllers
                     var pdfName = Path.GetFileNameWithoutExtension(pdfFileName);
                     var xmlName = Path.GetFileNameWithoutExtension(xmlFileName);
                     var archivos = new List<ArchivoDTO>
-                        {
-                            new() { OrderNumber = ordenCompra, Name = pdfName, Route = folderPath, DateTime = timestamp, Extension = ".pdf", Converted = false },
-                            new() { OrderNumber = ordenCompra, Name = xmlName, Route = folderPath, DateTime = timestamp, Extension = ".xml", Converted = false }
-                        };
+                            {
+                                new() { OrderNumber = ordenCompra, Name = pdfName, Route = folderPath, DateTime = timestamp, Extension = ".pdf", Converted = false },
+                                new() { OrderNumber = ordenCompra, Name = xmlName, Route = folderPath, DateTime = timestamp, Extension = ".xml", Converted = false }
+                            };
 
                     XmlServicio.GuardarArchivosEnBaseDeDatos(archivos);
                     var xmlConverted = XmlServicio.ConvertXmlToPdf(xmlContent, Path.Combine(folderPath, $"{timestamp}_Converted_{xmlName}.pdf"));
                     var archiveConverted = new List<ArchivoDTO>
-                    {
-                        new() { OrderNumber = ordenCompra, Name = $"{xmlName}", Route = folderPath, DateTime = timestamp, Extension = ".pdf", Converted = true }
-                    };
+                        {
+                            new() { OrderNumber = ordenCompra, Name = $"{xmlName}", Route = folderPath, DateTime = timestamp, Extension = ".pdf", Converted = true }
+                        };
                     XmlServicio.GuardarArchivosEnBaseDeDatos(archiveConverted);
                     var orderNumberId = OrderService.ObtenerOrderNumberIdInDatabase(ordenCompra);
                     XmlServicio.GuardarDatosXmlEnBaseDeDatos(xmlFilePath, orderNumberId);
@@ -166,7 +166,7 @@ namespace WebProveedoresN.Controllers
                         Para = userEmail,
                         CCO = "noeazael77@hotmail.com",
                         Asunto = "Documentos guardados correctamente",
-                        Contenido = $"Hola, {nombre}<br><br>Las facturas: <br><br> {Path.GetFileNameWithoutExtension(pdfFileName)} y <br> {Path.GetFileNameWithoutExtension(xmlFileName)}. <br><br> Para la orden de compra {ordenCompra} de la Empresa {supplierName} se han guardado correctamente.<br><br>Saludos,<br>El equipo de LUBER Lubricantes"
+                        Contenido = $"Hola, {nombre}<br><br>Las facturas: <br><br> {pdfFile.FileName} y <br> {xmlFile.FileName}. <br><br> Para la orden de compra {ordenCompra} de la Empresa {supplierName} se han guardado correctamente.<br><br>Saludos,<br>El equipo de LUBER Lubricantes"
                     };
                     CorreoServicio.EnviarCorreo(correo, nombre);
 
@@ -182,5 +182,6 @@ namespace WebProveedoresN.Controllers
             ViewBag.OrderNumber = model.OrderNumber;
             return View();
         }
+
     }
 }

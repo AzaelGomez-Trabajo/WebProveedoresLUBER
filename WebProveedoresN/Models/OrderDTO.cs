@@ -20,5 +20,8 @@ namespace WebProveedoresN.Models
         [DisplayName("Monto Total")]
         public decimal TotalAmount { get; set; }
         public string Status { get; set; }
+        [DisplayName("Moneda")]
+        public string Currency {  get; set; }
+        public string Canceled { get; set; }
     }
 }

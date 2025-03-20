@@ -1,4 +1,5 @@
-﻿using Microsoft.Data.SqlClient;
+﻿using Microsoft.AspNetCore.Mvc.Formatters;
+using Microsoft.Data.SqlClient;
 using System.Data;
 using WebProveedoresN.Conexion;
 using WebProveedoresN.Models;
@@ -8,52 +9,6 @@ namespace WebProveedoresN.Data
 {
     public class DBArchivos
     {
-        //public static bool ValidateOrderNumberInDatabase(OrderDTO model)
-        //{
-        //    bool isValid = false;
-
-        //    using (SqlConnection connection = DBConexion.ObtenerConexion())
-        //    {
-        //        string storedProcedure = "sp_ValidateOrderNumber";
-        //        using (var cmd = new SqlCommand(storedProcedure, connection))
-        //        {
-        //            cmd.Parameters.AddWithValue("@NumeroOrden", model.OrderNumber);
-        //            cmd.Parameters.AddWithValue("@Proveedor", model.NombreEmpresa);
-        //            cmd.CommandType = CommandType.StoredProcedure;
-
-        //            connection.Open();
-        //            Console.WriteLine($"Ejecutando procedimiento almacenado para NumeroOrden: {model.OrderNumber}, Proveedor: {model.NombreEmpresa}");
-        //            int count = (int)cmd.ExecuteScalar();
-        //            Console.WriteLine($"Este es el resultado del SP: {count}");
-        //            isValid = count > 0;
-        //            connection.Close();
-        //        }
-        //    }
-        //    return isValid;
-        //}
-        //public static bool ValidateOrderNumberInDatabase2(string orderNumber, string nombreProveedor)
-        //{
-        //    bool isValid = false;
-
-        //    using (SqlConnection connection = DBConexion.ObtenerConexion())
-        //    {
-        //        string query = "SELECT COUNT(*) FROM OrdenesCompra WHERE NumeroOrden = @NumeroOrden AND Proveedor = @Proveedor";
-        //        using (var cmd = new SqlCommand(query, connection))
-        //        {
-        //            cmd.Parameters.AddWithValue("@NumeroOrden", orderNumber);
-        //            cmd.Parameters.AddWithValue("@Proveedor", nombreProveedor);
-        //            cmd.CommandType = CommandType.Text;
-
-        //            connection.Open();
-        //            Console.WriteLine($"Ejecutando consulta para NumeroOrden: {orderNumber}, Proveedor: {nombreProveedor}");
-        //            int count = (int)cmd.ExecuteScalar();
-        //            isValid = count > 0;
-        //            connection.Close();
-        //        }
-        //    }
-        //    return isValid;
-        //}
-
         public static void SaveFileToDatabase(ArchivoDTO archivo)
         {
             using (SqlConnection connection = DBConexion.ObtenerConexion())
@@ -72,76 +27,101 @@ namespace WebProveedoresN.Data
                     cmd.ExecuteNonQuery();
                     connection.Close();
                 }
-                //Insertar datos en la tabla 
             }
         }
 
-        public static void GuardarDatosEnSqlServer(List<LecturaXmlDTO> archivos, int orderNumberId)
+        public static string GuardarDatosEnSqlServer(List<LecturaXmlDTO> archivos, int orderNumberId)
         {
-            try
+            var isValid = false;
+            foreach (var model in archivos)
             {
-                using (var connection = DBConexion.ObtenerConexion())
+                isValid = BuscarOrdenCompraYFactura(orderNumberId, model.Total);
+            }
+            if (isValid)
+            {
+                try
                 {
-                    connection.Open();
-                    foreach (var archivo in archivos)
+                    using (var connection = DBConexion.ObtenerConexion())
                     {
-                        // Insertar datos en la tabla ArchivosXml
-                        var queryArchivo = "INSERT INTO ArchivosXml (FolioFactura, Serie, Version, EmisorNombre, EmisorRfc, ReceptorRfc, SubTotal, Total, UUID) OUTPUT INSERTED.Id VALUES (@FolioFactura, @Serie, @Version, @EmisorNombre, @EmisorRfc, @ReceptorRfc, @SubTotal, @Total, @UUID)";
-                        int archivoId;
-                        using (var cmd = new SqlCommand(queryArchivo, connection))
+                        connection.Open();
+                        foreach (var archivo in archivos)
                         {
-                            cmd.Parameters.AddWithValue("@FolioFactura", archivo.FolioFactura);
-                            cmd.Parameters.AddWithValue("@Serie", archivo.Serie);
-                            cmd.Parameters.AddWithValue("@Version", archivo.Version);
-                            cmd.Parameters.AddWithValue("@EmisorNombre", archivo.EmisorNombre);
-                            cmd.Parameters.AddWithValue("@EmisorRfc", archivo.EmisorRfc);
-                            cmd.Parameters.AddWithValue("@ReceptorRfc", archivo.ReceptorRfc);
-                            cmd.Parameters.AddWithValue("@SubTotal", archivo.SubTotal);
-                            cmd.Parameters.AddWithValue("@Total", archivo.Total);
-                            cmd.Parameters.AddWithValue("@UUID", archivo.UUID);
-                            cmd.CommandType = CommandType.Text;
-                            archivoId = (int)cmd.ExecuteScalar();
-                        }
-
-                        // Insertar datos en la tabla ConceptosXml
-                        var queryConcepto = "INSERT INTO ConceptosXml (ArchivoId, Cantidad, Descripcion, ValorUnitario, Importe) VALUES (@ArchivoId, @Cantidad, @Descripcion, @ValorUnitario, @Importe)";
-                        foreach (var concepto in archivo.Conceptos)
-                        {
-                            using (var cmd = new SqlCommand(queryConcepto, connection))
+                            // Insertar datos en la tabla ArchivosXml
+                            var queryArchivo = "INSERT INTO ArchivosXml (FolioFactura, Serie, Version, EmisorNombre, EmisorRfc, ReceptorRfc, SubTotal, Total, UUID) OUTPUT INSERTED.IdFactura VALUES (@FolioFactura, @Serie, @Version, @EmisorNombre, @EmisorRfc, @ReceptorRfc, @SubTotal, @Total, @UUID)";
+                            int archivoId;
+                            using (var cmd = new SqlCommand(queryArchivo, connection))
                             {
-                                cmd.Parameters.AddWithValue("@ArchivoId", archivoId);
-                                cmd.Parameters.AddWithValue("@Cantidad", concepto.Cantidad);
-                                cmd.Parameters.AddWithValue("@Descripcion", concepto.Descripcion);
-                                cmd.Parameters.AddWithValue("@ValorUnitario", concepto.ValorUnitario);
-                                cmd.Parameters.AddWithValue("@Importe", concepto.Importe);
+                                cmd.Parameters.AddWithValue("@FolioFactura", archivo.FolioFactura);
+                                cmd.Parameters.AddWithValue("@Serie", archivo.Serie);
+                                cmd.Parameters.AddWithValue("@Version", archivo.Version);
+                                cmd.Parameters.AddWithValue("@EmisorNombre", archivo.EmisorNombre);
+                                cmd.Parameters.AddWithValue("@EmisorRfc", archivo.EmisorRfc);
+                                cmd.Parameters.AddWithValue("@ReceptorRfc", archivo.ReceptorRfc);
+                                cmd.Parameters.AddWithValue("@SubTotal", archivo.SubTotal);
+                                cmd.Parameters.AddWithValue("@Total", archivo.Total);
+                                cmd.Parameters.AddWithValue("@UUID", archivo.UUID);
                                 cmd.CommandType = CommandType.Text;
+                                archivoId = (int)cmd.ExecuteScalar();
+                            }
+
+                            // Inserta datos en la tabla OrdersFacturas
+                            var queryOrderFactura = "INSERT INTO OrdersFacturas (IdOrders, IdFactura) VALUES (@IdOrders, @IdFactura)";
+                            using (var cmd = new SqlCommand(queryOrderFactura, connection))
+                            {
+                                cmd.CommandType = CommandType.Text;
+                                cmd.Parameters.AddWithValue("@IdOrders", orderNumberId);
+                                cmd.Parameters.AddWithValue("@IdFactura", archivoId);
                                 cmd.ExecuteNonQuery();
                             }
-                        }
 
-                        // Inserta datos en la tabla OrdersFacturas
-                        var queryOrderFactura = "INSERT INTO OrdersFacturas (IdOrders, IdFactura) VALUES (@IdOrders, @IdFactura)";
-                        using (var cmd = new SqlCommand(queryOrderFactura, connection))
-                        {
-                            cmd.CommandType = CommandType.Text;
-                            cmd.Parameters.Clear();
-                            cmd.Parameters.AddWithValue("@IdOrders", orderNumberId);
-                            cmd.Parameters.AddWithValue("@IdFactura", archivoId);
-                            cmd.ExecuteNonQuery();
+                            // Insertar datos en la tabla ConceptosXml
+                            var queryConcepto = "INSERT INTO ConceptosXml (ArchivoId, Cantidad, Descripcion, ValorUnitario, Importe) VALUES (@ArchivoId, @Cantidad, @Descripcion, @ValorUnitario, @Importe)";
+                            foreach (var concepto in archivo.Conceptos)
+                            {
+                                using (var cmd = new SqlCommand(queryConcepto, connection))
+                                {
+                                    cmd.Parameters.AddWithValue("@ArchivoId", archivoId);
+                                    cmd.Parameters.AddWithValue("@Cantidad", concepto.Cantidad);
+                                    cmd.Parameters.AddWithValue("@Descripcion", concepto.Descripcion);
+                                    cmd.Parameters.AddWithValue("@ValorUnitario", concepto.ValorUnitario);
+                                    cmd.Parameters.AddWithValue("@Importe", concepto.Importe);
+                                    cmd.CommandType = CommandType.Text;
+                                    cmd.ExecuteNonQuery();
+                                }
+                            }
                         }
-
+                        connection.Close();
+                        return "OK";
                     }
-                    connection.Close();
+                }
+                catch (SqlException ex)
+                {
+                    return $"Error al guardar los datos en SQL Server {ex.Message}";
+                }
+                catch (Exception ex)
+                {
+                    return $"Error inesperado al guardar los datos en SQL Server {ex.Message}";
                 }
             }
-            catch (SqlException ex)
+            return "La factura supera el monto faltante de la Orden de Compra";
+        }
+
+        private static bool BuscarOrdenCompraYFactura(int orderNumberId, decimal totalInvoice)
+        {
+            bool isValid = false;
+            string storedProcedure = "sp_ValidarFacturaConOrdenCompra";
+            using (var connection = DBConexion.ObtenerConexion())
             {
-                Console.WriteLine($"Error al guardar los datos en SQL Server {ex.Message}");
+                using (var cmd = new SqlCommand(storedProcedure, connection))
+                {
+                    connection.Open();
+                    cmd.Parameters.AddWithValue("@IdOrder", orderNumberId);
+                    cmd.Parameters.AddWithValue("@TotalInvoice", totalInvoice);
+                    cmd.CommandType = CommandType.StoredProcedure;
+                    isValid = Convert.ToBoolean(cmd.ExecuteScalar());
+                }
             }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"Error inesperado al guardar los datos en SQL Server {ex.Message}");
-            }
+            return isValid;
         }
     }
 }

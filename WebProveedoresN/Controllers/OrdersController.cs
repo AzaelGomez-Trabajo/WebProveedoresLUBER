@@ -12,7 +12,7 @@ namespace WebProveedoresN.Controllers
         {
             var supplierName = User.FindFirst("SupplierName")?.Value;
             ViewBag.Empresa = supplierName;
-            var orders = OrderService.GetOrders(ViewBag.Empresa);
+            var orders = OrderService.GetOrders(ViewBag.Empresa,1,0);
             return View(orders);
         }
 

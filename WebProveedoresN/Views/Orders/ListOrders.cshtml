@@ -20,6 +20,7 @@
                     <th>Número de Orden</th>
                     <th>Fecha de Orden</th>
                     <th>Monto Total</th>
+                    <th>Moneda</th>
                     <th>Estado</th>
                     <th></th>
                 </tr>
@@ -31,6 +32,7 @@
                         <td>@item.OrderNumber</td>
                         <td>@item.OrderDate.ToShortDateString()</td>
                         <td>@item.TotalAmount.ToString("C")</td>
+                        <td>@item.Currency.ToString()</td>
                         <td>@item.Status.ToString()</td>
                         <td>
                             <a asp-action="Upload" asp-controller="Archivos" asp-route-orderNumber="@item.OrderNumber" class="btn btn-outline-secondary btn-sm">

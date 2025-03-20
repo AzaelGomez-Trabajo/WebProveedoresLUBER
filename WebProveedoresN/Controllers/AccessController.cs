@@ -21,27 +21,42 @@ namespace WebProveedoresN.Controllers
             var usuario = DBInicio.ValidarUsuario(model.Correo, UtilityService.ConvertirSHA256(model.Clave));
             if (usuario.Nombre != null)
             {
-                // crear las claims para el usuario con las cookies
-                var claims = new List<Claim>
+                if (!usuario.Confirmado)
+                {
+                    ViewBag.Mensaje = $"Falta confirmar su cuenta, favor revise su bandeja del correo {model.Correo}.";
+                }
+                else if (usuario.Restablecer)
+                {
+                    ViewBag.Mensaje = $"Se ha solicitado restablecer su cuenta, favor revise su bandeja del correo {model.Correo}.";
+                }
+                else 
+                {
+                    // crear las claims para el usuario con las cookies
+                    var claims = new List<Claim>
                     {
                         new(ClaimTypes.Name, usuario.Nombre),
                         new(ClaimTypes.Email, usuario.Correo),
                         new("SupplierName", usuario.Empresa)
                     };
 
-                foreach (var rol in usuario.Roles)
-                {
-                    claims.Add(new Claim(ClaimTypes.Role, rol));
+                    foreach (var rol in usuario.Roles)
+                    {
+                        claims.Add(new Claim(ClaimTypes.Role, rol));
+                    }
+
+                    var claimsIdentity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
+
+                    await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, new ClaimsPrincipal(claimsIdentity));
+                    // termina la autenticación
+
+                    return RedirectToAction("ListOrders", "Orders", new { empresa = usuario.Empresa });
                 }
 
-                var claimsIdentity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
-
-                await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, new ClaimsPrincipal(claimsIdentity));
-                // termina la autenticación
-
-                return RedirectToAction("ListOrders", "Orders", new { empresa = usuario.Empresa });
             }
-            ViewBag.Message = "Usuario o contraseña incorrectos";
+            else 
+            {
+                ViewBag.Mensaje = "No se encontraron coincidencias";
+            }
             return View();
         }
 

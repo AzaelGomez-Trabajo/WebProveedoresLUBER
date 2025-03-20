@@ -7,7 +7,7 @@ namespace WebProveedoresN.Data
 {
     public class DBOrders
     {
-        public static List<OrderDTO> ListOrders(string empresa)
+        public static List<OrderDTO> ListOrders(string empresa, int parametro1, int parametro2)
         {
             var orders = new List<OrderDTO>();
             try
@@ -18,17 +18,20 @@ namespace WebProveedoresN.Data
                 using (var cmd = new SqlCommand(storedProcedure, conexion))
                 {
                     cmd.Parameters.AddWithValue("@SupplierName", empresa);
+                    cmd.Parameters.AddWithValue("@Parametro1", parametro1);
+                    cmd.Parameters.AddWithValue("@Parametro2", parametro2);
                     cmd.CommandType = CommandType.StoredProcedure;
                     using var dr = cmd.ExecuteReader();
                     while (dr.Read())
                     {
                         orders.Add(new OrderDTO()
                         {
-                            Id = Convert.ToInt32(dr["IdOrder"]),
                             OrderNumber = dr["OrderNumber"].ToString(),
                             OrderDate = (DateTime)dr["OrderDate"],
+                            Canceled = dr["Canceled"].ToString(),
                             TotalAmount = (decimal)dr["TotalAmount"],
-                            Status = dr["Status"].ToString()
+                            Status = dr["IdEstatus"].ToString(),
+                            Currency = dr["Currency"].ToString()
                         });
                     }
 

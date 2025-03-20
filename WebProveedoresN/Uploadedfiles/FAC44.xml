@@ -5,7 +5,7 @@
                   CondicionesDePago="Contado" 
                   Exportacion="01" 
                   Fecha="2024-08-01T16:37:14" 
-                  Folio="42" 
+                  Folio="44" 
                   FormaPago="01" 
                   LugarExpedicion="83116" 
                   MetodoPago="PUE" 
@@ -15,7 +15,7 @@
                   Serie="FAC" 
                   SubTotal="150.00" 
                   TipoDeComprobante="I" 
-                  Total="174.00" 
+                  Total="55000.00" 
                   Version="4.0" 
                   xsi:schemaLocation="http://www.sat.gob.mx/cfd/4 http://www.sat.gob.mx/sitio_internet/cfd/4/cfdv40.xsd">
   <cfdi:Emisor Nombre="MARIO ANTONIO MUÑOZ CAMPOY"
