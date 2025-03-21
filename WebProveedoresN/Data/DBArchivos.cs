@@ -1,9 +1,8 @@
-﻿using Microsoft.AspNetCore.Mvc.Formatters;
+﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.Data.SqlClient;
 using System.Data;
 using WebProveedoresN.Conexion;
 using WebProveedoresN.Models;
-using WebProveedoresN.Services;
 
 namespace WebProveedoresN.Data
 {
@@ -30,12 +29,13 @@ namespace WebProveedoresN.Data
             }
         }
 
-        public static string GuardarDatosEnSqlServer(List<LecturaXmlDTO> archivos, int orderNumberId)
+        public static string GuardarDatosEnSqlServer(List<LecturaXmlDTO> archivos, string orderNumber)
         {
+
             var isValid = false;
             foreach (var model in archivos)
             {
-                isValid = BuscarOrdenCompraYFactura(orderNumberId, model.Total);
+                isValid = BuscarOrdenCompraYFactura(orderNumber, model.Total);
             }
             if (isValid)
             {
@@ -47,10 +47,11 @@ namespace WebProveedoresN.Data
                         foreach (var archivo in archivos)
                         {
                             // Insertar datos en la tabla ArchivosXml
-                            var queryArchivo = "INSERT INTO ArchivosXml (FolioFactura, Serie, Version, EmisorNombre, EmisorRfc, ReceptorRfc, SubTotal, Total, UUID) OUTPUT INSERTED.IdFactura VALUES (@FolioFactura, @Serie, @Version, @EmisorNombre, @EmisorRfc, @ReceptorRfc, @SubTotal, @Total, @UUID)";
+                            var queryArchivo = "INSERT INTO ArchivosXml (SupplierId, FolioFactura, Serie, Version, EmisorNombre, EmisorRfc, ReceptorRfc, SubTotal, Total, UUID) OUTPUT INSERTED.IdFactura VALUES (@SupplierId, @FolioFactura, @Serie, @Version, @EmisorNombre, @EmisorRfc, @ReceptorRfc, @SubTotal, @Total, @UUID)";
                             int archivoId;
                             using (var cmd = new SqlCommand(queryArchivo, connection))
                             {
+                                cmd.Parameters.AddWithValue("@SupplierId", archivo.SupplierId);
                                 cmd.Parameters.AddWithValue("@FolioFactura", archivo.FolioFactura);
                                 cmd.Parameters.AddWithValue("@Serie", archivo.Serie);
                                 cmd.Parameters.AddWithValue("@Version", archivo.Version);
@@ -65,13 +66,14 @@ namespace WebProveedoresN.Data
                             }
 
                             // Inserta datos en la tabla OrdersFacturas
-                            var queryOrderFactura = "INSERT INTO OrdersFacturas (IdOrders, IdFactura) VALUES (@IdOrders, @IdFactura)";
+                            var queryOrderFactura = "INSERT INTO OrdersFacturas (OrderNumber, IdFactura) OUTPUT INSERTED.IdFactura VALUES (@OrderNumber, @IdFactura)";
                             using (var cmd = new SqlCommand(queryOrderFactura, connection))
                             {
                                 cmd.CommandType = CommandType.Text;
-                                cmd.Parameters.AddWithValue("@IdOrders", orderNumberId);
+                                cmd.Parameters.Clear();
+                                cmd.Parameters.AddWithValue("@OrderNumber", orderNumber);
                                 cmd.Parameters.AddWithValue("@IdFactura", archivoId);
-                                cmd.ExecuteNonQuery();
+                                archivoId = (int)cmd.ExecuteScalar();
                             }
 
                             // Insertar datos en la tabla ConceptosXml
@@ -80,6 +82,7 @@ namespace WebProveedoresN.Data
                             {
                                 using (var cmd = new SqlCommand(queryConcepto, connection))
                                 {
+                                    cmd.Parameters.Clear();
                                     cmd.Parameters.AddWithValue("@ArchivoId", archivoId);
                                     cmd.Parameters.AddWithValue("@Cantidad", concepto.Cantidad);
                                     cmd.Parameters.AddWithValue("@Descripcion", concepto.Descripcion);
@@ -106,7 +109,7 @@ namespace WebProveedoresN.Data
             return "La factura supera el monto faltante de la Orden de Compra";
         }
 
-        private static bool BuscarOrdenCompraYFactura(int orderNumberId, decimal totalInvoice)
+        private static bool BuscarOrdenCompraYFactura(string orderNumber, decimal totalInvoice)
         {
             bool isValid = false;
             string storedProcedure = "sp_ValidarFacturaConOrdenCompra";
@@ -115,7 +118,7 @@ namespace WebProveedoresN.Data
                 using (var cmd = new SqlCommand(storedProcedure, connection))
                 {
                     connection.Open();
-                    cmd.Parameters.AddWithValue("@IdOrder", orderNumberId);
+                    cmd.Parameters.AddWithValue("@OrderNumber", orderNumber);
                     cmd.Parameters.AddWithValue("@TotalInvoice", totalInvoice);
                     cmd.CommandType = CommandType.StoredProcedure;
                     isValid = Convert.ToBoolean(cmd.ExecuteScalar());
@@ -123,5 +126,39 @@ namespace WebProveedoresN.Data
             }
             return isValid;
         }
+
+        public async static Task<List<ArchivoDTO>> ObtenerDocumentosAsync(string orderNumber, int converted)
+        {
+            var documents = new List<ArchivoDTO>();
+
+            using (var connection = DBConexion.ObtenerConexion())
+            {
+                string query = "SELECT Route, Name, DateTime FROM Archivos WHERE OrderNumber = @OrderNumber AND Extension = @Extension AND Converted = @Converted";
+                SqlCommand command = new SqlCommand(query, connection);
+                command.Parameters.AddWithValue("@OrderNumber", orderNumber);
+                command.Parameters.AddWithValue("@Extension", ".pdf");
+                command.Parameters.AddWithValue("@Converted", converted);
+
+                await connection.OpenAsync();
+                using (SqlDataReader reader = await command.ExecuteReaderAsync())
+                {
+                    if (await reader.ReadAsync())
+                    {
+                        documents.Add(new ArchivoDTO
+                        {
+                            Name = reader["Name"].ToString(),
+                            Extension = ".pdf",
+                            Route = reader["Route"].ToString(),
+                            DateTime = reader["DateTime"].ToString(),
+                            OrderNumber = orderNumber,
+                        });
+                    }
+                }
+            }
+            return documents;
+        }
+
+
+
     }
 }

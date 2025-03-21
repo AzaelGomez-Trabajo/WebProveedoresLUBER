@@ -32,6 +32,7 @@ namespace WebProveedoresN.Controllers
             }
             ViewBag.OrderNumber = orderNumber;
             ViewBag.NombreEmpresa = supplierName;
+            ViewBag.SupplierId = User.FindFirst("SupplierId")?.Value;
             ViewBag.UserIpAddress = _ipService.GetUserIpAddress();
             var model = new LoadFileDTO
             {
@@ -126,6 +127,15 @@ namespace WebProveedoresN.Controllers
                     xmlFile.CopyTo(xmlStream);
                 }
 
+                // Obtener el SupplierId del claim
+                var supplierIdClaim = User.FindFirst("SupplierId")?.Value;
+                if (string.IsNullOrEmpty(supplierIdClaim))
+                {
+                    // Manejar el caso en que el claim no esté presente
+                    return RedirectToAction("Login", "Inicio");
+                }
+                int supplierId = int.Parse(supplierIdClaim);
+
                 // Leer el contenido del archivo XML
                 string xmlContent = System.IO.File.ReadAllText(xmlFilePath);
                 string rfcReceptor = XmlServicio.ObtenerRfcReceptor(xmlContent);
@@ -148,14 +158,13 @@ namespace WebProveedoresN.Controllers
                             };
 
                     XmlServicio.GuardarArchivosEnBaseDeDatos(archivos);
-                    var xmlConverted = XmlServicio.ConvertXmlToPdf(xmlContent, Path.Combine(folderPath, $"{timestamp}_Converted_{xmlName}.pdf"));
+                    var xmlConverted = XmlServicio.ConvertXmlToPdf(xmlContent, Path.Combine(folderPath, $"{timestamp}_1_{xmlName}.pdf"));
                     var archiveConverted = new List<ArchivoDTO>
                         {
                             new() { OrderNumber = ordenCompra, Name = $"{xmlName}", Route = folderPath, DateTime = timestamp, Extension = ".pdf", Converted = true }
                         };
                     XmlServicio.GuardarArchivosEnBaseDeDatos(archiveConverted);
-                    var orderNumberId = OrderService.ObtenerOrderNumberIdInDatabase(ordenCompra);
-                    XmlServicio.GuardarDatosXmlEnBaseDeDatos(xmlFilePath, orderNumberId);
+                    XmlServicio.GuardarDatosXmlEnBaseDeDatos(xmlFilePath, ordenCompra, supplierId);
 
                     // Enviar correo de confirmación
                     var userEmail = User.FindFirst(ClaimTypes.Email)?.Value;
@@ -182,6 +191,17 @@ namespace WebProveedoresN.Controllers
             ViewBag.OrderNumber = model.OrderNumber;
             return View();
         }
+
+        public async Task<IActionResult> ObtenerDocumentos(string orderNumber, int converted)
+        {
+            var documents = await DBArchivos.ObtenerDocumentosAsync(orderNumber, converted);
+            if (documents != null && documents.Count > 0)
+            {
+                return Json(new { success = true, documents });
+            }
+            return Json(new { success = false, message = "No tiene facturas cargadas." });
+        }
+
 
     }
 }

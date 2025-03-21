@@ -1,10 +1,12 @@
 using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.Extensions.FileProviders;
 using WebProveedoresN.Interfaces;
 using WebProveedoresN.Services;
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddControllersWithViews();
+builder.Services.AddRazorPages();
 builder.Services.AddRazorPages().AddRazorRuntimeCompilation(); // Para ver los cambios en tiempo real con el NUGET Microsoft.AspNetCore.Mvc.Razor.RuntimeCompilation
 builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme) // Para autenticación con cookies
     .AddCookie(options =>
@@ -30,7 +32,13 @@ if (!app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 app.UseStaticFiles();
-
+// Configurar la carpeta UploadedFiles para servir archivos estáticos
+app.UseStaticFiles(new StaticFileOptions
+{
+    FileProvider = new PhysicalFileProvider(
+        Path.Combine(app.Environment.ContentRootPath, "UploadedFiles")),
+    RequestPath = "/UploadedFiles"
+});
 app.UseRouting();
 
 app.UseAuthentication(); // Para autenticación con cookies

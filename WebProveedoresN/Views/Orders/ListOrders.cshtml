@@ -7,22 +7,23 @@
 
 <div class="card">
     <div class="card-header">
-        <h1 class="text-center">Órdenes de Compra para: @ViewBag.Empresa</h1>
+        <h2 class="text-center">Órdenes de Compra para: </h2>
+        <h2 class="text-center">@ViewBag.Empresa</h2>
     </div>
     <div class="card-body">
         <p>
-            <a asp-action="ListOrders" class="btn btn-outline-success"><i class="bi bi-arrow-clockwise"></i>  Actualizar</a>
+            <a asp-action="ListOrders" class="btn btn-outline-success"><i class="bi bi-arrow-repeat"></i>  Actualizar</a>
         </p>
         <hr />
         <table class="table text-center">
             <thead>
                 <tr>
-                    <th>Número de Orden</th>
-                    <th>Fecha de Orden</th>
-                    <th>Monto Total</th>
-                    <th>Moneda</th>
-                    <th>Estado</th>
-                    <th></th>
+                    <th>@Html.DisplayNameFor(Model => Model.OrderNumber)</th>
+                    <th>@Html.DisplayNameFor(Model => Model.OrderDate)</th>
+                    <th>@Html.DisplayNameFor(Model => Model.TotalAmount)</th>
+                    <th>@Html.DisplayNameFor(Model => Model.Currency)</th>
+                    <th>@Html.DisplayNameFor(Model => Model.Status)</th>
+                    <th>Documentos</th>
                 </tr>
             </thead>
             <tbody>
@@ -35,8 +36,11 @@
                         <td>@item.Currency.ToString()</td>
                         <td>@item.Status.ToString()</td>
                         <td>
-                            <a asp-action="Upload" asp-controller="Archivos" asp-route-orderNumber="@item.OrderNumber" class="btn btn-outline-secondary btn-sm">
-                                <i class="bi bi-cloud-arrow-up"></i> Cargar Facturas
+                            <button class="btn btn-outline-secondary btn-sm" onclick="mostrarDocumentos('@item.OrderNumber', 0)">
+                                <i class="bi bi-cloud-download-fill"></i> Mostrar Factura(s)
+                            </button>
+                            <a asp-action="Upload" asp-controller="Archivos" asp-route-orderNumber="@item.OrderNumber" class="btn btn-outline-primary btn-sm">
+                                <i class="bi bi-cloud-upload-fill"></i> Cargar Facturas
                             </a>
                         </td>
                     </tr>
@@ -45,3 +49,48 @@
         </table>
     </div>
 </div>
+
+<!-- Modal -->
+<div class="modal fade" id="documentModal" tabindex="-1" aria-labelledby="documentModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="documentModalLabel">Facturas</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div id="documentList">
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        function mostrarDocumentos(orderNumber, converted) {
+            $.ajax({
+                url: '@Url.Action("ObtenerDocumentos", "Archivos")',
+                type: 'GET',
+                data: { orderNumber: orderNumber, converted: converted },
+                success: function (response) {
+                    if (response.success) {
+                        var documentList = $('#documentList');
+                        documentList.empty();
+                        response.documents.forEach(function (document) {
+                            var link = $('<a>')
+                                .attr('href', '/UploadedFiles/' + document.name + document.extension)
+                                .attr('target', '_blank')
+                                .text(document.name);
+                            documentList.append($('<div>').append(link));
+                        });
+                        $('#documentModal').modal('show');
+                    } else {
+                        alert(response.message);
+                    }
+                }
+            });
+        }
+    </script>
+}

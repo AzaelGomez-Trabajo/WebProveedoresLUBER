@@ -6,6 +6,7 @@ namespace WebProveedoresN.Models
     public class UsuarioDTO
     {
         public int IdUsuario { get; set; }
+        public int SupplierId { get; set; }
 
         [Required(ErrorMessage = "El campo {0} es obligatorio.")]
         [MaxLength(100, ErrorMessage = "El campo {0} no puede tener más de {1} caracteres")]

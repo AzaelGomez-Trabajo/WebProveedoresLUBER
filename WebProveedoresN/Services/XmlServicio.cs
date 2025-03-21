@@ -66,6 +66,7 @@ namespace WebProveedoresN.Services
                             };
                             archivo.Conceptos.Add(concepto);
                         }
+
                         archivos.Add(archivo);
                     }
 
@@ -107,10 +108,14 @@ namespace WebProveedoresN.Services
             }
         }
 
-        public static void GuardarDatosXmlEnBaseDeDatos(string xmlFilePath, string orderNumberId)
+        public static void GuardarDatosXmlEnBaseDeDatos(string xmlFilePath, string orderNumber, int supplierId)
         {
             var archivos = ObtenerDatosDesdeXml(xmlFilePath);
-            DBArchivos.GuardarDatosEnSqlServer(archivos, Convert.ToInt32(orderNumberId));
+            foreach(var archivo in archivos)
+            {
+                archivo.SupplierId = supplierId;
+            }
+            DBArchivos.GuardarDatosEnSqlServer(archivos, orderNumber);
         }
 
 

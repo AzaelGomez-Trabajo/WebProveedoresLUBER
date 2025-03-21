@@ -36,7 +36,8 @@ namespace WebProveedoresN.Controllers
                     {
                         new(ClaimTypes.Name, usuario.Nombre),
                         new(ClaimTypes.Email, usuario.Correo),
-                        new("SupplierName", usuario.Empresa)
+                        new("SupplierName", usuario.Empresa),
+                        new("SupplierId", usuario.SupplierId.ToString())
                     };
 
                     foreach (var rol in usuario.Roles)

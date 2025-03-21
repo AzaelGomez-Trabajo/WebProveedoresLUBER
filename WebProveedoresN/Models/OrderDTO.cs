@@ -8,17 +8,18 @@ namespace WebProveedoresN.Models
         [Key]
         public int Id { get; set; }
         [Required]
-        [DisplayName("Número de Orden de Compra")]
+        [DisplayName("Orden de Compra")]
         public string OrderNumber { get; set; }
         [Required]
         [DisplayName("Nombre del proveedor")]
         public string SupplierName { get; set; }
         [Required]
-        [DisplayName("Fecha de la orden")]
+        [DisplayName("Fecha de orden")]
         public DateTime OrderDate { get; set; }
         [Required]
         [DisplayName("Monto Total")]
         public decimal TotalAmount { get; set; }
+        [DisplayName("Estado")]
         public string Status { get; set; }
         [DisplayName("Moneda")]
         public string Currency {  get; set; }

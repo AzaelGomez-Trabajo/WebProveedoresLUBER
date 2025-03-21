@@ -108,6 +108,7 @@ namespace WebProveedoresN.Data
                         Restablecer = Convert.ToBoolean(dr["Restablecer"]),
                         Confirmado = Convert.ToBoolean(dr["Confirmado"]),
                         IdStatus = Convert.ToInt32(dr["IdStatus"]),
+                        SupplierId = Convert.ToInt32(dr["SupplierId"]),
                         Roles = new List<string>()
                     };
                     if (!dr.IsDBNull(dr.GetOrdinal("Rol")))
@@ -182,14 +183,18 @@ namespace WebProveedoresN.Data
                     using var dr = cmd.ExecuteReader();
                     while (dr.Read())
                     {
-                        usuario.Empresa = dr["Empresa"].ToString();
-                        usuario.Nombre = dr["Nombre"].ToString();
-                        usuario.Correo = dr["Correo"].ToString();
-                        usuario.Clave = dr["Clave"].ToString();
-                        usuario.Token = dr["Token"].ToString();
-                        usuario.Restablecer = Convert.ToBoolean(dr["Restablecer"]);
-                        usuario.Confirmado = Convert.ToBoolean(dr["Confirmado"]);
-                        usuario.IdStatus = Convert.ToInt32(dr["IdStatus"]);
+                        usuario = new UsuarioDTO
+                        {
+                            SupplierId = Convert.ToInt32(dr["SupplierId"]),
+                            Empresa = dr["Empresa"].ToString(),
+                            Nombre = dr["Nombre"].ToString(),
+                            Correo = dr["Correo"].ToString(),
+                            Clave = dr["Clave"].ToString(),
+                            Token = dr["Token"].ToString(),
+                            Restablecer = Convert.ToBoolean(dr["Restablecer"]),
+                            Confirmado = Convert.ToBoolean(dr["Confirmado"]),
+                            IdStatus = Convert.ToInt32(dr["StatusId"]),
+                        };
                     }
                 }
 
@@ -231,15 +236,6 @@ namespace WebProveedoresN.Data
                 cmd.ExecuteNonQuery();
                 //}
                 transaction.Commit();
-                // Enviar correo de confirmación
-                //var correo = new CorreoDTO
-                //{
-                //    Para = usuario.Correo,
-                //    Asunto = "Confirmación de registro",
-                //    Contenido = $"Hola {usuario.Nombre},<br><br>Gracias por registrarte. Por favor, confirma tu correo electrónico haciendo clic en el siguiente enlace:<br><a href='https://tu-sitio.com/confirmar?token={usuario.Token}'>Confirmar correo</a><br><br>Saludos,<br>El equipo de LUBER Lubricantes"
-                //};
-
-                //CorreoServicio.EnviarCorreo(correo, usuario.Nombre);
 
                 return "Usuario guardado exitosamente.";
 

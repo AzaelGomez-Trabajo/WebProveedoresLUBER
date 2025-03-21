@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 
 namespace WebProveedoresN.Models
@@ -6,6 +7,8 @@ namespace WebProveedoresN.Models
     public class LecturaXmlDTO
     {
         // Datos del comprobante
+        [DisplayName("Id Proveedor")]
+        public int SupplierId { get; set; }
         [Display(Name = "Folio de la factura")]
         public string FolioFactura { get; set; }
         
