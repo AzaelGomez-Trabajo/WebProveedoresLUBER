@@ -118,6 +118,17 @@ namespace WebProveedoresN.Services
             DBArchivos.GuardarDatosEnSqlServer(archivos, orderNumber);
         }
 
-
+        public static bool BuscarFactura(string xmlFilePath)
+        {
+            var archivos = ObtenerDatosDesdeXml(xmlFilePath);
+            foreach (var archivo in archivos)
+            {
+                if (DBArchivos.BuscarFactura(archivo))
+                {
+                    return true;
+                }
+            }
+            return false;
+        }
     }
 }

@@ -1,4 +1,6 @@
-﻿@model IEnumerable<WebProveedoresN.Models.OrderDTO>
+﻿@using WebProveedoresN.Models
+@model Pagination<OrderDTO>
+@* @model IEnumerable<OrderDTO> *@
 
 @{
     ViewData["Title"] = "Órdenes de Compra";
@@ -11,6 +13,12 @@
         <h2 class="text-center">@ViewBag.Empresa</h2>
     </div>
     <div class="card-body">
+        <form method="get" asp-action="ListOrders">
+            <p>
+                <input type="text" name="searchString" value="@ViewBag.SearchString" placeholder="Número de orden" />
+                <input type="submit" value="Buscar" class="btn btn-primary" />
+            </p>
+        </form>
         <p>
             <a asp-action="ListOrders" class="btn btn-outline-success"><i class="bi bi-arrow-repeat"></i>  Actualizar</a>
         </p>
@@ -18,11 +26,10 @@
         <table class="table text-center">
             <thead>
                 <tr>
-                    <th>@Html.DisplayNameFor(Model => Model.OrderNumber)</th>
-                    <th>@Html.DisplayNameFor(Model => Model.OrderDate)</th>
-                    <th>@Html.DisplayNameFor(Model => Model.TotalAmount)</th>
-                    <th>@Html.DisplayNameFor(Model => Model.Currency)</th>
-                    <th>@Html.DisplayNameFor(Model => Model.Status)</th>
+                    <th>Numero de Orden</th>
+                    <th>Fecha</th>
+                    <th>Importe Total</th>
+                    <th>Moneda</th>
                     <th>Documentos</th>
                 </tr>
             </thead>
@@ -34,11 +41,14 @@
                         <td>@item.OrderDate.ToShortDateString()</td>
                         <td>@item.TotalAmount.ToString("C")</td>
                         <td>@item.Currency.ToString()</td>
-                        <td>@item.Status.ToString()</td>
                         <td>
                             <button class="btn btn-outline-secondary btn-sm" onclick="mostrarDocumentos('@item.OrderNumber', 0)">
                                 <i class="bi bi-cloud-download-fill"></i> Mostrar Factura(s)
                             </button>
+                            <button class="btn btn-outline-danger btn-sm" onclick="cerrarEmbed('@item.OrderNumber')">
+                                <i class="bi bi-x-circle-fill">Cerrar</i> 
+                            </button>
+                            <embed id="embed-@item.OrderNumber" src="" type="application/pdf" width="100%" height="400px" style="display:none;" />
                             <a asp-action="Upload" asp-controller="Archivos" asp-route-orderNumber="@item.OrderNumber" class="btn btn-outline-primary btn-sm">
                                 <i class="bi bi-cloud-upload-fill"></i> Cargar Facturas
                             </a>
@@ -47,6 +57,20 @@
                 }
             </tbody>
         </table>
+        @{
+            var previousDisabled = !Model.HasPreviousPage ? "disabled" : "";
+            var nextDisabled = !Model.HasNextPage ? "disabled" : "";
+        }
+        <div>
+                <a asp-action="ListOrders" asp-route-pageNumber="@(ViewBag.PageNumber - 1)" asp-route-searchString="@ViewBag.SearchString" class="btn btn-outline-dark btn-sm @previousDisabled">Anterior</a>
+            @for (var i = 1; i <= Model.TotalPages; i++)
+            {
+                var pageActive = (i == Model.PageNumber) ? "active" : "";
+                <a asp-action="ListOrders" asp-route-pageNumber="@i" asp-route-searchString="@ViewBag.SearchString" class="btn btn-outline-dark btn-sm @pageActive">@i</a>
+                <a></a>
+            }
+                <a asp-action="ListOrders" asp-route-pageNumber="@(ViewBag.PageNumber + 1)" asp-route-searchString="@ViewBag.SearchString" class="btn btn-outline-dark btn-sm @nextDisabled">Siguiente</a>
+        </div>
     </div>
 </div>
 
@@ -60,7 +84,6 @@
             </div>
             <div class="modal-body">
                 <div id="documentList">
-
                 </div>
             </div>
         </div>
@@ -76,21 +99,24 @@
                 data: { orderNumber: orderNumber, converted: converted },
                 success: function (response) {
                     if (response.success) {
-                        var documentList = $('#documentList');
-                        documentList.empty();
-                        response.documents.forEach(function (document) {
-                            var link = $('<a>')
-                                .attr('href', '/UploadedFiles/' + document.name + document.extension)
-                                .attr('target', '_blank')
-                                .text(document.name);
-                            documentList.append($('<div>').append(link));
-                        });
-                        $('#documentModal').modal('show');
+                        var embedElement = $('#embed-' + orderNumber);
+                        if (response.documents.length > 0) {
+                            var document = response.documents[0]; // Assuming you want to show the first document
+                            embedElement.attr('src', '/UploadedFiles/' + document.name + document.extension);
+                            embedElement.show();
+                        } else {
+                            alert('No se encontraron documentos.');
+                        }
                     } else {
                         alert(response.message);
                     }
                 }
             });
+        }
+        function cerrarEmbed(orderNumber) {
+            var embedElement = $('#embed-' + orderNumber);
+            embedElement.hide();
+            embedElement.attr('src', ''); // Clear the src attribute
         }
     </script>
 }

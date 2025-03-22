@@ -15,10 +15,20 @@ namespace WebProveedoresN.Controllers
             _webHostEnvironment = webHostEnvironment;
         }
 
-        [Authorize(Roles = "Administrador")]
         public IActionResult Listar()
         {
-            var usuarios = DBInicio.ListarUsuariosConRoles();
+            return View();
+        }
+
+        [Authorize(Roles = "Administrador")]
+        [HttpPost]
+        public IActionResult Listar(UsuarioDTO usuario)
+        {
+            var supplierId = User.FindFirst("SupplierId")?.Value;
+            ViewBag.SupplierId = supplierId;
+
+            // Metodo que devuelve una lista de usuarios
+            var usuarios = DBInicio.ListarUsuariosConRoles(int.Parse(supplierId));
             return View(usuarios);
         }
 
@@ -116,6 +126,7 @@ namespace WebProveedoresN.Controllers
             }
         }
 
+        [Authorize(Roles = "Administrador")]
         public ActionResult Registrar()
         {
             return View();

@@ -85,7 +85,7 @@ namespace WebProveedoresN.Data
             return lista;
         }
 
-        public static List<UsuarioDTO> ListarUsuariosConRoles()
+        public static List<UsuarioDTO> ListarUsuariosConRoles(int supplierId)
         {
             var usuarios = new List<UsuarioDTO>();
             try
@@ -94,6 +94,7 @@ namespace WebProveedoresN.Data
                 conexion.Open();
                 var storedProcedure = "sp_ListarUsuariosConRoles";
                 var cmd = new SqlCommand(storedProcedure, conexion);
+                cmd.Parameters.AddWithValue("@SupplierId", supplierId);
                 cmd.CommandType = CommandType.StoredProcedure;
                 using var dr = cmd.ExecuteReader();
                 while (dr.Read())
@@ -107,7 +108,7 @@ namespace WebProveedoresN.Data
                         Token = dr["Token"].ToString(),
                         Restablecer = Convert.ToBoolean(dr["Restablecer"]),
                         Confirmado = Convert.ToBoolean(dr["Confirmado"]),
-                        IdStatus = Convert.ToInt32(dr["IdStatus"]),
+                        IdStatus = Convert.ToInt32(dr["StatusId"]),
                         SupplierId = Convert.ToInt32(dr["SupplierId"]),
                         Roles = new List<string>()
                     };

@@ -158,6 +158,24 @@ namespace WebProveedoresN.Data
             return documents;
         }
 
+        public static bool BuscarFactura(LecturaXmlDTO model)
+        {
+            bool isValid = false;
+            string storedProcedure = "sp_InvoiceSearch";
+            using (var connection = DBConexion.ObtenerConexion())
+            {
+                using (var cmd = new SqlCommand(storedProcedure, connection))
+                {
+                    connection.Open();
+                    cmd.Parameters.AddWithValue("@UUID", model.UUID);
+                    cmd.CommandType = CommandType.StoredProcedure;
+                    isValid = Convert.ToBoolean(cmd.ExecuteScalar());
+                }
+                connection.Close();
+            }
+            return isValid;
+        }
+
 
 
     }

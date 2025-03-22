@@ -40,6 +40,12 @@ namespace WebProveedoresN.Controllers
                         new("SupplierId", usuario.SupplierId.ToString())
                     };
 
+                    // Verificar si el usuario tiene el rol de "Administrador"
+                    if (usuario.Roles.Contains("Administrador"))
+                    {
+                        claims.Add(new Claim(ClaimTypes.Role, "Administrador"));
+                    }
+
                     foreach (var rol in usuario.Roles)
                     {
                         claims.Add(new Claim(ClaimTypes.Role, rol));

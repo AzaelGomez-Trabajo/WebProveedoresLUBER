@@ -63,6 +63,7 @@ namespace WebProveedoresN.Controllers
                 {
                     ModelState.AddModelError("FilePDF", "El archivo debe ser un PDF.");
                     ViewBag.OrderNumber = model.OrderNumber;
+                    ViewBag.UserIpAddress = _ipService.GetUserIpAddress();
                     return View(model);
                 }
 
@@ -70,6 +71,7 @@ namespace WebProveedoresN.Controllers
                 {
                     ModelState.AddModelError("FileXML", "El archivo debe ser un XML.");
                     ViewBag.OrderNumber = model.OrderNumber;
+                    ViewBag.UserIpAddress = _ipService.GetUserIpAddress();
                     return View(model);
                 }
 
@@ -78,6 +80,7 @@ namespace WebProveedoresN.Controllers
                 {
                     ModelState.AddModelError("FilePDF", "El archivo PDF no debe exceder los 2 MB.");
                     ViewBag.OrderNumber = model.OrderNumber;
+                    ViewBag.UserIpAddress = _ipService.GetUserIpAddress();
                     return View(model);
                 }
 
@@ -85,6 +88,7 @@ namespace WebProveedoresN.Controllers
                 {
                     ModelState.AddModelError("FileXML", "El archivo XML no debe exceder los 2 MB.");
                     ViewBag.OrderNumber = model.OrderNumber;
+                    ViewBag.UserIpAddress = _ipService.GetUserIpAddress();
                     return View(model);
                 }
 
@@ -101,6 +105,7 @@ namespace WebProveedoresN.Controllers
                 {
                     ModelState.AddModelError("FileXML", "El archivo XML no es válido.");
                     ViewBag.OrderNumber = model.OrderNumber;
+                    ViewBag.UserIpAddress = _ipService.GetUserIpAddress();
                     return View(model);
                 }
 
@@ -164,7 +169,21 @@ namespace WebProveedoresN.Controllers
                             new() { OrderNumber = ordenCompra, Name = $"{xmlName}", Route = folderPath, DateTime = timestamp, Extension = ".pdf", Converted = true }
                         };
                     XmlServicio.GuardarArchivosEnBaseDeDatos(archiveConverted);
-                    XmlServicio.GuardarDatosXmlEnBaseDeDatos(xmlFilePath, ordenCompra, supplierId);
+
+                    var facturaUnica = XmlServicio.BuscarFactura(xmlFilePath);
+                    if (facturaUnica)
+                    {
+                        ViewBag.Message = $"La factura ya ha sido cargada.";
+                        // Eliminar los archivos después de procesarlos
+                        System.IO.File.Delete(pdfFilePath);
+                        System.IO.File.Delete(xmlFilePath);
+                        ViewBag.OrderNumber = model.OrderNumber;
+                        ViewBag.UserIpAddress = _ipService.GetUserIpAddress();
+                        return View(model);
+
+                    }
+                        // Guardar los datos del XML en la base de datos
+                        XmlServicio.GuardarDatosXmlEnBaseDeDatos(xmlFilePath, ordenCompra, supplierId);
 
                     // Enviar correo de confirmación
                     var userEmail = User.FindFirst(ClaimTypes.Email)?.Value;
@@ -189,7 +208,8 @@ namespace WebProveedoresN.Controllers
             }
 
             ViewBag.OrderNumber = model.OrderNumber;
-            return View();
+            ViewBag.UserIpAddress = _ipService.GetUserIpAddress();
+            return View(model);
         }
 
         public async Task<IActionResult> ObtenerDocumentos(string orderNumber, int converted)
