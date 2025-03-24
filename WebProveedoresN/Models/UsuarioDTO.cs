@@ -25,8 +25,6 @@ namespace WebProveedoresN.Models
         [MaxLength(100, ErrorMessage = "El campo {0} no puede tener más de {1} caracteres")]
         [DisplayName("Contraseña")]
         public string Clave { get; set; }
-        public string ConfirmarClave { get; set; }
-
         public bool Restablecer { get; set; }
         public bool Confirmado { get; set; }
         public string Token { get; set; }

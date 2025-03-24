@@ -15,21 +15,79 @@ namespace WebProveedoresN.Controllers
             _webHostEnvironment = webHostEnvironment;
         }
 
-        public IActionResult Listar()
+
+        [Authorize(Roles = "Administrador")]
+        public IActionResult Listar(UsuarioDTO usuario)
         {
-            return View();
+            try
+            {
+                var supplierId = User.FindFirst("SupplierId")?.Value;
+                if (supplierId == null)
+                {
+                    return RedirectToAction("Login", "Access");
+                }
+                ViewBag.SupplierId = supplierId;
+
+                // Metodo que devuelve una lista de usuarios
+                var usuarios = DBInicio.ListarUsuariosConRoles(int.Parse(supplierId));
+                return View(usuarios);
+            }
+            catch (Exception ex)
+            {
+                ViewBag.ErrorMessage = "Ocurrió un error al cargar la lista de usuarios: " + ex.Message;
+                return View(new List<UsuarioDTO>());
+            }
         }
 
         [Authorize(Roles = "Administrador")]
-        [HttpPost]
-        public IActionResult Listar(UsuarioDTO usuario)
+        public IActionResult InvitarUsuario()
         {
-            var supplierId = User.FindFirst("SupplierId")?.Value;
-            ViewBag.SupplierId = supplierId;
+            var supplierName = User.FindFirst("SupplierName")?.Value;
+            ViewBag.Empresa = supplierName;
+            var usuarioDTO = new UsuarioDTO()
+            {
+                Empresa = ViewBag.Empresa
+            };
+            return View(usuarioDTO);
+        }
 
-            // Metodo que devuelve una lista de usuarios
-            var usuarios = DBInicio.ListarUsuariosConRoles(int.Parse(supplierId));
-            return View(usuarios);
+        [HttpPost]
+        [Authorize(Roles = "Administrador")]
+        public IActionResult InvitarUsuario(UsuarioDTO model)
+        {
+            if (!ModelState.IsValid)
+            {
+                return View(model);
+            }
+            if (model.Clave != null)
+            {
+                model.Clave = UtilityService.ConvertirSHA256(model.Clave);
+            }
+            model.Token = UtilityService.GenerarToken();
+            model.Restablecer = false;
+            model.Confirmado = false;
+            model.IdStatus = 1;
+            var respuesta = DBInicio.GuardarInvitadoConRoles(model);
+            TempData["Message"] = respuesta;
+            if (respuesta.Contains("exitosamente"))
+            {
+                string path = Path.Combine(_webHostEnvironment.ContentRootPath, "Plantilla", "Invitacion.html");
+                string content = System.IO.File.ReadAllText(path);
+                string url = string.Format("{0}://{1}{2}", Request.Scheme, Request.Host, "/Inicio/Confirmar?token=" + model.Token);
+                string htmlBody = string.Format(content, model.Nombre, url);
+                var correoDTO = new CorreoDTO()
+                {
+                    Para = model.Correo,
+                    Asunto = "Invitación",
+                    Contenido = htmlBody
+                };
+                CorreoServicio.EnviarCorreo(correoDTO, model.Nombre);
+                ViewBag.Creado = true;
+                respuesta = $"Se ha enviado una invitación al correo {model.Correo}";
+                TempData["Message"] = respuesta;
+                return RedirectToAction("Listar");
+            }
+            return View(model);
         }
 
         [HttpGet]
@@ -98,24 +156,22 @@ namespace WebProveedoresN.Controllers
         {
             // Metodo solo devuelve la vista
             ViewBag.Status = DBStatus.ObtenerEstatus() ?? [];
-            ViewBag.Roles = DBRoles.ObtenerRoles() ?? [];
             var usuario = DBInicio.ObtenerUsuarioConToken(token);
+
             return View(usuario);
         }
 
         [HttpPost]
+        [Authorize(Roles = "Administrador")]
         public IActionResult Editar(UsuarioDTO model)
         {
             if (!ModelState.IsValid)
             {
                 ViewBag.Status = DBStatus.ObtenerEstatus() ?? [];
-                ViewBag.Roles = DBRoles.ObtenerRoles() ?? [];
                 return View();
             }
             var respuesta = DBInicio.EditarUsuarioConRoles(model);
-            //var respuesta = DBUsuario.Editar(model);
-
-            TempData["Mensaje"] = respuesta;
+            TempData["Message"] = respuesta;
             if (respuesta.Contains("exitosamente"))
             {
                 return RedirectToAction("Listar");

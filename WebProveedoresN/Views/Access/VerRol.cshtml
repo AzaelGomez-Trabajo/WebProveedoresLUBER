@@ -1,0 +1,14 @@
+﻿@using System.Security.Claims
+@{
+    ViewData["Title"] = "Roles";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    var roles = ViewBag.Roles as List<string>;
+}
+
+<h2>Roles del Usuario</h2>
+<ul>
+    @foreach (var role in roles)
+    {
+        <li>@role</li>
+    }
+</ul>

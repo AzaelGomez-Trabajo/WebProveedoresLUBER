@@ -2,24 +2,27 @@
 @{
     ViewData["Title"] = "Editar";
     Layout = "~/Views/Shared/_Layout.cshtml";
-    var mensaje = TempData["Mensaje"] as string; 
+    var message = TempData["Message"] as string; 
     var status = ViewBag.Status as List<StatusDTO>;
-    var roles = ViewBag.Roles as List<string>;
 }
 <div class="card">
     <div class="card-header">
         <h3>Editar Usuario</h3>
     </div>
     <div class="card-body">
-        <form asp-action="Editar" asp-controller="Usuario" method="post">
+        <form asp-action="Editar" asp-controller="Inicio" method="post">
             <input asp-for="Token" type="hidden" class="form-control"/>
             <input asp-for="Clave" type="hidden" class="form-control"/>
             <input asp-for="Empresa" type="hidden" class="form-control"/>
             <input asp-for="IdUsuario" type="hidden" class="form-control"/>
-            @if (!string.IsNullOrEmpty(mensaje))
+            <input asp-for="Confirmado" type="hidden" class="form-control"/>
+            <input asp-for="Restablecer" type="hidden" class="form-control"/>
+            <input asp-for="Roles" type="hidden" class="form-control" />
+            <input asp-for="SupplierId" type="hidden" class="form-control" />
+            @if (!string.IsNullOrEmpty(message))
             {
                 <div class="alert alert-info">
-                    @mensaje
+                    @message
                 </div>
             }
             <div class="mb-3">
@@ -44,8 +47,8 @@
                 <span asp-validation-for="IdStatus" class="text-danger"></span>
             </div>
 
-            <button type="submit" class="btn btn-outline-primary">Guardar</button>
-            <a asp-action="Listar" asp-controller="Usuario" class="btn btn-outline-warning"> | Volver a la lista</a>
+            <button type="submit" class="btn btn-outline-primary"> Guardar</button> |
+            <a asp-action="Listar" asp-controller="Inicio" class="btn btn-outline-warning"> Volver a la lista</a>
         </form>
     </div>
 </div>

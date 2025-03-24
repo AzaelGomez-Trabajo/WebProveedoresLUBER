@@ -101,15 +101,14 @@ namespace WebProveedoresN.Data
                 {
                     var usuario = new UsuarioDTO
                     {
-                        Empresa = dr["Empresa"].ToString(),
                         Nombre = dr["Nombre"].ToString(),
+                        SupplierId = supplierId,
                         Correo = dr["Correo"].ToString(),
                         Clave = dr["Clave"].ToString(),
                         Token = dr["Token"].ToString(),
                         Restablecer = Convert.ToBoolean(dr["Restablecer"]),
                         Confirmado = Convert.ToBoolean(dr["Confirmado"]),
                         IdStatus = Convert.ToInt32(dr["StatusId"]),
-                        SupplierId = Convert.ToInt32(dr["SupplierId"]),
                         Roles = new List<string>()
                     };
                     if (!dr.IsDBNull(dr.GetOrdinal("Rol")))
@@ -144,14 +143,15 @@ namespace WebProveedoresN.Data
                         usuario = new UsuarioDTO
                         {
                             IdUsuario = Convert.ToInt32(dr["IdUsuario"]),
-                            Empresa = dr["Empresa"].ToString(),
                             Nombre = dr["Nombre"].ToString(),
+                            SupplierId = Convert.ToInt32(dr["SupplierId"]),
+                            Empresa = dr["Empresa"].ToString(),
                             Correo = dr["Correo"].ToString(),
                             Clave = dr["Clave"].ToString(),
                             Token = dr["Token"].ToString(),
                             Restablecer = Convert.ToBoolean(dr["Restablecer"]),
                             Confirmado = Convert.ToBoolean(dr["Confirmado"]),
-                            IdStatus = Convert.ToInt32(dr["IdStatus"]),
+                            IdStatus = Convert.ToInt32(dr["StatusId"]),
                             Roles = []
                         };
                         if (!dr.IsDBNull(dr.GetOrdinal("Rol")))
@@ -195,7 +195,12 @@ namespace WebProveedoresN.Data
                             Restablecer = Convert.ToBoolean(dr["Restablecer"]),
                             Confirmado = Convert.ToBoolean(dr["Confirmado"]),
                             IdStatus = Convert.ToInt32(dr["StatusId"]),
+                            Roles = []
                         };
+                        if (!dr.IsDBNull(dr.GetOrdinal("Rol")))
+                        {
+                            usuario.Roles.Add(dr["Rol"].ToString());
+                        }
                     }
                 }
 
@@ -234,6 +239,53 @@ namespace WebProveedoresN.Data
                 cmd.Parameters.Clear();
                 cmd.Parameters.AddWithValue("@IdUsuario", idUsuario);
                 cmd.Parameters.AddWithValue("@RolNombre", "Administrador");
+                cmd.ExecuteNonQuery();
+                //}
+                transaction.Commit();
+
+                return "Usuario guardado exitosamente.";
+
+            }
+            catch (SqlException ex)
+            {
+                transaction.Rollback();
+                var error = ex.Message;
+                return $"Error al guardar los datos en SQL Server - {error}";
+            }
+            catch (Exception ex)
+            {
+                var error = ex.Message;
+                return $"Error inesperado al guardar los datos en SQL Server - {error}";
+            }
+        }
+
+        public static string GuardarInvitadoConRoles(UsuarioDTO usuario)
+        {
+            using var conexion = DBConexion.ObtenerConexion();
+            conexion.Open();
+            var transaction = conexion.BeginTransaction();
+            var storedProcedure = "sp_GuardarUsuarioConRoles";
+            try
+            {
+                using var cmd = new SqlCommand(storedProcedure, conexion, transaction);
+                cmd.CommandType = CommandType.StoredProcedure;
+                cmd.Parameters.AddWithValue("@Nombre", usuario.Nombre);
+                cmd.Parameters.AddWithValue("@Empresa", usuario.Empresa);
+                cmd.Parameters.AddWithValue("@Correo", usuario.Correo);
+                cmd.Parameters.AddWithValue("@Clave", usuario.Clave);
+                cmd.Parameters.AddWithValue("@Restablecer", usuario.Restablecer);
+                cmd.Parameters.AddWithValue("@Confirmado", usuario.Confirmado);
+                cmd.Parameters.AddWithValue("@Token", usuario.Token);
+                cmd.Parameters.AddWithValue("@IdStatus", usuario.IdStatus);
+                var idUsuario = Convert.ToInt32(cmd.ExecuteScalar());
+
+                //foreach (var rol in usuario.Roles)
+                //{
+                storedProcedure = "sp_GuardarUsuarioRol";
+                cmd.CommandText = storedProcedure;
+                cmd.Parameters.Clear();
+                cmd.Parameters.AddWithValue("@IdUsuario", idUsuario);
+                cmd.Parameters.AddWithValue("@RolNombre", "Usuario");
                 cmd.ExecuteNonQuery();
                 //}
                 transaction.Commit();
@@ -304,22 +356,6 @@ namespace WebProveedoresN.Data
                     cmd.Parameters.AddWithValue("@Token", model.Token);
                     cmd.Parameters.AddWithValue(@"IdStatus", model.IdStatus);
                     cmd.ExecuteNonQuery();
-                    // Eliminar los roles del usuario
-                    storedProcedure = "sp_EliminarRolesUsuario";
-                    cmd.CommandText = storedProcedure;
-                    cmd.Parameters.Clear();
-                    cmd.Parameters.AddWithValue("@IdUsuario", model.IdUsuario);
-                    cmd.ExecuteNonQuery();
-                    // Guardar los roles del usuario
-                    foreach (var rol in model.Roles)
-                    {
-                        storedProcedure = "sp_GuardarUsuarioRol";
-                        cmd.CommandText = storedProcedure;
-                        cmd.Parameters.Clear();
-                        cmd.Parameters.AddWithValue("@IdUsuario", model.IdUsuario);
-                        cmd.Parameters.AddWithValue("@RolNombre", rol);
-                        cmd.ExecuteNonQuery();
-                    }
                     transaction.Commit();
                     return "Usuario guardado exitosamente.";
                 }
@@ -431,7 +467,7 @@ namespace WebProveedoresN.Data
             {
                 using (SqlConnection oconexion = DBConexion.ObtenerConexion())
                 {
-                    string query = "select Nombre,Empresa,Clave,Restablecer,Confirmado,Token from Usuario";
+                    string query = "select Nombre,Clave,Restablecer,Confirmado,Token from Usuario";
                     query += " where Correo=@correo";
 
                     var cmd = new SqlCommand(query, oconexion);
@@ -447,7 +483,6 @@ namespace WebProveedoresN.Data
                             usuario = new UsuarioDTO()
                             {
                                 Nombre = dr["Nombre"].ToString(),
-                                Empresa = dr["Empresa"].ToString(),
                                 Clave = dr["Clave"].ToString(),
                                 Restablecer = (bool)dr["Restablecer"],
                                 Confirmado = (bool)dr["Confirmado"],

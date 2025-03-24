@@ -1,6 +1,5 @@
 ﻿@using WebProveedoresN.Models
 @model Pagination<OrderDTO>
-@* @model IEnumerable<OrderDTO> *@
 
 @{
     ViewData["Title"] = "Órdenes de Compra";
@@ -13,11 +12,11 @@
         <h2 class="text-center">@ViewBag.Empresa</h2>
     </div>
     <div class="card-body">
-        <form method="get" asp-action="ListOrders">
-            <p>
-                <input type="text" name="searchString" value="@ViewBag.SearchString" placeholder="Número de orden" />
-                <input type="submit" value="Buscar" class="btn btn-primary" />
-            </p>
+        <form method="get" asp-action="ListOrders" class="d-flex justify-content-end">
+            <div class=" input-group mb-3" style="max-width: 300px">
+                <input type="text" name="searchString" value="@ViewBag.SearchString" placeholder="Número de orden" class="form-control"/>
+                <button type="submit" class="btn btn-outline-primary">Buscar</button>
+            </div>
         </form>
         <p>
             <a asp-action="ListOrders" class="btn btn-outline-success"><i class="bi bi-arrow-repeat"></i>  Actualizar</a>
@@ -42,16 +41,22 @@
                         <td>@item.TotalAmount.ToString("C")</td>
                         <td>@item.Currency.ToString()</td>
                         <td>
+                            <a asp-action="Upload" asp-controller="Archivos" asp-route-orderNumber="@item.OrderNumber" class="btn btn-outline-primary btn-sm">
+                                <i class="bi bi-cloud-upload-fill"></i> Cargar Facturas
+                            </a>
                             <button class="btn btn-outline-secondary btn-sm" onclick="mostrarDocumentos('@item.OrderNumber', 0)">
                                 <i class="bi bi-cloud-download-fill"></i> Mostrar Factura(s)
                             </button>
                             <button class="btn btn-outline-danger btn-sm" onclick="cerrarEmbed('@item.OrderNumber')">
-                                <i class="bi bi-x-circle-fill">Cerrar</i> 
+                                <i class="bi bi-x-circle-fill"> Cerrar</i>
                             </button>
-                            <embed id="embed-@item.OrderNumber" src="" type="application/pdf" width="100%" height="400px" style="display:none;" />
-                            <a asp-action="Upload" asp-controller="Archivos" asp-route-orderNumber="@item.OrderNumber" class="btn btn-outline-primary btn-sm">
-                                <i class="bi bi-cloud-upload-fill"></i> Cargar Facturas
-                            </a>
+                            <div id="embed-container-@item.OrderNumber" style="display:none;">
+                                <div class="mt-2">
+                                    <button class="btn btn-primary btn-sm" onclick="descargarDocumento('@item.OrderNumber')">Descargar</button>
+                                    <button class="btn btn-secondary btn-sm" onclick="cerrarEmbed('@item.OrderNumber')">Cerrar</button>
+                                </div>
+                                <embed id="embed-@item.OrderNumber" src="" type="application/pdf" width="100%" height="400px" />
+                            </div>
                         </td>
                     </tr>
                 }
@@ -61,31 +66,15 @@
             var previousDisabled = !Model.HasPreviousPage ? "disabled" : "";
             var nextDisabled = !Model.HasNextPage ? "disabled" : "";
         }
-        <div>
-                <a asp-action="ListOrders" asp-route-pageNumber="@(ViewBag.PageNumber - 1)" asp-route-searchString="@ViewBag.SearchString" class="btn btn-outline-dark btn-sm @previousDisabled">Anterior</a>
+        <div class="d-flex justify-content-center">
+            <a asp-action="ListOrders" asp-route-pageNumber="@(ViewBag.PageNumber - 1)" asp-route-searchString="@ViewBag.SearchString" class="btn btn-outline-dark btn-sm @previousDisabled">Anterior</a>
             @for (var i = 1; i <= Model.TotalPages; i++)
             {
                 var pageActive = (i == Model.PageNumber) ? "active" : "";
                 <a asp-action="ListOrders" asp-route-pageNumber="@i" asp-route-searchString="@ViewBag.SearchString" class="btn btn-outline-dark btn-sm @pageActive">@i</a>
                 <a></a>
             }
-                <a asp-action="ListOrders" asp-route-pageNumber="@(ViewBag.PageNumber + 1)" asp-route-searchString="@ViewBag.SearchString" class="btn btn-outline-dark btn-sm @nextDisabled">Siguiente</a>
-        </div>
-    </div>
-</div>
-
-<!-- Modal -->
-<div class="modal fade" id="documentModal" tabindex="-1" aria-labelledby="documentModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-lg">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="documentModalLabel">Facturas</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body">
-                <div id="documentList">
-                </div>
-            </div>
+            <a asp-action="ListOrders" asp-route-pageNumber="@(ViewBag.PageNumber + 1)" asp-route-searchString="@ViewBag.SearchString" class="btn btn-outline-dark btn-sm @nextDisabled">Siguiente</a>
         </div>
     </div>
 </div>
@@ -99,11 +88,12 @@
                 data: { orderNumber: orderNumber, converted: converted },
                 success: function (response) {
                     if (response.success) {
+                        var embedContainer = $('#embed-container-' + orderNumber);
                         var embedElement = $('#embed-' + orderNumber);
                         if (response.documents.length > 0) {
                             var document = response.documents[0]; // Assuming you want to show the first document
                             embedElement.attr('src', '/UploadedFiles/' + document.name + document.extension);
-                            embedElement.show();
+                            embedContainer.show();
                         } else {
                             alert('No se encontraron documentos.');
                         }
@@ -114,9 +104,19 @@
             });
         }
         function cerrarEmbed(orderNumber) {
+            var embedContainer = $('#embed-container-' + orderNumber);
             var embedElement = $('#embed-' + orderNumber);
-            embedElement.hide();
+            embedContainer.hide();
             embedElement.attr('src', ''); // Clear the src attribute
+        }
+        function descargarDocumento(orderNumber) {
+            var embedElement = $('#embed-' + orderNumber);
+            var src = embedElement.attr('src');
+            if (src) {
+                window.open(src, '_blank');
+            } else {
+                alert('No hay documento para descargar.');
+            }
         }
     </script>
 }

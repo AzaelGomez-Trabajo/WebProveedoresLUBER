@@ -1,51 +1,48 @@
 ﻿@model UsuarioDTO
 @{
-    ViewData["Title"] = "Guardar";
+    ViewData["Title"] = "Invitar Usuario";
     Layout = "~/Views/Shared/_Layout.cshtml";
-    var mensaje = TempData["Mensaje"] as string; 
+    var message = TempData["Message"] as string;
 }
 <div class="card">
     <div class="card-header">
-        <h3>Crear Contacto</h3>
+        <h3>Invitar Usuario</h3>
     </div>
     <div class="card-body">
 
-
-
-        @if (TempData["Mensaje"] != null)
+        @if (message != null)
         {
             <div class="alert alert-success" role="alert">
-                @TempData["Mensaje"]
+                @message
             </div>
         }
 
-        <form asp-action="Guardar" asp-controller="Inicio" method="post">
+        <form asp-action="InvitarUsuario" asp-controller="Inicio" method="post">
             <input asp-for="Empresa" type="hidden" class="form-control" />
-            @if (!string.IsNullOrEmpty(mensaje))
+            @if (!string.IsNullOrEmpty(message))
             {
                 <div class="alert alert-info">
-                    @mensaje
+                    @message
                 </div>
             }
             <div class="mb-3">
                 <label class="form-label">Nombre Completo </label>
-                <input asp-for="Nombre" type="text" class="form-control" >
+                <input asp-for="Nombre" type="text" class="form-control">
                 <span asp-validation-for="Nombre" class="text-danger"></span>
             </div>
             <div class="mb-3">
                 <label class="form-label">Correo</label>
-                <input asp-for="Correo" type="text" class="form-control" >
+                <input asp-for="Correo" type="text" class="form-control">
                 <span asp-validation-for="Correo" class="text-danger"></span>
             </div>
             <div class="mb-3">
                 <label class="form-label">Contraseña</label>
-                <input asp-for="Clave" type="password" class="form-control" >
+                <input asp-for="Clave" type="password" class="form-control">
                 <span asp-validation-for="Clave" class="text-danger"></span>
             </div>
-            <button type="submit" class="btn btn-outline-primary">Guardar</button> | 
+            <button type="submit" class="btn btn-outline-primary">Enviar Invitacion</button> |
             <a asp-action="Listar" asp-controller="Inicio" class="btn btn-outline-warning"> Volver a la lista</a>
-         </form>
+        </form>
 
     </div>
 </div>
-

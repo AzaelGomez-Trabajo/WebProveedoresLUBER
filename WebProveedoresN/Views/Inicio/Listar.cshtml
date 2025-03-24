@@ -4,63 +4,81 @@
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
-@if(User.IsInRole("Administrador"))
+@if (User.IsInRole("Administrador"))
 {
-<div class="card">
-    <div class="card-header">
-        <h3>Lista Usuario</h3>
+    <div class="card">
+        <div class="card-header">
+            <h3>Lista Usuario</h3>
+        </div>
+        <div class="card-body">
+            @if (ViewBag.ErrorMessage != null)
+            {
+                <div class="alert alert-danger" role="alert">
+                    @ViewBag.ErrorMessage
+                </div>
+            }
+            else
+            {
+                <a asp-action="InvitarUsuario" asp-controller="Inicio" class="btn btn-outline-success">
+                    <i class="bi bi-plus-circle"></i> Invitar Nuevo
+                </a>
+                <hr />
+                <table class="table table-bordered">
+                    <thead>
+                        <tr>
+                            <th>Nombre</th>
+                            <th>Correo</th>
+                            <th>Confirmado</th>
+                            <th>Estatus</th>
+                            <th>Roles</th>
+                            <th>Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var item in Model)
+                        {
+                            <tr>
+                                <td>@item.Nombre</td>
+                                <td>@item.Correo</td>
+                                <td>
+                                    @switch (item.Confirmado)
+                                    {
+                                        case true:
+                                            @:Si
+                                            break;
+                                        default:
+                                            @:No
+                                            break;
+                                    }
+                                </td>
+                                <td>
+                                    @switch (item.IdStatus)
+                                    {
+                                        case 1:
+                                            @:Activo
+                                            break;
+                                        case 2:
+                                            @:Inactivo
+                                            break;
+                                        case 3:
+                                            @:Eliminado
+                                            break;
+                                        default:
+                                            @:Desconocido
+                                            break;
+                                    }
+                                </td>
+                                <td>@string.Join(", ", item.Roles)</td>
+                                <td>
+                                    <a asp-action="Editar" asp-controller="Inicio" class="btn btn-outline-primary btn-sm" asp-route-Token="@item.Token">Editar</a>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            }
+        </div>
     </div>
-    <div class="card-body">
-        <a asp-action="Guardar" asp-controller="Inicio" class="btn btn-outline-success">
-            <i class="bi bi-plus-circle"></i> Crear Nuevo
-        </a>
-        <hr />
-        <table class="table table-bordered">
-            <thead>
-                <tr>
-                    <th>Nombre</th>
-                    <th>Empresa</th>
-                    <th>Correo</th>
-                    <th>Estatus</th>
-                    <th>Roles</th>
-                    <th>Acciones</th>
-                </tr>
-            </thead>
-            <tbody>
-                @foreach (var item in Model)
-                {
-                    <tr>
-                        <td>@item.Nombre</td>
-                        <td>@item.Empresa</td>
-                        <td>@item.Correo</td>
-                        <td>
-                            @switch (item.IdStatus)
-                            {
-                                case 1:
-                                    @:Activo
-                                    break;
-                                case 2:
-                                    @:Inactivo
-                                    break;
-                                case 3:
-                                    @:Eliminado
-                                    break;
-                                default:
-                                    @:Desconocido
-                                    break;
-                            }
-                        </td>
-                        <td>@string.Join(", ", item.Roles)</td>
-                        <td>
-                            <a asp-action="Editar" asp-controller="Inicio" class="btn btn-outline-primary btn-sm" asp-route-Token="@item.Token">Editar</a>
-                        </td>
-                    </tr>
-                }
-            </tbody>
-        </table>
-
-    </div>
-</div>
 }
 else
 {

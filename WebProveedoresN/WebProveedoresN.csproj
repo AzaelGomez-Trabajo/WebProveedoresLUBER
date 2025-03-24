@@ -7,6 +7,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Content Include="Plantilla\Invitacion.html" />
     <Content Include="Plantilla\Confirmar.html" />
     <Content Include="Plantilla\Restablecer.html" />
   </ItemGroup>

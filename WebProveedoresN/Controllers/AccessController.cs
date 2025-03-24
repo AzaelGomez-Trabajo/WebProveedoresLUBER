@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
 using WebProveedoresN.Data;
@@ -19,15 +20,15 @@ namespace WebProveedoresN.Controllers
         public async Task<IActionResult> Login(UsuarioDTO model)
         {
             var usuario = DBInicio.ValidarUsuario(model.Correo, UtilityService.ConvertirSHA256(model.Clave));
-            if (usuario.Nombre != null)
+            if (usuario != null && usuario.Nombre != null)
             {
                 if (!usuario.Confirmado)
                 {
-                    ViewBag.Mensaje = $"Falta confirmar su cuenta, favor revise su bandeja del correo {model.Correo}.";
+                    ViewBag.Message = $"Falta confirmar su cuenta, favor revise su bandeja del correo {model.Correo}.";
                 }
                 else if (usuario.Restablecer)
                 {
-                    ViewBag.Mensaje = $"Se ha solicitado restablecer su cuenta, favor revise su bandeja del correo {model.Correo}.";
+                    ViewBag.Message = $"Se ha solicitado restablecer su cuenta, favor revise su bandeja del correo {model.Correo}.";
                 }
                 else 
                 {
@@ -40,12 +41,7 @@ namespace WebProveedoresN.Controllers
                         new("SupplierId", usuario.SupplierId.ToString())
                     };
 
-                    // Verificar si el usuario tiene el rol de "Administrador"
-                    if (usuario.Roles.Contains("Administrador"))
-                    {
-                        claims.Add(new Claim(ClaimTypes.Role, "Administrador"));
-                    }
-
+                    // agregar los roles del usuario
                     foreach (var rol in usuario.Roles)
                     {
                         claims.Add(new Claim(ClaimTypes.Role, rol));
@@ -58,11 +54,10 @@ namespace WebProveedoresN.Controllers
 
                     return RedirectToAction("ListOrders", "Orders", new { empresa = usuario.Empresa });
                 }
-
             }
             else 
             {
-                ViewBag.Mensaje = "No se encontraron coincidencias";
+                ViewBag.Message = "Correo o contraseña incorrectos";
             }
             return View();
         }
@@ -73,5 +68,6 @@ namespace WebProveedoresN.Controllers
             await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
             return RedirectToAction("Login", "Access");
         }
+
     }
 }

@@ -19,7 +19,7 @@ namespace WebProveedoresN.Controllers
                 orders = ((IEnumerable<OrderDTO>)orders).Where(o => o.OrderNumber.Contains(searchString)).ToList();
             }
             
-            int pageSize = 3;
+            int pageSize = 10;
             int totalRecords = orders.Count;
             int totalPages = (int)Math.Ceiling(totalRecords / (double)pageSize);
 

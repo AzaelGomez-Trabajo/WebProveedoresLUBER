@@ -13,7 +13,7 @@
 </head>
 <body>
     <div class="container mt-3">
-        @if ((bool)ViewBag.Respuesta)
+        @if (ViewBag.Respuesta.Contains("exitosamente"))
         {
             <div class="alert alert-success">
                 <p><b>Listo!</b>&nbsp; Su cuenta fue confirmada. Ahora puede acceder</p>
