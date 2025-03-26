@@ -1,7 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.Data.SqlClient;
 using System.Data;
-using WebProveedoresN.Conexion;
 using WebProveedoresN.Models;
 
 namespace WebProveedoresN.Data
@@ -29,13 +28,13 @@ namespace WebProveedoresN.Data
             }
         }
 
-        public static string GuardarDatosEnSqlServer(List<LecturaXmlDTO> archivos, string orderNumber)
+        public static string GuardarDatosEnSqlServer(List<LecturaXmlDTO> archivos, string orderNumber, string supplierName)
         {
 
             var isValid = false;
             foreach (var model in archivos)
             {
-                isValid = BuscarOrdenCompraYFactura(orderNumber, model.Total);
+                isValid = BuscarOrdenCompraYFactura(orderNumber, model.Total, supplierName);
             }
             if (isValid)
             {
@@ -47,7 +46,7 @@ namespace WebProveedoresN.Data
                         foreach (var archivo in archivos)
                         {
                             // Insertar datos en la tabla ArchivosXml
-                            var queryArchivo = "INSERT INTO ArchivosXml (SupplierId, FolioFactura, Serie, Version, EmisorNombre, EmisorRfc, ReceptorRfc, SubTotal, Total, UUID) OUTPUT INSERTED.IdFactura VALUES (@SupplierId, @FolioFactura, @Serie, @Version, @EmisorNombre, @EmisorRfc, @ReceptorRfc, @SubTotal, @Total, @UUID)";
+                            var queryArchivo = "INSERT INTO ArchivosXml (SupplierId, FolioFactura, Serie, Version, EmisorNombre, EmisorRfc, ReceptorRfc, SubTotal, Total, UUID) OUTPUT INSERTED.Id VALUES (@SupplierId, @FolioFactura, @Serie, @Version, @EmisorNombre, @EmisorRfc, @ReceptorRfc, @SubTotal, @Total, @UUID)";
                             int archivoId;
                             using (var cmd = new SqlCommand(queryArchivo, connection))
                             {
@@ -109,7 +108,7 @@ namespace WebProveedoresN.Data
             return "La factura supera el monto faltante de la Orden de Compra";
         }
 
-        private static bool BuscarOrdenCompraYFactura(string orderNumber, decimal totalInvoice)
+        private static bool BuscarOrdenCompraYFactura(string orderNumber, decimal totalInvoice, string supplierName)
         {
             bool isValid = false;
             string storedProcedure = "sp_ValidarFacturaConOrdenCompra";
@@ -119,6 +118,7 @@ namespace WebProveedoresN.Data
                 {
                     connection.Open();
                     cmd.Parameters.AddWithValue("@OrderNumber", orderNumber);
+                    cmd.Parameters.AddWithValue("@SupplierName", supplierName);
                     cmd.Parameters.AddWithValue("@TotalInvoice", totalInvoice);
                     cmd.CommandType = CommandType.StoredProcedure;
                     isValid = Convert.ToBoolean(cmd.ExecuteScalar());

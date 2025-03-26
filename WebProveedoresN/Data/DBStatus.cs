@@ -1,5 +1,4 @@
 ﻿using Microsoft.Data.SqlClient;
-using WebProveedoresN.Conexion;
 using WebProveedoresN.Models;
 
 namespace WebProveedoresN.Data

@@ -1,6 +1,5 @@
 ﻿using Microsoft.Data.SqlClient;
 using System.Data;
-using WebProveedoresN.Conexion;
 using WebProveedoresN.Models;
 
 namespace WebProveedoresN.Data
@@ -17,9 +16,9 @@ namespace WebProveedoresN.Data
                 var storedProcedure = "sp_ListarOrdenes";
                 using (var cmd = new SqlCommand(storedProcedure, conexion))
                 {
-                    cmd.Parameters.AddWithValue("@SupplierName", empresa);
-                    cmd.Parameters.AddWithValue("@Parametro1", parametro1);
-                    cmd.Parameters.AddWithValue("@Parametro2", parametro2);
+                    cmd.Parameters.AddWithValue("@Parameter1", parametro1);
+                    cmd.Parameters.AddWithValue("@Parameter2", parametro2);
+                    cmd.Parameters.AddWithValue("@Parameter3", empresa);
                     cmd.CommandType = CommandType.StoredProcedure;
                     using var dr = cmd.ExecuteReader();
                     while (dr.Read())

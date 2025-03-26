@@ -51,6 +51,7 @@ namespace WebProveedoresN.Controllers
                 return View(model);
             }
             ViewBag.UserIpAddress = _ipService.GetUserIpAddress();
+            var supplierName = User.FindFirst("SupplierName")?.Value;
 
             try
             {
@@ -183,12 +184,11 @@ namespace WebProveedoresN.Controllers
 
                     }
                         // Guardar los datos del XML en la base de datos
-                        XmlServicio.GuardarDatosXmlEnBaseDeDatos(xmlFilePath, ordenCompra, supplierId);
+                        XmlServicio.GuardarDatosXmlEnBaseDeDatos(xmlFilePath, ordenCompra, supplierId, supplierName);
 
                     // Enviar correo de confirmación
                     var userEmail = User.FindFirst(ClaimTypes.Email)?.Value;
                     var nombre = User.FindFirst(ClaimTypes.Name)?.Value;
-                    var supplierName = User.FindFirst("SupplierName")?.Value;
                     var correo = new CorreoDTO
                     {
                         Para = userEmail,

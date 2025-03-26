@@ -1,6 +1,6 @@
 ﻿using Microsoft.Data.SqlClient;
 using System.Data;
-using WebProveedoresN.Conexion;
+using WebProveedoresN.Entities;
 using WebProveedoresN.Models;
 using WebProveedoresN.Services;
 
@@ -19,7 +19,7 @@ namespace WebProveedoresN.Data
                 var storedProcedure = "sp_ValidarPrimerUsuario";
                 using var cmd = new SqlCommand(storedProcedure, conexion);
                 cmd.Parameters.AddWithValue("@Empresa", empresa.Empresa);
-                cmd.Parameters.AddWithValue("@Clave", empresa.Clave);
+                //cmd.Parameters.AddWithValue("@Clave", empresa.Clave);
                 cmd.CommandType = CommandType.StoredProcedure;
                 var respuesta = cmd.ExecuteScalar().ToString();
                 return respuesta;
@@ -189,8 +189,8 @@ namespace WebProveedoresN.Data
                             SupplierId = Convert.ToInt32(dr["SupplierId"]),
                             Empresa = dr["Empresa"].ToString(),
                             Nombre = dr["Nombre"].ToString(),
-                            Correo = dr["Correo"].ToString(),
-                            Clave = dr["Clave"].ToString(),
+                            Correo = correo,
+                            Clave = clave,
                             Token = dr["Token"].ToString(),
                             Restablecer = Convert.ToBoolean(dr["Restablecer"]),
                             Confirmado = Convert.ToBoolean(dr["Confirmado"]),
@@ -229,7 +229,7 @@ namespace WebProveedoresN.Data
                 cmd.Parameters.AddWithValue("@Restablecer", usuario.Restablecer);
                 cmd.Parameters.AddWithValue("@Confirmado", usuario.Confirmado);
                 cmd.Parameters.AddWithValue("@Token", usuario.Token);
-                cmd.Parameters.AddWithValue("@IdStatus", usuario.IdStatus);
+                cmd.Parameters.AddWithValue("@StatusId", usuario.IdStatus);
                 var idUsuario = Convert.ToInt32(cmd.ExecuteScalar());
 
                 //foreach (var rol in usuario.Roles)
@@ -237,8 +237,8 @@ namespace WebProveedoresN.Data
                 storedProcedure = "sp_GuardarUsuarioRol";
                 cmd.CommandText = storedProcedure;
                 cmd.Parameters.Clear();
-                cmd.Parameters.AddWithValue("@IdUsuario", idUsuario);
-                cmd.Parameters.AddWithValue("@RolNombre", "Administrador");
+                cmd.Parameters.AddWithValue("@UsuarioId", idUsuario);
+                cmd.Parameters.AddWithValue("@RoleId", 1);
                 cmd.ExecuteNonQuery();
                 //}
                 transaction.Commit();
@@ -276,7 +276,7 @@ namespace WebProveedoresN.Data
                 cmd.Parameters.AddWithValue("@Restablecer", usuario.Restablecer);
                 cmd.Parameters.AddWithValue("@Confirmado", usuario.Confirmado);
                 cmd.Parameters.AddWithValue("@Token", usuario.Token);
-                cmd.Parameters.AddWithValue("@IdStatus", usuario.IdStatus);
+                cmd.Parameters.AddWithValue("@StatusId", usuario.IdStatus);
                 var idUsuario = Convert.ToInt32(cmd.ExecuteScalar());
 
                 //foreach (var rol in usuario.Roles)
@@ -284,8 +284,8 @@ namespace WebProveedoresN.Data
                 storedProcedure = "sp_GuardarUsuarioRol";
                 cmd.CommandText = storedProcedure;
                 cmd.Parameters.Clear();
-                cmd.Parameters.AddWithValue("@IdUsuario", idUsuario);
-                cmd.Parameters.AddWithValue("@RolNombre", "Usuario");
+                cmd.Parameters.AddWithValue("@UsuarioId", idUsuario);
+                cmd.Parameters.AddWithValue("@RoleId", 2);
                 cmd.ExecuteNonQuery();
                 //}
                 transaction.Commit();
@@ -354,9 +354,19 @@ namespace WebProveedoresN.Data
                     cmd.Parameters.AddWithValue("@Nombre", model.Nombre);
                     cmd.Parameters.AddWithValue("@Correo", model.Correo);
                     cmd.Parameters.AddWithValue("@Token", model.Token);
-                    cmd.Parameters.AddWithValue(@"IdStatus", model.IdStatus);
-                    cmd.ExecuteNonQuery();
+                    cmd.Parameters.AddWithValue(@"StatusId", model.IdStatus);
+                    var idUsuario = Convert.ToInt32(cmd.ExecuteScalar());
+                    foreach (var rol in model.Roles)
+                    {
+                        storedProcedure = "sp_GuardarUsuarioRol";
+                        cmd.CommandText = storedProcedure;
+                        cmd.Parameters.Clear();
+                        cmd.Parameters.AddWithValue("@UsuarioId", idUsuario);
+                        cmd.Parameters.AddWithValue("@RoleId", rol);
+                        cmd.ExecuteNonQuery();
+                    }
                     transaction.Commit();
+
                     return "Usuario guardado exitosamente.";
                 }
                 catch (SqlException ex)
@@ -384,7 +394,7 @@ namespace WebProveedoresN.Data
                 cmd.CommandType = CommandType.StoredProcedure;
                 cmd.Parameters.AddWithValue("@Nombre", usuario.Nombre);
                 cmd.Parameters.AddWithValue("@Correo", usuario.Correo);
-                cmd.Parameters.AddWithValue("@IdStatus", usuario.IdStatus);
+                cmd.Parameters.AddWithValue("@StatusId", usuario.IdStatus);
                 cmd.Parameters.AddWithValue("@Token", usuario.Token);
                 cmd.ExecuteNonQuery();
                 return "Usuario guardado exitosamente.";
@@ -409,7 +419,7 @@ namespace WebProveedoresN.Data
                 using (var oconexion = DBConexion.ObtenerConexion())
                 {
                     oconexion.Open();
-                    var storedProcedure = "sp_RestablecerActualizar";
+                    var storedProcedure = "sp_Restablecer";
                     using var cmd = new SqlCommand(storedProcedure, oconexion);
                     cmd.CommandType = CommandType.StoredProcedure;
                     cmd.Parameters.AddWithValue("@restablecer", restablecer);

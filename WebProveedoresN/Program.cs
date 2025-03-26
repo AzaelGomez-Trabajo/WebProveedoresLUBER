@@ -4,7 +4,6 @@ using WebProveedoresN.Interfaces;
 using WebProveedoresN.Services;
 using Microsoft.AspNetCore.Identity;
 using WebProveedoresN.Data;
-using WebProveedoresN.Conexion;
 
 var builder = WebApplication.CreateBuilder(args);
 

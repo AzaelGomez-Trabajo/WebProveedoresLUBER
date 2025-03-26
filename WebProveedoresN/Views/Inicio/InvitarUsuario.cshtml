@@ -9,14 +9,6 @@
         <h3>Invitar Usuario</h3>
     </div>
     <div class="card-body">
-
-        @if (message != null)
-        {
-            <div class="alert alert-success" role="alert">
-                @message
-            </div>
-        }
-
         <form asp-action="InvitarUsuario" asp-controller="Inicio" method="post">
             <input asp-for="Empresa" type="hidden" class="form-control" />
             @if (!string.IsNullOrEmpty(message))

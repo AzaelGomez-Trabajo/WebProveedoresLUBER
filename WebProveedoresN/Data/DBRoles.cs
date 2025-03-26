@@ -1,6 +1,5 @@
 ﻿using Microsoft.Data.SqlClient;
 using System.Data;
-using WebProveedoresN.Conexion;
 
 namespace WebProveedoresN.Data
 {
@@ -21,7 +20,7 @@ namespace WebProveedoresN.Data
                 using var dr = cmd.ExecuteReader();
                 while (dr.Read())
                 {
-                    roles.Add(dr["Nombre"].ToString());
+                    roles.Add(dr["Name"].ToString());
                 }
             }
             catch (Exception)

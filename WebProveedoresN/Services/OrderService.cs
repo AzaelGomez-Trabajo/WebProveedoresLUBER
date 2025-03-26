@@ -1,5 +1,4 @@
-﻿using WebProveedoresN.Conexion;
-using WebProveedoresN.Data;
+﻿using WebProveedoresN.Data;
 using WebProveedoresN.Models;
 
 namespace WebProveedoresN.Services

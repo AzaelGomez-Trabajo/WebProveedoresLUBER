@@ -69,6 +69,12 @@ namespace WebProveedoresN.Controllers
             model.IdStatus = 1;
             var respuesta = DBInicio.GuardarInvitadoConRoles(model);
             TempData["Message"] = respuesta;
+            if (respuesta.Contains("duplicate"))
+            {
+                respuesta = $"Ya esta registrado el correo {model.Correo}";
+                TempData["Message"] = respuesta;
+                return View(model);
+            }
             if (respuesta.Contains("exitosamente"))
             {
                 string path = Path.Combine(_webHostEnvironment.ContentRootPath, "Plantilla", "Invitacion.html");
@@ -170,7 +176,7 @@ namespace WebProveedoresN.Controllers
                 ViewBag.Status = DBStatus.ObtenerEstatus() ?? [];
                 return View();
             }
-            var respuesta = DBInicio.EditarUsuarioConRoles(model);
+            var respuesta = DBInicio.Editar(model);
             TempData["Message"] = respuesta;
             if (respuesta.Contains("exitosamente"))
             {
@@ -182,7 +188,6 @@ namespace WebProveedoresN.Controllers
             }
         }
 
-        [Authorize(Roles = "Administrador")]
         public ActionResult Registrar()
         {
             return View();

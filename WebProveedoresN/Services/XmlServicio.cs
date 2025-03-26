@@ -108,14 +108,14 @@ namespace WebProveedoresN.Services
             }
         }
 
-        public static void GuardarDatosXmlEnBaseDeDatos(string xmlFilePath, string orderNumber, int supplierId)
+        public static void GuardarDatosXmlEnBaseDeDatos(string xmlFilePath, string orderNumber, int supplierId, string supplierName)
         {
             var archivos = ObtenerDatosDesdeXml(xmlFilePath);
             foreach(var archivo in archivos)
             {
                 archivo.SupplierId = supplierId;
             }
-            DBArchivos.GuardarDatosEnSqlServer(archivos, orderNumber);
+            DBArchivos.GuardarDatosEnSqlServer(archivos, orderNumber, supplierName);
         }
 
         public static bool BuscarFactura(string xmlFilePath)

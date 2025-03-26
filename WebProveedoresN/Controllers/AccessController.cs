@@ -62,6 +62,18 @@ namespace WebProveedoresN.Controllers
             return View();
         }
 
+        [Authorize]
+        public IActionResult VerRol()
+        {
+            var roles = User.Claims
+                            .Where(c => c.Type == ClaimTypes.Role)
+                            .Select(c => c.Value)
+                            .ToList();
+
+            ViewBag.Roles = roles;
+            return View();
+        }
+
         public async Task<IActionResult> Salir()
         {
             // elimiar la cookie de autenticación

@@ -1,7 +1,7 @@
 ﻿using Microsoft.Data.SqlClient;
 
 
-namespace WebProveedoresN.Conexion
+namespace WebProveedoresN.Data
 {
     public static class DBConexion
     {
