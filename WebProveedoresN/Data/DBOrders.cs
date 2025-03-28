@@ -30,7 +30,9 @@ namespace WebProveedoresN.Data
                             Canceled = dr["Canceled"].ToString(),
                             TotalAmount = (decimal)dr["TotalAmount"],
                             Status = dr["IdEstatus"].ToString(),
-                            Currency = dr["Currency"].ToString()
+                            Currency = dr["Currency"].ToString(),
+                            Invoices = (int)dr["Invoices"],
+                            TotalInvoices = (decimal)dr["TotalInvoice"],
                         });
                     }
 

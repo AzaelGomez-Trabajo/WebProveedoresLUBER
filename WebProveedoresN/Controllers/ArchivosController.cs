@@ -94,12 +94,14 @@ namespace WebProveedoresN.Controllers
                 }
 
                 // Validar el contenido del archivo XML
+                string xmlContent = string.Empty;
                 try
                 {
                     using (var xmlStream = xmlFile.OpenReadStream())
                     {
                         var xmlDoc = new System.Xml.XmlDocument();
                         xmlDoc.Load(xmlStream);
+                        xmlContent = xmlDoc.InnerXml;
                     }
                 }
                 catch (Exception)
@@ -143,15 +145,12 @@ namespace WebProveedoresN.Controllers
                 int supplierId = int.Parse(supplierIdClaim);
 
                 // Leer el contenido del archivo XML
-                string xmlContent = System.IO.File.ReadAllText(xmlFilePath);
+                ////string xmlContent = System.IO.File.ReadAllText(xmlFilePath);
                 string rfcReceptor = XmlServicio.ObtenerRfcReceptor(xmlContent);
 
                 if (!rfcReceptor.Equals("CIN041008173"))
                 {
                     ViewBag.Message = "La factura no es para LUBER Lubricantes.";
-                    // Eliminar los archivos después de procesarlos
-                    System.IO.File.Delete(pdfFilePath);
-                    System.IO.File.Delete(xmlFilePath);
                 }
                 else
                 {
@@ -175,9 +174,6 @@ namespace WebProveedoresN.Controllers
                     if (facturaUnica)
                     {
                         ViewBag.Message = $"La factura ya ha sido cargada.";
-                        // Eliminar los archivos después de procesarlos
-                        System.IO.File.Delete(pdfFilePath);
-                        System.IO.File.Delete(xmlFilePath);
                         ViewBag.OrderNumber = model.OrderNumber;
                         ViewBag.UserIpAddress = _ipService.GetUserIpAddress();
                         return View(model);

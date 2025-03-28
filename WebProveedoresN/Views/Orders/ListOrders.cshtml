@@ -29,6 +29,8 @@
                     <th>Fecha</th>
                     <th>Importe Total</th>
                     <th>Moneda</th>
+                    <th># Factura(s)</th>
+                    <th>Monto factura(s)</th>
                     <th>Documentos</th>
                 </tr>
             </thead>
@@ -40,6 +42,8 @@
                         <td>@item.OrderDate.ToShortDateString()</td>
                         <td>@item.TotalAmount.ToString("C")</td>
                         <td>@item.Currency.ToString()</td>
+                        <td>@item.Invoices.ToString()</td>
+                        <td>@item.TotalInvoices.ToString("C")</td>
                         <td>
                             <a asp-action="Upload" asp-controller="Archivos" asp-route-orderNumber="@item.OrderNumber" class="btn btn-outline-primary btn-sm">
                                 <i class="bi bi-cloud-upload-fill"></i> Cargar Facturas

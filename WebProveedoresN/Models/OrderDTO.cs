@@ -24,5 +24,7 @@ namespace WebProveedoresN.Models
         [DisplayName("Moneda")]
         public string Currency {  get; set; }
         public string Canceled { get; set; }
+        public int Invoices { get; set; }
+        public decimal TotalInvoices { get; set; }
     }
 }
