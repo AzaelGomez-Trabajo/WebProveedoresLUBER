@@ -5,7 +5,7 @@
                   CondicionesDePago="Contado" 
                   Exportacion="01" 
                   Fecha="2024-08-01T16:37:14" 
-                  Folio="42" 
+                  Folio="43" 
                   FormaPago="01" 
                   LugarExpedicion="83116" 
                   MetodoPago="PUE" 
@@ -114,7 +114,7 @@
                              NoCertificadoSAT="00001000000705928441"
                              RfcProvCertif="PPD101129EA3"
                              SelloCFD="WqqB+bfy0UXI09+0BR1tnguXTfLKECm7057zbIVeTTpIKiPkGqZhCLzdeqaHajzsqgCBcqUz5Dy41G1RYbOmVgvRCLW0fDty5FagoFIjK8MF6h4GLzmJz842O0b9phlBzRExcJ/lTbFJ9maT5dQ4g7tUSsxVk84x/NzBXVX9p2jLGVxpy4bqAm0EZZGVRp+y+hvVlgXmXOiRbPcQTMfPqSDUlnAE6TpYhdryqAB9d6HRceW9wGLor67QkPS2I9FFJ1mvdl7NCQSOgCKv5Qoj10STQMoKFRhnhusXlDRVQIyde9BUBnh/M7cmx280hN/nQb4S6Tj28D4fai06byw45A==" SelloSAT="OlTy1bu86A1KaIM4w0TIOtm9FfsG4uIrts+0tqEm7M36uLCkncDdG6pt+EvMIqz53TrKtRjvJX7uCCL8d6mom4xLpPGmyfSU4QCbE/8VPvzCLi3d9+5djhHJP9sT/0WmOme9N2Ago8gfFJkGPtmOrY8FP4Od54XAsQW4zY+WD3Td9YS/2aPiKbWyUVvyotfjey9SyOvzOJ7cPW9jXyAkNxT6/lEaD560mrQv4zVLUUA4Os9QGonR9eOaaOBSlyzMoXwEpqP1J0PKtjIQ6/FtreU8r7G1zqQ13pvy3V/1FWn2ts1GRfqnx9nfSd2Kdqk1O1l24E6xnZnyv/G4HK2V/A=="
-                             UUID="00CDDA53-D4C8-4A7D-A17A-144F1CADF046"
+                             UUID="X00CDDA53-D4C8-4A7D-A17A-144F1CADF046"
                              Version="1.1" xsi:schemaLocation="http://www.sat.gob.mx/TimbreFiscalDigital http://www.sat.gob.mx/sitio_internet/cfd/TimbreFiscalDigital/TimbreFiscalDigitalv11.xsd"
                              xmlns:tfd="http://www.sat.gob.mx/TimbreFiscalDigital"/>
   </cfdi:Complemento>

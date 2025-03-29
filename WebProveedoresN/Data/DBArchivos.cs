@@ -46,7 +46,7 @@ namespace WebProveedoresN.Data
                         foreach (var archivo in archivos)
                         {
                             // Insertar datos en la tabla ArchivosXml
-                            var queryArchivo = "INSERT INTO ArchivosXml (SupplierId, FolioFactura, Serie, Version, EmisorNombre, EmisorRfc, ReceptorRfc, SubTotal, Total, UUID) OUTPUT INSERTED.Id VALUES (@SupplierId, @FolioFactura, @Serie, @Version, @EmisorNombre, @EmisorRfc, @ReceptorRfc, @SubTotal, @Total, @UUID)";
+                            var queryArchivo = "INSERT INTO ArchivosXml (SupplierId, FolioFactura, Serie, Version, EmisorNombre, EmisorRfc, ReceptorRfc, SubTotal, Total, UUID, Sello) OUTPUT INSERTED.Id VALUES (@SupplierId, @FolioFactura, @Serie, @Version, @EmisorNombre, @EmisorRfc, @ReceptorRfc, @SubTotal, @Total, @UUID, @Sello)";
                             int archivoId;
                             using (var cmd = new SqlCommand(queryArchivo, connection))
                             {
@@ -60,6 +60,7 @@ namespace WebProveedoresN.Data
                                 cmd.Parameters.AddWithValue("@SubTotal", archivo.SubTotal);
                                 cmd.Parameters.AddWithValue("@Total", archivo.Total);
                                 cmd.Parameters.AddWithValue("@UUID", archivo.UUID);
+                                cmd.Parameters.AddWithValue("@Sello", archivo.Sello);
                                 cmd.CommandType = CommandType.Text;
                                 archivoId = (int)cmd.ExecuteScalar();
                             }

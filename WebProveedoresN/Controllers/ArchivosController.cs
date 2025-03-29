@@ -11,6 +11,7 @@ namespace WebProveedoresN.Controllers
     {
         private readonly IWebHostEnvironment _webHostEnvironment;
         private readonly IIPService _ipService;
+
         public ArchivosController(IWebHostEnvironment webHostEnvironment, IIPService ipService)
         {
             _webHostEnvironment = webHostEnvironment;
@@ -52,6 +53,14 @@ namespace WebProveedoresN.Controllers
             }
             ViewBag.UserIpAddress = _ipService.GetUserIpAddress();
             var supplierName = User.FindFirst("SupplierName")?.Value;
+            // Obtener el SupplierId del claim
+            var supplierIdClaim = User.FindFirst("SupplierId")?.Value;
+            if (string.IsNullOrEmpty(supplierIdClaim))
+            {
+                // Manejar el caso en que el claim no esté presente
+                return RedirectToAction("Login", "Inicio");
+            }
+            int supplierId = int.Parse(supplierIdClaim);
 
             try
             {
@@ -112,6 +121,36 @@ namespace WebProveedoresN.Controllers
                     return View(model);
                 }
 
+                // Leer el contenido del archivo XML
+                string rfcReceptor = string.Empty;
+                var datos = XmlServicio.ObtenerDatosDesdeXml(xmlContent);
+                foreach (var dato in datos)
+                {
+                    dato.SupplierId = supplierId;
+                    rfcReceptor = dato.ReceptorRfc;
+                }
+
+                var facturaUnica = XmlServicio.BuscarFactura(xmlContent);
+                if (facturaUnica)
+                {
+                    ViewBag.Message = $"La factura ya ha sido cargada.";
+                    ViewBag.OrderNumber = model.OrderNumber;
+                    ViewBag.UserIpAddress = _ipService.GetUserIpAddress();
+                    return View(model);
+                }
+
+                // Guardar los datos del XML en la base de datos
+                var result = XmlServicio.GuardarDatosXmlEnBaseDeDatos(datos, ordenCompra, supplierName);
+
+                if (!rfcReceptor.Equals("CIN041008173"))
+                {
+                    ViewBag.Message = "La factura no es para LUBER Lubricantes.";
+                }
+                if (result != "OK")
+                {
+                    ViewBag.Message = result;
+                }
+
                 string folderPath = Path.Combine(_webHostEnvironment.ContentRootPath, "UploadedFiles");
                 if (!Directory.Exists(folderPath))
                 {
@@ -135,68 +174,31 @@ namespace WebProveedoresN.Controllers
                     xmlFile.CopyTo(xmlStream);
                 }
 
-                // Obtener el SupplierId del claim
-                var supplierIdClaim = User.FindFirst("SupplierId")?.Value;
-                if (string.IsNullOrEmpty(supplierIdClaim))
-                {
-                    // Manejar el caso en que el claim no esté presente
-                    return RedirectToAction("Login", "Inicio");
-                }
-                int supplierId = int.Parse(supplierIdClaim);
-
-                // Leer el contenido del archivo XML
-                ////string xmlContent = System.IO.File.ReadAllText(xmlFilePath);
-                string rfcReceptor = XmlServicio.ObtenerRfcReceptor(xmlContent);
-
-                if (!rfcReceptor.Equals("CIN041008173"))
-                {
-                    ViewBag.Message = "La factura no es para LUBER Lubricantes.";
-                }
-                else
-                {
-                    var pdfName = Path.GetFileNameWithoutExtension(pdfFileName);
-                    var xmlName = Path.GetFileNameWithoutExtension(xmlFileName);
-                    var archivos = new List<ArchivoDTO>
+                var pdfName = Path.GetFileNameWithoutExtension(pdfFileName);
+                var xmlName = Path.GetFileNameWithoutExtension(xmlFileName);
+                var xmlConverted = XmlServicio.ConvertXmlToPdf(xmlContent, Path.Combine(folderPath, $"{timestamp}_1_{xmlName}.pdf"));
+                var archivos = new List<ArchivoDTO>
                             {
                                 new() { OrderNumber = ordenCompra, Name = pdfName, Route = folderPath, DateTime = timestamp, Extension = ".pdf", Converted = false },
-                                new() { OrderNumber = ordenCompra, Name = xmlName, Route = folderPath, DateTime = timestamp, Extension = ".xml", Converted = false }
+                                new() { OrderNumber = ordenCompra, Name = xmlName, Route = folderPath, DateTime = timestamp, Extension = ".xml", Converted = false },
+                                new() { OrderNumber = ordenCompra, Name = xmlName, Route = folderPath, DateTime = timestamp, Extension = ".pdf", Converted = true }
                             };
+                XmlServicio.GuardarArchivosEnBaseDeDatos(archivos);
 
-                    XmlServicio.GuardarArchivosEnBaseDeDatos(archivos);
-                    var xmlConverted = XmlServicio.ConvertXmlToPdf(xmlContent, Path.Combine(folderPath, $"{timestamp}_1_{xmlName}.pdf"));
-                    var archiveConverted = new List<ArchivoDTO>
-                        {
-                            new() { OrderNumber = ordenCompra, Name = $"{xmlName}", Route = folderPath, DateTime = timestamp, Extension = ".pdf", Converted = true }
-                        };
-                    XmlServicio.GuardarArchivosEnBaseDeDatos(archiveConverted);
+                // Enviar correo de confirmación
+                var userEmail = User.FindFirst(ClaimTypes.Email)?.Value;
+                var nombre = User.FindFirst(ClaimTypes.Name)?.Value;
+                var correo = new CorreoDTO
+                {
+                    Para = userEmail,
+                    CCO = "noeazael77@hotmail.com",
+                    Asunto = "Documentos guardados correctamente",
+                    Contenido = $"Hola, {nombre}<br><br>Las facturas: <br><br> {pdfFile.FileName} y <br> {xmlFile.FileName}. <br><br> Para la orden de compra {ordenCompra} de la Empresa {supplierName} se han guardado correctamente.<br><br>Saludos,<br>El equipo de LUBER Lubricantes"
+                };
+                CorreoServicio.EnviarCorreo(correo, nombre);
 
-                    var facturaUnica = XmlServicio.BuscarFactura(xmlFilePath);
-                    if (facturaUnica)
-                    {
-                        ViewBag.Message = $"La factura ya ha sido cargada.";
-                        ViewBag.OrderNumber = model.OrderNumber;
-                        ViewBag.UserIpAddress = _ipService.GetUserIpAddress();
-                        return View(model);
-
-                    }
-                        // Guardar los datos del XML en la base de datos
-                        XmlServicio.GuardarDatosXmlEnBaseDeDatos(xmlFilePath, ordenCompra, supplierId, supplierName);
-
-                    // Enviar correo de confirmación
-                    var userEmail = User.FindFirst(ClaimTypes.Email)?.Value;
-                    var nombre = User.FindFirst(ClaimTypes.Name)?.Value;
-                    var correo = new CorreoDTO
-                    {
-                        Para = userEmail,
-                        CCO = "noeazael77@hotmail.com",
-                        Asunto = "Documentos guardados correctamente",
-                        Contenido = $"Hola, {nombre}<br><br>Las facturas: <br><br> {pdfFile.FileName} y <br> {xmlFile.FileName}. <br><br> Para la orden de compra {ordenCompra} de la Empresa {supplierName} se han guardado correctamente.<br><br>Saludos,<br>El equipo de LUBER Lubricantes"
-                    };
-                    CorreoServicio.EnviarCorreo(correo, nombre);
-
-                    // Redirigir a la vista Index del controlador LecturaXml
-                    return RedirectToAction("Index", "LecturaXml", new { xmlFilePath });
-                }
+                // Redirigir a la vista Index del controlador LecturaXml
+                return RedirectToAction("Index", "LecturaXml", new { xmlFilePath });
             }
             catch (Exception ex)
             {
@@ -217,7 +219,5 @@ namespace WebProveedoresN.Controllers
             }
             return Json(new { success = false, message = "No tiene facturas cargadas." });
         }
-
-
     }
 }

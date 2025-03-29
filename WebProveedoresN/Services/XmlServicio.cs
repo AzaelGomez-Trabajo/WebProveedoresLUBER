@@ -26,14 +26,12 @@ namespace WebProveedoresN.Services
             return null;
         }
 
-        public static List<LecturaXmlDTO> ObtenerDatosDesdeXml(string rutaXml)
+        public static List<LecturaXmlDTO> ObtenerDatosDesdeXml(string xmlContent)
         {
             var archivos = new List<LecturaXmlDTO>();
             try
             {
-                if (File.Exists(rutaXml))
-                {
-                    var xmlDoc = XDocument.Load(rutaXml);
+                    var xmlDoc = XDocument.Parse(xmlContent);
                     foreach (var element in xmlDoc.Descendants("{http://www.sat.gob.mx/cfd/4}Comprobante"))
                     {
                         var archivo = new LecturaXmlDTO
@@ -69,12 +67,6 @@ namespace WebProveedoresN.Services
 
                         archivos.Add(archivo);
                     }
-
-                }
-                else
-                {
-                    throw new FileNotFoundException("El archivo XML no se encontró en la ruta especificada.");
-                }
             }
             catch (Exception ex)
             {
@@ -108,14 +100,9 @@ namespace WebProveedoresN.Services
             }
         }
 
-        public static void GuardarDatosXmlEnBaseDeDatos(string xmlFilePath, string orderNumber, int supplierId, string supplierName)
+        public static string GuardarDatosXmlEnBaseDeDatos(List<LecturaXmlDTO> archivos, string orderNumber, string supplierName)
         {
-            var archivos = ObtenerDatosDesdeXml(xmlFilePath);
-            foreach(var archivo in archivos)
-            {
-                archivo.SupplierId = supplierId;
-            }
-            DBArchivos.GuardarDatosEnSqlServer(archivos, orderNumber, supplierName);
+             return DBArchivos.GuardarDatosEnSqlServer(archivos, orderNumber, supplierName);
         }
 
         public static bool BuscarFactura(string xmlFilePath)
