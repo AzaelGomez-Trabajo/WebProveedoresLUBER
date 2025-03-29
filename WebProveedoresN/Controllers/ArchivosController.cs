@@ -220,7 +220,7 @@ namespace WebProveedoresN.Controllers
             {
                 return Json(new { success = true, documents });
             }
-            return Json(new { success = false, message = "No tiene facturas cargadas." });
+            return Json(new { success = false, message = $"No tiene facturas cargadas la Orden de Compra {orderNumber}." });
         }
     }
 }
