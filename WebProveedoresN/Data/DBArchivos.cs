@@ -28,15 +28,14 @@ namespace WebProveedoresN.Data
             }
         }
 
-        public static string GuardarDatosEnSqlServer(List<LecturaXmlDTO> archivos, string orderNumber, string supplierName)
+        public static string GuardarDatosEnSqlServer(List<LecturaXmlDTO> archivos, string orderNumber, string supplierName, string idUsuario, string ipUsuario)
         {
-
-            var isValid = false;
+            var isValid = string.Empty;
             foreach (var model in archivos)
             {
                 isValid = BuscarOrdenCompraYFactura(orderNumber, model.Total, supplierName);
             }
-            if (isValid)
+            if (isValid is "true")
             {
                 try
                 {
@@ -66,13 +65,15 @@ namespace WebProveedoresN.Data
                             }
 
                             // Inserta datos en la tabla OrdersFacturas
-                            var queryOrderFactura = "INSERT INTO OrdersFacturas (OrderNumber, IdFactura) OUTPUT INSERTED.IdFactura VALUES (@OrderNumber, @IdFactura)";
+                            var queryOrderFactura = "INSERT INTO OrdersFacturas (OrderNumber, IdFactura, IdUsuario, IpUsuario) OUTPUT INSERTED.IdFactura VALUES (@OrderNumber, @IdFactura, @IdUsuario, @IpUsuario)";
                             using (var cmd = new SqlCommand(queryOrderFactura, connection))
                             {
                                 cmd.CommandType = CommandType.Text;
                                 cmd.Parameters.Clear();
                                 cmd.Parameters.AddWithValue("@OrderNumber", orderNumber);
                                 cmd.Parameters.AddWithValue("@IdFactura", archivoId);
+                                cmd.Parameters.AddWithValue("@IdUsuario", idUsuario);
+                                cmd.Parameters.AddWithValue("@IpUsuario", ipUsuario);
                                 archivoId = (int)cmd.ExecuteScalar();
                             }
 
@@ -106,12 +107,16 @@ namespace WebProveedoresN.Data
                     return $"Error inesperado al guardar los datos en SQL Server {ex.Message}";
                 }
             }
-            return "La factura supera el monto faltante de la Orden de Compra";
+            if (isValid is "false")
+            {
+                return "La factura supera el monto faltante de la Orden de Compra ";
+            }
+            return "No se encontró la Orden de Compra ";
         }
 
-        private static bool BuscarOrdenCompraYFactura(string orderNumber, decimal totalInvoice, string supplierName)
+        private static string BuscarOrdenCompraYFactura(string orderNumber, decimal totalInvoice, string supplierName)
         {
-            bool isValid = false;
+            var isValid = string.Empty;
             string storedProcedure = "sp_ValidarFacturaConOrdenCompra";
             using (var connection = DBConexion.ObtenerConexion())
             {
@@ -122,13 +127,13 @@ namespace WebProveedoresN.Data
                     cmd.Parameters.AddWithValue("@SupplierName", supplierName);
                     cmd.Parameters.AddWithValue("@TotalInvoice", totalInvoice);
                     cmd.CommandType = CommandType.StoredProcedure;
-                    isValid = Convert.ToBoolean(cmd.ExecuteScalar());
+                    isValid = cmd.ExecuteScalar().ToString();
                 }
             }
             return isValid;
         }
 
-        public async static Task<List<ArchivoDTO>> ObtenerDocumentosAsync(string orderNumber, int converted)
+        public static async Task<List<ArchivoDTO>> ObtenerDocumentosAsync(string orderNumber)
         {
             var documents = new List<ArchivoDTO>();
 
@@ -138,12 +143,12 @@ namespace WebProveedoresN.Data
                 SqlCommand command = new SqlCommand(query, connection);
                 command.Parameters.AddWithValue("@OrderNumber", orderNumber);
                 command.Parameters.AddWithValue("@Extension", ".pdf");
-                command.Parameters.AddWithValue("@Converted", converted);
+                command.Parameters.AddWithValue("@Converted", 0);
 
                 await connection.OpenAsync();
                 using (SqlDataReader reader = await command.ExecuteReaderAsync())
                 {
-                    if (await reader.ReadAsync())
+                    while (await reader.ReadAsync())
                     {
                         documents.Add(new ArchivoDTO
                         {
@@ -176,8 +181,5 @@ namespace WebProveedoresN.Data
             }
             return isValid;
         }
-
-
-
     }
 }

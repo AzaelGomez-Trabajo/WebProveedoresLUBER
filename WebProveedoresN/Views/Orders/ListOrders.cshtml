@@ -31,7 +31,7 @@
                     <th>Moneda</th>
                     <th># Factura(s)</th>
                     <th>Monto factura(s)</th>
-                    <th>Documentos</th>
+                    <th>Factura(s)</th>
                 </tr>
             </thead>
             <tbody>
@@ -46,10 +46,10 @@
                         <td>@item.TotalInvoices.ToString("C")</td>
                         <td>
                             <a asp-action="Upload" asp-controller="Archivos" asp-route-orderNumber="@item.OrderNumber" class="btn btn-outline-primary btn-sm">
-                                <i class="bi bi-cloud-upload-fill"></i> Cargar Facturas
+                                <i class="bi bi-cloud-upload-fill"></i> Cargar
                             </a>
-                            <button class="btn btn-outline-secondary btn-sm" onclick="mostrarDocumentos('@item.OrderNumber', 0)">
-                                <i class="bi bi-cloud-download-fill"></i> Mostrar Factura(s)
+                            <button class="btn btn-outline-secondary btn-sm" onclick="mostrarDocumentos('@item.OrderNumber')">
+                                <i class="bi bi-cloud-download-fill"></i> Mostrar
                             </button>
                             <button class="btn btn-outline-danger btn-sm" onclick="cerrarEmbed('@item.OrderNumber')">
                                 <i class="bi bi-x-circle-fill"> Cerrar</i>
@@ -85,11 +85,11 @@
 
 @section Scripts {
     <script>
-        function mostrarDocumentos(orderNumber, converted) {
+        function mostrarDocumentos(orderNumber) {
             $.ajax({
                 url: '@Url.Action("ObtenerDocumentos", "Archivos")',
                 type: 'GET',
-                data: { orderNumber: orderNumber, converted: converted },
+                data: { orderNumber: orderNumber },
                 success: function (response) {
                     if (response.success) {
                         var embedContainer = $('#embed-container-' + orderNumber);

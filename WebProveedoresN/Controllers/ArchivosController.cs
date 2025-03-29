@@ -49,6 +49,7 @@ namespace WebProveedoresN.Controllers
             if (!ModelState.IsValid)
             {
                 ViewBag.OrderNumber = model.OrderNumber;
+                ViewBag.UserIpAddress = _ipService.GetUserIpAddress();
                 return View(model);
             }
             ViewBag.UserIpAddress = _ipService.GetUserIpAddress();
@@ -60,8 +61,9 @@ namespace WebProveedoresN.Controllers
                 // Manejar el caso en que el claim no esté presente
                 return RedirectToAction("Login", "Inicio");
             }
-            int supplierId = int.Parse(supplierIdClaim);
-
+            var supplierId = int.Parse(supplierIdClaim);
+            var idUsuario = User.FindFirst("IdUsuario")?.Value;
+            var ipAddress = _ipService.GetUserIpAddress();
             try
             {
                 var pdfFile = model.FilePDF;
@@ -73,7 +75,7 @@ namespace WebProveedoresN.Controllers
                 {
                     ModelState.AddModelError("FilePDF", "El archivo debe ser un PDF.");
                     ViewBag.OrderNumber = model.OrderNumber;
-                    ViewBag.UserIpAddress = _ipService.GetUserIpAddress();
+                    ViewBag.UserIpAddress = ipAddress;
                     return View(model);
                 }
 
@@ -81,7 +83,7 @@ namespace WebProveedoresN.Controllers
                 {
                     ModelState.AddModelError("FileXML", "El archivo debe ser un XML.");
                     ViewBag.OrderNumber = model.OrderNumber;
-                    ViewBag.UserIpAddress = _ipService.GetUserIpAddress();
+                    ViewBag.UserIpAddress = ipAddress;
                     return View(model);
                 }
 
@@ -90,7 +92,7 @@ namespace WebProveedoresN.Controllers
                 {
                     ModelState.AddModelError("FilePDF", "El archivo PDF no debe exceder los 2 MB.");
                     ViewBag.OrderNumber = model.OrderNumber;
-                    ViewBag.UserIpAddress = _ipService.GetUserIpAddress();
+                    ViewBag.UserIpAddress = ipAddress;
                     return View(model);
                 }
 
@@ -98,7 +100,7 @@ namespace WebProveedoresN.Controllers
                 {
                     ModelState.AddModelError("FileXML", "El archivo XML no debe exceder los 2 MB.");
                     ViewBag.OrderNumber = model.OrderNumber;
-                    ViewBag.UserIpAddress = _ipService.GetUserIpAddress();
+                    ViewBag.UserIpAddress = ipAddress;
                     return View(model);
                 }
 
@@ -117,7 +119,7 @@ namespace WebProveedoresN.Controllers
                 {
                     ModelState.AddModelError("FileXML", "El archivo XML no es válido.");
                     ViewBag.OrderNumber = model.OrderNumber;
-                    ViewBag.UserIpAddress = _ipService.GetUserIpAddress();
+                    ViewBag.UserIpAddress = ipAddress;
                     return View(model);
                 }
 
@@ -130,25 +132,27 @@ namespace WebProveedoresN.Controllers
                     rfcReceptor = dato.ReceptorRfc;
                 }
 
+                if (!rfcReceptor.Equals("CIN041008173"))
+                {
+                    ViewBag.Message = "La factura no es para LUBER Lubricantes.";
+                }
+
                 var facturaUnica = XmlServicio.BuscarFactura(xmlContent);
                 if (facturaUnica)
                 {
                     ViewBag.Message = $"La factura ya ha sido cargada.";
                     ViewBag.OrderNumber = model.OrderNumber;
-                    ViewBag.UserIpAddress = _ipService.GetUserIpAddress();
+                    ViewBag.UserIpAddress = ipAddress;
                     return View(model);
                 }
 
                 // Guardar los datos del XML en la base de datos
-                var result = XmlServicio.GuardarDatosXmlEnBaseDeDatos(datos, ordenCompra, supplierName);
+                var result = XmlServicio.GuardarDatosXmlEnBaseDeDatos(datos, ordenCompra, supplierName, idUsuario, ipAddress);
 
-                if (!rfcReceptor.Equals("CIN041008173"))
-                {
-                    ViewBag.Message = "La factura no es para LUBER Lubricantes.";
-                }
                 if (result != "OK")
                 {
-                    ViewBag.Message = result;
+                    ViewBag.Message = $"{result} {ordenCompra}." ;
+                    return View(model);
                 }
 
                 string folderPath = Path.Combine(_webHostEnvironment.ContentRootPath, "UploadedFiles");
@@ -204,15 +208,14 @@ namespace WebProveedoresN.Controllers
             {
                 ViewBag.Message = $"Ocurrió un error al procesar los archivos: {ex.Message}";
             }
-
+            ViewBag.UserIpAddress = ipAddress;
             ViewBag.OrderNumber = model.OrderNumber;
-            ViewBag.UserIpAddress = _ipService.GetUserIpAddress();
             return View(model);
         }
 
-        public async Task<IActionResult> ObtenerDocumentos(string orderNumber, int converted)
+        public async Task<IActionResult> ObtenerDocumentos(string orderNumber)
         {
-            var documents = await DBArchivos.ObtenerDocumentosAsync(orderNumber, converted);
+            var documents = await DBArchivos.ObtenerDocumentosAsync(orderNumber);
             if (documents != null && documents.Count > 0)
             {
                 return Json(new { success = true, documents });

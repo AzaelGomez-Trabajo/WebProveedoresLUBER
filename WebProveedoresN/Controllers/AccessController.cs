@@ -38,7 +38,8 @@ namespace WebProveedoresN.Controllers
                         new(ClaimTypes.Name, usuario.Nombre),
                         new(ClaimTypes.Email, usuario.Correo),
                         new("SupplierName", usuario.Empresa),
-                        new("SupplierId", usuario.SupplierId.ToString())
+                        new("SupplierId", usuario.SupplierId.ToString()),
+                        new("IdUsuario", usuario.IdUsuario.ToString()),
                     };
 
                     // agregar los roles del usuario

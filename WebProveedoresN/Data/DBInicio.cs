@@ -186,6 +186,7 @@ namespace WebProveedoresN.Data
                     {
                         usuario = new UsuarioDTO
                         {
+                            IdUsuario = Convert.ToInt32(dr["IdUsuario"]),
                             SupplierId = Convert.ToInt32(dr["SupplierId"]),
                             Empresa = dr["Empresa"].ToString(),
                             Nombre = dr["Nombre"].ToString(),

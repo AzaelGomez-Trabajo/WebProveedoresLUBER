@@ -2,8 +2,6 @@ using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.Extensions.FileProviders;
 using WebProveedoresN.Interfaces;
 using WebProveedoresN.Services;
-using Microsoft.AspNetCore.Identity;
-using WebProveedoresN.Data;
 
 var builder = WebApplication.CreateBuilder(args);
 

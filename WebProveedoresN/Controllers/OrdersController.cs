@@ -1,8 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using WebProveedoresN.Data;
 using WebProveedoresN.Models;
 using WebProveedoresN.Services;
-using System.Linq;
 
 namespace WebProveedoresN.Controllers
 {
@@ -18,7 +16,7 @@ namespace WebProveedoresN.Controllers
             {
                 orders = ((IEnumerable<OrderDTO>)orders).Where(o => o.OrderNumber.Contains(searchString)).ToList();
             }
-            
+
             int pageSize = 10;
             int totalRecords = orders.Count;
             int totalPages = (int)Math.Ceiling(totalRecords / (double)pageSize);
@@ -28,6 +26,5 @@ namespace WebProveedoresN.Controllers
             ViewBag.SearchString = searchString;
             return View(Pagination<OrderDTO>.CreatePagination(orders, pageNumber, pageSize));
         }
-
     }
 }

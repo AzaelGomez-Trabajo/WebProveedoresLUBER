@@ -100,9 +100,9 @@ namespace WebProveedoresN.Services
             }
         }
 
-        public static string GuardarDatosXmlEnBaseDeDatos(List<LecturaXmlDTO> archivos, string orderNumber, string supplierName)
+        public static string GuardarDatosXmlEnBaseDeDatos(List<LecturaXmlDTO> archivos, string orderNumber, string supplierName,string idUsuario, string ipUsuario)
         {
-             return DBArchivos.GuardarDatosEnSqlServer(archivos, orderNumber, supplierName);
+             return DBArchivos.GuardarDatosEnSqlServer(archivos, orderNumber, supplierName, idUsuario, ipUsuario);
         }
 
         public static bool BuscarFactura(string xmlFilePath)

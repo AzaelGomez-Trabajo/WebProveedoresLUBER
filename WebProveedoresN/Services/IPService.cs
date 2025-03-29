@@ -14,8 +14,12 @@ namespace WebProveedoresN.Services
 
         public string GetUserIpAddress()
         {
-            return _httpContextAccessor.HttpContext?.Connection.RemoteIpAddress?.ToString() ?? "IP no disponible";
+            var ipAddress = _httpContextAccessor.HttpContext?.Connection.RemoteIpAddress?.ToString() ?? "IP no disponible";
+            if (ipAddress == "::1" || string.IsNullOrEmpty(ipAddress))
+            {
+                ipAddress = "127.0.0.1"; // Asignar la dirección IPv4 de loopback si es local
+            }
+            return ipAddress;
         }
-
     }
 }
