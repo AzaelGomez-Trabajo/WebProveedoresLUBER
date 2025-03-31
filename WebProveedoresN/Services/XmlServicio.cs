@@ -105,9 +105,9 @@ namespace WebProveedoresN.Services
              return DBArchivos.GuardarDatosEnSqlServer(archivos, orderNumber, supplierName, idUsuario, ipUsuario);
         }
 
-        public static bool BuscarFactura(string xmlFilePath)
+        public static bool BuscarFactura(string xmlContent)
         {
-            var archivos = ObtenerDatosDesdeXml(xmlFilePath);
+            var archivos = ObtenerDatosDesdeXml(xmlContent);
             foreach (var archivo in archivos)
             {
                 if (DBArchivos.BuscarFactura(archivo))

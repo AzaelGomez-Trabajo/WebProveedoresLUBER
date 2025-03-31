@@ -202,7 +202,8 @@ namespace WebProveedoresN.Controllers
                 CorreoServicio.EnviarCorreo(correo, nombre);
 
                 // Redirigir a la lista de órdenes
-                return RedirectToAction("ListOrders", "Orders");
+                return RedirectToAction("Index", "Lecturaxml", new { xmlContent } );
+                //return RedirectToAction("ListOrders", "Orders");
             }
             catch (Exception ex)
             {
@@ -221,6 +222,12 @@ namespace WebProveedoresN.Controllers
                 return Json(new { success = true, documents });
             }
             return Json(new { success = false, message = $"No tiene facturas cargadas la Orden de Compra {orderNumber}." });
+        }
+
+        [HttpPost]
+        public IActionResult CerrarEmbed(string orderNumber)
+        {
+            return Json(new { success = true });
         }
     }
 }

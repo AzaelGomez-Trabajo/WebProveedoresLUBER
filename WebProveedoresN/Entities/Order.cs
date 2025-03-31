@@ -1,10 +1,11 @@
-﻿using System.ComponentModel;
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel;
 
-namespace WebProveedoresN.Models
+namespace WebProveedoresN.Entities
 {
-	public class OrderDTO
-	{
+    public class Order
+    {
+        [Key]
         public int Id { get; set; }
         [Required]
         [DisplayName("Orden de Compra")]
@@ -21,7 +22,7 @@ namespace WebProveedoresN.Models
         [DisplayName("Estado")]
         public string IdEstatus { get; set; }
         [DisplayName("Moneda")]
-        public string Currency {  get; set; }
+        public string Currency { get; set; }
         public string Canceled { get; set; }
         public int Invoices { get; set; }
         public decimal TotalInvoice { get; set; }

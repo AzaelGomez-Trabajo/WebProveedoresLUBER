@@ -29,10 +29,10 @@ namespace WebProveedoresN.Data
                             OrderDate = (DateTime)dr["OrderDate"],
                             Canceled = dr["Canceled"].ToString(),
                             TotalAmount = (decimal)dr["TotalAmount"],
-                            Status = dr["IdEstatus"].ToString(),
+                            IdEstatus = dr["IdEstatus"].ToString(),
                             Currency = dr["Currency"].ToString(),
                             Invoices = (int)dr["Invoices"],
-                            TotalInvoices = (decimal)dr["TotalInvoice"],
+                            TotalInvoice = (decimal)dr["TotalInvoice"],
                         });
                     }
 

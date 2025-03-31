@@ -6,15 +6,15 @@ namespace WebProveedoresN.Controllers
 {
     public class LecturaXmlController : Controller
     {
-        public ActionResult Index(string xmlFilePath)
+        public ActionResult Index(string xmlContent)
         {
-            if (string.IsNullOrEmpty(xmlFilePath))
+            if (string.IsNullOrEmpty(xmlContent))
             {
                 ViewBag.Message = "La ruta del archivo XML no es válida.";
                 return View();
             }
 
-            var archivos = XmlServicio.ObtenerDatosDesdeXml(xmlFilePath);
+            var archivos = XmlServicio.ObtenerDatosDesdeXml(xmlContent);
             return View(archivos);
 
         }

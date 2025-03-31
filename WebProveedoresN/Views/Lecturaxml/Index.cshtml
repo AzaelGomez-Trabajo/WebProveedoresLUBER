@@ -50,6 +50,25 @@
         }
     </tbody>
 </table>
+<h5>Datos Proveedor</h5>
+<table class="table">
+    <thead>
+        <tr>
+            <th>@Html.DisplayNameFor(model => model.EmisorNombre) </th>
+            <th>@Html.DisplayNameFor(model => model.EmisorRfc) </th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var archivo in Model)
+        {
+            <tr>
+                <td>@archivo.EmisorNombre</td>
+                <td>@archivo.EmisorRfc</td>
+            </tr>
+        }
+    </tbody>
+</table>
+
 <h5>Datos Concepto</h5>
 <table class="table">
     <thead>

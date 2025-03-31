@@ -14,7 +14,7 @@
     <div class="card-body">
         <form method="get" asp-action="ListOrders" class="d-flex justify-content-end">
             <div class=" input-group mb-3" style="max-width: 300px">
-                <input type="text" name="searchString" value="@ViewBag.SearchString" placeholder="Número de orden" class="form-control"/>
+                <input type="text" name="searchString" value="@ViewBag.SearchString" placeholder="Número de orden" class="form-control" />
                 <button type="submit" class="btn btn-outline-primary">Buscar</button>
             </div>
         </form>
@@ -43,7 +43,7 @@
                         <td>@item.TotalAmount.ToString("C")</td>
                         <td>@item.Currency.ToString()</td>
                         <td>@item.Invoices.ToString()</td>
-                        <td>@item.TotalInvoices.ToString("C")</td>
+                        <td>@item.TotalInvoice.ToString("C")</td>
                         <td>
                             <a asp-action="Upload" asp-controller="Archivos" asp-route-orderNumber="@item.OrderNumber" class="btn btn-outline-primary btn-sm">
                                 <i class="bi bi-cloud-upload-fill"></i> Cargar
@@ -53,13 +53,8 @@
                             </button>
                             <button class="btn btn-outline-danger btn-sm" onclick="cerrarEmbed('@item.OrderNumber')">
                                 <i class="bi bi-x-circle-fill"> Cerrar</i>
-                            </button>
-                            <div id="embed-container-@item.OrderNumber" style="display:none;">
-@*                                 <div class="mt-2">
-                                    <button class="btn btn-primary btn-sm" onclick="descargarDocumento('@item.OrderNumber')">Descargar</button>
-                                    <button class="btn btn-secondary btn-sm" onclick="cerrarEmbed('@item.OrderNumber')">Cerrar</button>
-                                </div>
- *@                                    <div id="embed-list-@item.OrderNumber"></div>
+                            </button>                           <div id="embed-container-@item.OrderNumber" style="display:none;">
+                                <div id="embed-list-@item.OrderNumber"></div>
                             </div>
                         </td>
                     </tr>
@@ -115,20 +110,21 @@
                     }
                 }
             });
-        }        function cerrarEmbed(orderNumber) {
-            var embedContainer = $('#embed-container-' + orderNumber);
-            var embedElement = $('#embed-' + orderNumber);
-            embedContainer.hide();
-            embedElement.attr('src', ''); // Clear the src attribute
-        }
-        function descargarDocumento(orderNumber) {
-            var embedElement = $('#embed-' + orderNumber);
-            var src = embedElement.attr('src');
-            if (src) {
-                window.open(src, '_blank');
-            } else {
-                alert('No hay documento para descargar.');
-            }
+        }      
+        function cerrarEmbed(orderNumber) {
+            $.ajax({
+                url: '@Url.Action("CerrarEmbed", "Archivos")',
+                type: 'POST',
+                data: { orderNumber: orderNumber },
+                success: function (response) {
+                    if (response.success) {
+                        var embedContainer = $('#embed-container-' + orderNumber);
+                        embedContainer.hide();
+                    } else {
+                        alert('Error al cerrar el embed.');
+                    }
+                }
+            });
         }
     </script>
 }
