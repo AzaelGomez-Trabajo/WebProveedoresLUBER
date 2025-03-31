@@ -11,7 +11,7 @@ namespace WebProveedoresN.Data
             using (var conexion = DBConexion.ObtenerConexion())
             {
                 conexion.Open();
-                var query = "SELECT * FROM cStatus";
+                var query = "SELECT Id, Name FROM Status";
                 using (var cmd = new SqlCommand(query, conexion))
                 {
                     using (var dr = cmd.ExecuteReader())
@@ -20,8 +20,8 @@ namespace WebProveedoresN.Data
                         {
                             status.Add(new StatusDTO
                             {
-                                IdStatus = Convert.ToInt32(dr["IdStatus"]),
-                                Status = dr["Status"].ToString()
+                                IdStatus = Convert.ToInt32(dr["Id"]),
+                                Status = dr["Name"].ToString()
                             });
                         }
                     }

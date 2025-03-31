@@ -201,8 +201,8 @@ namespace WebProveedoresN.Controllers
                 };
                 CorreoServicio.EnviarCorreo(correo, nombre);
 
-                // Redirigir a la vista Index del controlador LecturaXml
-                return RedirectToAction("Index", "LecturaXml", new { xmlFilePath });
+                // Redirigir a la lista de órdenes
+                return RedirectToAction("ListOrders", "Orders");
             }
             catch (Exception ex)
             {

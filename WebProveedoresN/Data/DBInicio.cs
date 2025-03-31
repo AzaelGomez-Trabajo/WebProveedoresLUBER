@@ -19,7 +19,7 @@ namespace WebProveedoresN.Data
                 var storedProcedure = "sp_ValidarPrimerUsuario";
                 using var cmd = new SqlCommand(storedProcedure, conexion);
                 cmd.Parameters.AddWithValue("@Empresa", empresa.Empresa);
-                //cmd.Parameters.AddWithValue("@Clave", empresa.Clave);
+                cmd.Parameters.AddWithValue("@Code", empresa.Code);
                 cmd.CommandType = CommandType.StoredProcedure;
                 var respuesta = cmd.ExecuteScalar().ToString();
                 return respuesta;

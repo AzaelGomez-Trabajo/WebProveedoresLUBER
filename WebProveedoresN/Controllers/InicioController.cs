@@ -196,22 +196,21 @@ namespace WebProveedoresN.Controllers
         [HttpPost]
         public ActionResult Registrar(EmpresaDTO empresaDTO)
         {
-            if(empresaDTO.Clave != empresaDTO.ConfirmarClave)
+            if(string.IsNullOrEmpty(empresaDTO.Code))
             {
                 ViewBag.Empresa = empresaDTO.Empresa;
-                ViewBag.Message = "Las contraseñas no coinciden";
                 return View();
             }
-            ViewBag.Empresa = empresaDTO.Empresa;
+            // TODO: que valide si ya existe el proveedor con el codigo de proveedor
             var respuesta = Convert.ToBoolean(DBInicio.ValidarPrimerUsuario(empresaDTO));
 
             if (respuesta)
             {
-                TempData["Empresa"] = empresaDTO.Empresa;
-                return RedirectToAction("Guardar");
+                TempData["Mensaje"] = $"Ya existe un Administrador para la empresa {empresaDTO.Empresa}, solicite se le envíe una Invitación.";
+                return View(empresaDTO);
             }
-            TempData["Mensaje"] = $"Ya existe un Administrador para la empresa {empresaDTO.Empresa}, solicite se le envíe una Invitación.";
-            return View(empresaDTO);
+            TempData["Empresa"] = empresaDTO.Empresa;
+            return RedirectToAction("Guardar");
 
 
         }

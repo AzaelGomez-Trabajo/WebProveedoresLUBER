@@ -32,15 +32,13 @@
                             @Html.AntiForgeryToken()
                              <div class="mb-3">
                                 <label>Empresa</label>
-                                <input type="text" class="form-control" name="Empresa" required />
+                                <input type="text" class="form-control" name="Empresa" />
+                                <span asp-validation-for="Empresa" class="text-danger"></span>
                             </div>
                             <div class="mb-3">
-                                <label>Contraseña</label>
-                                <input type="password" class="form-control" name="Clave" required />
-                            </div>
-                            <div class="mb-3">
-                                <label>Confirmar Contraseña</label>
-                                <input type="password" class="form-control" name="ConfirmarClave" required />
+                                <label>Codigo</label>
+                                <input type="text" class="form-control" name="Code" />
+                                <span asp-validation-for="Code" class="text-danger"></span>
                             </div>
 
                             @if (ViewBag.Message != null)
