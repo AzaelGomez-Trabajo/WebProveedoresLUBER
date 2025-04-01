@@ -1,7 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using WebProveedoresN.Models;
-using WebProveedoresN.Services;
 using WebProveedoresN.Interfaces;
+using WebProveedoresN.Models;
 
 namespace WebProveedoresN.Controllers
 {
@@ -21,13 +20,13 @@ namespace WebProveedoresN.Controllers
             var supplierName = User.FindFirst("SupplierName")?.Value;
             ViewBag.Empresa = supplierName;
 
-            var orders = await _orderService.GetOrdersAsync(supplierName, searchString, pageNumber, pageSize);
+            var orders = await _orderService.GetOrdersAsync(supplierName, 1, 0, searchString, pageNumber, pageSize);
             if (!orders.Any() && pageNumber > 1)
             {
                 return RedirectToAction("ListOrders", new { pageNumber = 1, searchString });
             }
 
-            int totalRecords = await _orderService.GetTotalOrdersAsync(supplierName, searchString);
+            int totalRecords = await _orderService.GetTotalOrdersAsync(supplierName, 1, 0, searchString);
             int totalPages = (int)Math.Ceiling(totalRecords / (double)pageSize);
 
             ViewBag.TotalPages = totalPages;

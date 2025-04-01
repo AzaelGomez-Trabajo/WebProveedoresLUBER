@@ -14,51 +14,38 @@ namespace WebProveedoresN.Services
             _context = context;
         }
 
-        public async Task<List<OrderDTO>> GetOrdersAsync(string empresa, string searchString, int pageNumber, int pageSize)
+        public async Task<List<OrderDTO>> GetOrdersAsync(string empresa, int parametro1, int parametro2, string searchString, int pageNumber, int pageSize)
         {
-            var query = _context.Orders.AsQueryable();
+            // Obtener todos los registros desde la base de datos
+            var orders = DBOrders.ListOrders(empresa, parametro1, parametro2);
 
-            if (!string.IsNullOrEmpty(empresa))
-            {
-                query = query.Where(o => o.SupplierName == empresa);
-            }
-
+            // Filtrar los resultados si se proporciona un searchString
             if (!string.IsNullOrEmpty(searchString))
             {
-                query = query.Where(o => o.OrderNumber.Contains(searchString));
+                orders = orders.Where(o => o.OrderNumber.Contains(searchString)).ToList();
             }
 
-            return await query
+            // Aplicar la paginación en memoria
+            var paginatedOrders = orders
                 .Skip((pageNumber - 1) * pageSize)
                 .Take(pageSize)
-                .Select(o => new OrderDTO
-                {
-                    OrderNumber = o.OrderNumber,
-                    OrderDate = o.OrderDate,
-                    TotalAmount = o.TotalAmount,
-                    IdEstatus = o.IdEstatus,
-                    Currency = o.Currency,
-                    Canceled = o.Canceled,
-                    Invoices = o.Invoices,
-                    TotalInvoice = o.TotalInvoice
-                }).ToListAsync();
+                .ToList();
+
+            return await Task.FromResult(paginatedOrders);
         }
 
-        public async Task<int> GetTotalOrdersAsync(string empresa, string searchString)
+        public async Task<int> GetTotalOrdersAsync(string empresa, int parametro1, int parametro2, string searchString)
         {
-            var query = _context.Orders.AsQueryable();
+            // Obtener todos los registros desde la base de datos
+            var orders = DBOrders.ListOrders(empresa, parametro1, parametro2);
 
-            if (!string.IsNullOrEmpty(empresa))
-            {
-                query = query.Where(o => o.SupplierName == empresa);
-            }
-
+            // Filtrar los resultados si se proporciona un searchString
             if (!string.IsNullOrEmpty(searchString))
             {
-                query = query.Where(o => o.OrderNumber.Contains(searchString));
+                orders = orders.Where(o => o.OrderNumber.Contains(searchString)).ToList();
             }
 
-            return await query.CountAsync();
+            return await Task.FromResult(orders.Count);
         }
 
 
