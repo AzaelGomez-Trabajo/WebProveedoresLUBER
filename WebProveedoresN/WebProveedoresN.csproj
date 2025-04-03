@@ -16,12 +16,20 @@
     <PackageReference Include="iTextSharp" Version="5.5.13.4" />
     <PackageReference Include="MailKit" Version="4.11.0" />
     <PackageReference Include="Microsoft.AspNet.WebApi.Client" Version="6.0.0" />
-    <PackageReference Include="Microsoft.AspNetCore.Mvc.Razor.RuntimeCompilation" Version="8.0.13" />
+    <PackageReference Include="Microsoft.AspNetCore.Mvc.Razor.RuntimeCompilation" Version="8.0.14" />
     <PackageReference Include="Microsoft.Data.SqlClient" Version="6.0.1" />
     <PackageReference Include="Microsoft.EntityFrameworkCore" Version="8.0.14" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="8.0.14" />
     <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="8.0.7" />
     <PackageReference Include="MimeKit" Version="4.11.0" />
+    <PackageReference Include="SW-sdk" Version="0.0.31.1" />
+    <PackageReference Include="System.ServiceModel.Http" Version="8.1.2" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Reference Include="SAT.Services">
+      <HintPath>..\SW-sdk-45\SW-sdk-45\SAT.Services.dll</HintPath>
+    </Reference>
   </ItemGroup>
 
 </Project>

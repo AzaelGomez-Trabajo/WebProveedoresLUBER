@@ -14,7 +14,7 @@ namespace WebProveedoresN.Controllers
                 return View();
             }
 
-            var archivos = XmlServicio.ObtenerDatosDesdeXml(xmlContent);
+            var archivos = XmlServicio.GetDataFromXml(xmlContent);
             return View(archivos);
 
         }

@@ -1,5 +1,7 @@
 ﻿using iTextSharp.text;
 using iTextSharp.text.pdf;
+using SAT.Services.ConsultaCFDIService;
+using SW.Services.Status;
 using System.Xml;
 using System.Xml.Linq;
 using WebProveedoresN.Data;
@@ -9,24 +11,7 @@ namespace WebProveedoresN.Services
 {
     public class XmlServicio
     {
-        public static string ObtenerRfcReceptor(string xmlContent)
-        {
-            var xmlDoc = new XmlDocument();
-            xmlDoc.LoadXml(xmlContent);
-
-            var nsmgr = new XmlNamespaceManager(xmlDoc.NameTable);
-            nsmgr.AddNamespace("cfdi", "http://www.sat.gob.mx/cfd/4");
-
-            var receptorNode = xmlDoc.SelectSingleNode("//cfdi:Receptor", nsmgr);
-            if (receptorNode != null && receptorNode.Attributes["Rfc"] != null)
-            {
-                return receptorNode.Attributes["Rfc"].Value;
-            }
-
-            return null;
-        }
-
-        public static List<LecturaXmlDTO> ObtenerDatosDesdeXml(string xmlContent)
+        public static List<LecturaXmlDTO> GetDataFromXml(string xmlContent)
         {
             var archivos = new List<LecturaXmlDTO>();
             try
@@ -92,7 +77,7 @@ namespace WebProveedoresN.Services
             return document.ToString();
         }
 
-        public static void GuardarArchivosEnBaseDeDatos(List<ArchivoDTO> archivos)
+        public static void SaveFilesToDatabase(List<ArchivoDTO> archivos)
         {
             foreach (var archivo in archivos)
             {
@@ -100,22 +85,27 @@ namespace WebProveedoresN.Services
             }
         }
 
-        public static string GuardarDatosXmlEnBaseDeDatos(List<LecturaXmlDTO> archivos, string orderNumber, string supplierName,string idUsuario, string ipUsuario)
+        public static string SaveXmlDataInDatabase(List<LecturaXmlDTO> archivos, string orderNumber, string supplierName,string idUsuario, string ipUsuario)
         {
              return DBArchivos.GuardarDatosEnSqlServer(archivos, orderNumber, supplierName, idUsuario, ipUsuario);
         }
 
-        public static bool BuscarFactura(string xmlContent)
+        public static bool SearchInvoice(string UUID)
         {
-            var archivos = ObtenerDatosDesdeXml(xmlContent);
-            foreach (var archivo in archivos)
-            {
-                if (DBArchivos.BuscarFactura(archivo))
-                {
-                    return true;
-                }
-            }
-            return false;
+            return DBArchivos.BuscarFactura(UUID);
+        }
+    
+        public static List<CFDIModel> GetCFDIStatus(string RfcEmisor, string RfcReceptor, string Total, string UUID, string Sello)
+        {
+            var xml = new CFDIModel();
+            // Verificar el estado del CFDI
+            Status status = new Status("https://consultaqr.facturaelectronica.sat.gob.mx/ConsultaCFDIService.svc");
+            Acuse response = status.GetStatusCFDI(RfcEmisor, RfcReceptor, Total, UUID, Sello);
+            xml.Estado = response.Estado;
+            xml.Codigo_Estatus = response.CodigoEstatus;
+            xml.Es_Cancelable = response.EsCancelable;
+            xml.Cancelacion_Estatus = response.EstatusCancelacion;
+            return [xml];
         }
     }
 }

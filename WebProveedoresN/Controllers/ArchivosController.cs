@@ -1,9 +1,11 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using SW.Services.Status;
 using System.Security.Claims;
 using WebProveedoresN.Data;
 using WebProveedoresN.Interfaces;
 using WebProveedoresN.Models;
 using WebProveedoresN.Services;
+using SAT.Services.ConsultaCFDIService;
 
 namespace WebProveedoresN.Controllers
 {
@@ -105,7 +107,7 @@ namespace WebProveedoresN.Controllers
                 }
 
                 // Validar el contenido del archivo XML
-                string xmlContent = string.Empty;
+                var xmlContent = string.Empty;
                 try
                 {
                     using (var xmlStream = xmlFile.OpenReadStream())
@@ -115,7 +117,7 @@ namespace WebProveedoresN.Controllers
                         xmlContent = xmlDoc.InnerXml;
                     }
                 }
-                catch (Exception)
+                catch
                 {
                     ModelState.AddModelError("FileXML", "El archivo XML no es válido.");
                     ViewBag.OrderNumber = model.OrderNumber;
@@ -124,8 +126,8 @@ namespace WebProveedoresN.Controllers
                 }
 
                 // Leer el contenido del archivo XML
-                string rfcReceptor = string.Empty;
-                var datos = XmlServicio.ObtenerDatosDesdeXml(xmlContent);
+                var rfcReceptor = string.Empty;
+                var datos = XmlServicio.GetDataFromXml(xmlContent);
                 foreach (var dato in datos)
                 {
                     dato.SupplierId = supplierId;
@@ -137,7 +139,7 @@ namespace WebProveedoresN.Controllers
                     ViewBag.Message = "La factura no es para LUBER Lubricantes.";
                 }
 
-                var facturaUnica = XmlServicio.BuscarFactura(xmlContent);
+                var facturaUnica = XmlServicio.SearchInvoice(datos[0].UUID);
                 if (facturaUnica)
                 {
                     ViewBag.Message = $"La factura ya ha sido cargada.";
@@ -146,8 +148,21 @@ namespace WebProveedoresN.Controllers
                     return View(model);
                 }
 
+                var estadoCFDI = XmlServicio.GetCFDIStatus(datos[0].EmisorRfc, datos[0].ReceptorRfc, datos[0].Total.ToString(), datos[0].UUID, datos[0].Sello);
+                var estado = string.Empty;
+                foreach (var xml in estadoCFDI)
+                {
+                    estado = xml.Estado.ToString();
+                }
+                if (estado != "Vigente")
+                {
+                    ViewBag.Message = $"El CFDI no está vigente. Estado: {estado}.";
+                    ViewBag.OrderNumber = model.OrderNumber;
+                    ViewBag.UserIpAddress = ipAddress;
+                    return View(model);
+                }
                 // Guardar los datos del XML en la base de datos
-                var result = XmlServicio.GuardarDatosXmlEnBaseDeDatos(datos, ordenCompra, supplierName, idUsuario, ipAddress);
+                var result = XmlServicio.SaveXmlDataInDatabase(datos, ordenCompra, supplierName, idUsuario, ipAddress);
 
                 if (result != "OK")
                 {
@@ -187,7 +202,7 @@ namespace WebProveedoresN.Controllers
                                 new() { OrderNumber = ordenCompra, Name = xmlName, Route = folderPath, DateTime = timestamp, Extension = ".xml", Converted = false },
                                 new() { OrderNumber = ordenCompra, Name = xmlName, Route = folderPath, DateTime = timestamp, Extension = ".pdf", Converted = true }
                             };
-                XmlServicio.GuardarArchivosEnBaseDeDatos(archivos);
+                XmlServicio.SaveFilesToDatabase(archivos);
 
                 // Enviar correo de confirmación
                 var userEmail = User.FindFirst(ClaimTypes.Email)?.Value;
@@ -225,9 +240,10 @@ namespace WebProveedoresN.Controllers
         }
 
         [HttpPost]
-        public IActionResult CerrarEmbed(string orderNumber)
+        public IActionResult CerrarEmbed()
         {
             return Json(new { success = true });
         }
+
     }
 }

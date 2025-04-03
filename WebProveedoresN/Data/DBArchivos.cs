@@ -164,7 +164,7 @@ namespace WebProveedoresN.Data
             return documents;
         }
 
-        public static bool BuscarFactura(LecturaXmlDTO model)
+        public static bool BuscarFactura(string UUID)
         {
             bool isValid = false;
             string storedProcedure = "sp_InvoiceSearch";
@@ -173,7 +173,7 @@ namespace WebProveedoresN.Data
                 using (var cmd = new SqlCommand(storedProcedure, connection))
                 {
                     connection.Open();
-                    cmd.Parameters.AddWithValue("@UUID", model.UUID);
+                    cmd.Parameters.AddWithValue("@UUID", UUID);
                     cmd.CommandType = CommandType.StoredProcedure;
                     isValid = Convert.ToBoolean(cmd.ExecuteScalar());
                 }

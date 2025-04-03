@@ -33,7 +33,7 @@ namespace WebProveedoresN.Controllers
             ViewBag.PageNumber = pageNumber;
             ViewBag.SearchString = searchString;
 
-            return View(Pagination<OrderDTO>.CreatePagination(orders, pageNumber, pageSize));
+            return View(PaginationDTO<OrderDTO>.CreatePagination(orders, pageNumber, pageSize));
         }
     }
 }
