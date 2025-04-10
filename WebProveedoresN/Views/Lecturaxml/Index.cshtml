@@ -14,7 +14,7 @@
 <table class="table">
     <thead>
         <tr>
-            <th>@Html.DisplayNameFor(model => model.FolioFactura) </th>
+            <th>@Html.DisplayNameFor(model => model.Folio) </th>
             <th>@Html.DisplayNameFor(model => model.Serie) </th>
             <th>@Html.DisplayNameFor(model => model.Version) </th>
             <th>@Html.DisplayNameFor(model => model.Sello) </th>
@@ -25,7 +25,7 @@
         @foreach (var archivo in Model)
         {
             <tr>
-                <td>@archivo.FolioFactura</td>
+                <td>@archivo.Folio</td>
                 <td>@archivo.Serie</td>
                 <td>@archivo.Version</td>
                 <td>@archivo.Sello</td>

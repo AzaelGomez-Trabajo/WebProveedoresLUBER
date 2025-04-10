@@ -1,11 +1,9 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using SW.Services.Status;
 using System.Security.Claims;
 using WebProveedoresN.Data;
 using WebProveedoresN.Interfaces;
 using WebProveedoresN.Models;
 using WebProveedoresN.Services;
-using SAT.Services.ConsultaCFDIService;
 
 namespace WebProveedoresN.Controllers
 {
@@ -21,7 +19,7 @@ namespace WebProveedoresN.Controllers
         }
 
         // GET: Archivos/Upload
-        public ActionResult Upload(string orderNumber)
+        public ActionResult Upload(string orderNumber, int orderId)
         {
             if (string.IsNullOrEmpty(orderNumber))
             {
@@ -31,12 +29,13 @@ namespace WebProveedoresN.Controllers
 
             if (string.IsNullOrEmpty(supplierName))
             {
-                return RedirectToAction("Login", "Inicio");
+                return RedirectToAction("Login", "Access");
             }
             ViewBag.OrderNumber = orderNumber;
             ViewBag.NombreEmpresa = supplierName;
-            ViewBag.SupplierId = User.FindFirst("SupplierId")?.Value;
+            ViewBag.SupplierCode = User.FindFirst("SupplierCode")?.Value;
             ViewBag.UserIpAddress = _ipService.GetUserIpAddress();
+            ViewBag.OrderId = orderId;
             var model = new LoadFileDTO
             {
                 OrderNumber = orderNumber,
@@ -46,7 +45,7 @@ namespace WebProveedoresN.Controllers
 
         // POST: Archivos/Upload
         [HttpPost]
-        public ActionResult Upload(LoadFileDTO model)
+        public ActionResult Upload(LoadFileDTO model, int orderId)
         {
             if (!ModelState.IsValid)
             {
@@ -57,13 +56,13 @@ namespace WebProveedoresN.Controllers
             ViewBag.UserIpAddress = _ipService.GetUserIpAddress();
             var supplierName = User.FindFirst("SupplierName")?.Value;
             // Obtener el SupplierId del claim
-            var supplierIdClaim = User.FindFirst("SupplierId")?.Value;
-            if (string.IsNullOrEmpty(supplierIdClaim))
+            var supplierCodeClaim = User.FindFirst("SupplierCode")?.Value;
+            if (string.IsNullOrEmpty(supplierCodeClaim))
             {
                 // Manejar el caso en que el claim no esté presente
-                return RedirectToAction("Login", "Inicio");
+                return RedirectToAction("Login", "Access");
             }
-            var supplierId = int.Parse(supplierIdClaim);
+            var supplierCode = supplierCodeClaim;
             var idUsuario = User.FindFirst("IdUsuario")?.Value;
             var ipAddress = _ipService.GetUserIpAddress();
             try
@@ -130,7 +129,7 @@ namespace WebProveedoresN.Controllers
                 var datos = XmlServicio.GetDataFromXml(xmlContent);
                 foreach (var dato in datos)
                 {
-                    dato.SupplierId = supplierId;
+                    dato.SupplierCode = supplierCode;
                     rfcReceptor = dato.ReceptorRfc;
                 }
 
@@ -162,11 +161,11 @@ namespace WebProveedoresN.Controllers
                     return View(model);
                 }
                 // Guardar los datos del XML en la base de datos
-                var result = XmlServicio.SaveXmlDataInDatabase(datos, ordenCompra, supplierName, idUsuario, ipAddress);
+                var result = XmlServicio.SaveXmlDataInDatabase(datos, orderId, ordenCompra, supplierName, idUsuario, ipAddress);
 
                 if (result != "OK")
                 {
-                    ViewBag.Message = $"{result} {ordenCompra}." ;
+                    ViewBag.Message = $"{result} {ordenCompra}.";
                     return View(model);
                 }
 
@@ -198,9 +197,9 @@ namespace WebProveedoresN.Controllers
                 var xmlConverted = XmlServicio.ConvertXmlToPdf(xmlContent, Path.Combine(folderPath, $"{timestamp}_1_{xmlName}.pdf"));
                 var archivos = new List<ArchivoDTO>
                             {
-                                new() { OrderNumber = ordenCompra, Name = pdfName, Route = folderPath, DateTime = timestamp, Extension = ".pdf", Converted = false },
-                                new() { OrderNumber = ordenCompra, Name = xmlName, Route = folderPath, DateTime = timestamp, Extension = ".xml", Converted = false },
-                                new() { OrderNumber = ordenCompra, Name = xmlName, Route = folderPath, DateTime = timestamp, Extension = ".pdf", Converted = true }
+                                new() { OrderId = orderId, Name = pdfName, Route = folderPath, DateTime = timestamp, Extension = ".pdf", Converted = false },
+                                new() { OrderId = orderId, Name = xmlName, Route = folderPath, DateTime = timestamp, Extension = ".xml", Converted = false },
+                                new() { OrderId = orderId, Name = xmlName, Route = folderPath, DateTime = timestamp, Extension = ".pdf", Converted = true }
                             };
                 XmlServicio.SaveFilesToDatabase(archivos);
 
@@ -217,7 +216,7 @@ namespace WebProveedoresN.Controllers
                 CorreoServicio.EnviarCorreo(correo, nombre);
 
                 // Redirigir a la lista de órdenes
-                return RedirectToAction("Index", "Lecturaxml", new { xmlContent } );
+                return RedirectToAction("Index", "Lecturaxml", new { xmlContent });
                 //return RedirectToAction("ListOrders", "Orders");
             }
             catch (Exception ex)
@@ -236,7 +235,7 @@ namespace WebProveedoresN.Controllers
             {
                 return Json(new { success = true, documents });
             }
-            return Json(new { success = false, message = $"No tiene facturas cargadas la Orden de Compra {orderNumber}." });
+            return Json(new { success = false, message = $"No tiene facturas cargadas la Orden de Compra." });
         }
 
         [HttpPost]
@@ -244,6 +243,5 @@ namespace WebProveedoresN.Controllers
         {
             return Json(new { success = true });
         }
-
     }
 }

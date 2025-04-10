@@ -4,6 +4,7 @@ using System.Diagnostics;
 using WebProveedoresN.Models;
 
 namespace WebProveedoresN.Controllers;
+
 public class HomeController : Controller
 {
     private readonly ILogger<HomeController> _logger;

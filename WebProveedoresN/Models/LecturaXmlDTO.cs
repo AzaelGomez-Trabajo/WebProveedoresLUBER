@@ -7,10 +7,10 @@ namespace WebProveedoresN.Models
     public class LecturaXmlDTO
     {
         // Datos del comprobante
-        [DisplayName("Id Proveedor")]
-        public int SupplierId { get; set; }
+        [DisplayName("Codigo de Proveedor")]
+        public string SupplierCode { get; set; }
         [Display(Name = "Folio de la factura")]
-        public string FolioFactura { get; set; }
+        public string Folio { get; set; }
         
         [Display(Name = "Serie de la factura")]
         public string Serie { get; set; }

@@ -1,0 +1,41 @@
+﻿@model WebProveedoresN.Entities.Usuario
+@{
+    ViewData["Title"] = "Invitar Usuario";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    var message = TempData["Message"] as string;
+}
+<div class="card">
+    <div class="card-header">
+        <h3>Invitar Usuario</h3>
+    </div>
+    <div class="card-body">
+        <form asp-action="InvitarUsuario" asp-controller="Start" method="post">
+            <input asp-for="SupplierName" type="hidden" class="form-control" />
+            <input asp-for="SupplierCode" type="hidden" class="form-control" />
+            @if (!string.IsNullOrEmpty(message))
+            {
+                <div class="alert alert-info">
+                    @message
+                </div>
+            }
+            <div class="mb-3">
+                <label class="form-label">Nombre Completo </label>
+                <input asp-for="Nombre" type="text" class="form-control">
+                <span asp-validation-for="Nombre" class="text-danger"></span>
+            </div>
+            <div class="mb-3">
+                <label class="form-label">Correo</label>
+                <input asp-for="Correo" type="text" class="form-control">
+                <span asp-validation-for="Correo" class="text-danger"></span>
+            </div>
+            <div class="mb-3">
+                <label class="form-label">Contraseña</label>
+                <input asp-for="Clave" type="password" class="form-control">
+                <span asp-validation-for="Clave" class="text-danger"></span>
+            </div>
+            <button type="submit" class="btn btn-outline-primary">Enviar Invitacion</button> |
+            <a asp-action="Listar" asp-controller="Start" class="btn btn-outline-warning"> Volver a la lista</a>
+        </form>
+
+    </div>
+</div>

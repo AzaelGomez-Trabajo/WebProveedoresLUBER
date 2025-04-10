@@ -17,16 +17,16 @@ namespace WebProveedoresN.Controllers
         public async Task<ActionResult> ListOrders(string searchString = null, int pageNumber = 1)
         {
             int pageSize = 10;
-            var supplierName = User.FindFirst("SupplierName")?.Value;
-            ViewBag.Empresa = supplierName;
+            var supplierCode = User.FindFirst("SupplierCode").Value;
+            ViewBag.Empresa = User.FindFirst("SupplierName").Value;
 
-            var orders = await _orderService.GetOrdersAsync(supplierName, 1, 0, searchString, pageNumber, pageSize);
+            var orders = await _orderService.GetOrdersAsync(supplierCode, 1, 0, searchString, pageNumber, pageSize);
             if (!orders.Any() && pageNumber > 1)
             {
                 return RedirectToAction("ListOrders", new { pageNumber = 1, searchString });
             }
 
-            int totalRecords = await _orderService.GetTotalOrdersAsync(supplierName, 1, 0, searchString);
+            int totalRecords = await _orderService.GetTotalOrdersAsync(supplierCode, 1, 0, searchString);
             int totalPages = (int)Math.Ceiling(totalRecords / (double)pageSize);
 
             ViewBag.TotalPages = totalPages;

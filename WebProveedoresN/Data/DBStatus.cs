@@ -8,7 +8,7 @@ namespace WebProveedoresN.Data
         public static List<StatusDTO> ObtenerEstatus()
         {
             var status = new List<StatusDTO>();
-            using (var conexion = DBConexion.ObtenerConexion())
+            using (var conexion = DBConnectiion.GetConnection())
             {
                 conexion.Open();
                 var query = "SELECT Id, Name FROM Status";

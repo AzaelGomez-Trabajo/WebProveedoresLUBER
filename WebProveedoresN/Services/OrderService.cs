@@ -14,10 +14,10 @@ namespace WebProveedoresN.Services
             _context = context;
         }
 
-        public async Task<List<OrderDTO>> GetOrdersAsync(string empresa, int parametro1, int parametro2, string searchString, int pageNumber, int pageSize)
+        public async Task<List<OrderDTO>> GetOrdersAsync(string supplierCode, int parameter1, int parameter2, string searchString, int pageNumber, int pageSize)
         {
             // Obtener todos los registros desde la base de datos
-            var orders = DBOrders.ListOrders(empresa, parametro1, parametro2);
+            var orders = DBOrders.ListOrders(supplierCode, parameter1, parameter2);
 
             // Filtrar los resultados si se proporciona un searchString
             if (!string.IsNullOrEmpty(searchString))
@@ -34,10 +34,10 @@ namespace WebProveedoresN.Services
             return await Task.FromResult(paginatedOrders);
         }
 
-        public async Task<int> GetTotalOrdersAsync(string empresa, int parametro1, int parametro2, string searchString)
+        public async Task<int> GetTotalOrdersAsync(string supplierCode, int parameter1, int parameter2, string searchString)
         {
             // Obtener todos los registros desde la base de datos
-            var orders = DBOrders.ListOrders(empresa, parametro1, parametro2);
+            var orders = DBOrders.ListOrders(supplierCode, parameter1, parameter2);
 
             // Filtrar los resultados si se proporciona un searchString
             if (!string.IsNullOrEmpty(searchString))
@@ -49,15 +49,9 @@ namespace WebProveedoresN.Services
         }
 
 
-        public static List<OrderDTO> GetOrders(string empresa, int parametro1, int parametro2)
-        {
-            return DBOrders.ListOrders(empresa, parametro1, parametro2);
-        }
-
-        public static string ObtenerOrderNumberIdInDatabase(string orderNumber)
-        {
-            return DBOrders.ObtenerOrderNumberId(orderNumber);
-        }
+        public static List<OrderDTO> GetOrders(string empresa, int parametro1, int parametro2) => DBOrders.ListOrders(empresa, parametro1, parametro2);
+        
+        public static string ObtenerOrderNumberIdInDatabase(string orderNumber) => DBOrders.ObtenerOrderNumberId(orderNumber);
 
     }
 }

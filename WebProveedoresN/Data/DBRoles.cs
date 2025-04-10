@@ -5,14 +5,14 @@ namespace WebProveedoresN.Data
 {
     public class DBRoles
     {
-        public static List<string> ObtenerRoles()
+        public static List<string> GetRoles()
         {
             var roles = new List<string>();
             try
             {
-                using var conexion = DBConexion.ObtenerConexion();
+                using var conexion = DBConnectiion.GetConnection();
                 conexion.Open();
-                var storedProcedure = "sp_ListarRoles";
+                var storedProcedure = "sp_GetRoles";
                 using var cmd = new SqlCommand(storedProcedure, conexion)
                 {
                     CommandType = CommandType.StoredProcedure

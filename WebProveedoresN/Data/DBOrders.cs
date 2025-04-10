@@ -6,25 +6,26 @@ namespace WebProveedoresN.Data
 {
     public class DBOrders
     {
-        public static List<OrderDTO> ListOrders(string empresa, int parametro1, int parametro2)
+        public static List<OrderDTO> ListOrders(string supplierCode, int parameter1, int parameter2)
         {
             var orders = new List<OrderDTO>();
             try
             {
-                using var conexion = DBConexion.ObtenerConexion();
+                using var conexion = DBConnectiion.GetConnection();
                 conexion.Open();
-                var storedProcedure = "sp_ListarOrdenes";
+                var storedProcedure = "sp_GetOrders";
                 using (var cmd = new SqlCommand(storedProcedure, conexion))
                 {
-                    cmd.Parameters.AddWithValue("@Parameter1", parametro1);
-                    cmd.Parameters.AddWithValue("@Parameter2", parametro2);
-                    cmd.Parameters.AddWithValue("@Parameter3", empresa);
+                    cmd.Parameters.AddWithValue("@Parameter1", parameter1);
+                    cmd.Parameters.AddWithValue("@Parameter2", parameter2);
+                    cmd.Parameters.AddWithValue("@Parameter3", supplierCode);
                     cmd.CommandType = CommandType.StoredProcedure;
                     using var dr = cmd.ExecuteReader();
                     while (dr.Read())
                     {
                         orders.Add(new OrderDTO()
                         {
+                            Id = (int)dr["Id"],
                             OrderNumber = dr["OrderNumber"].ToString(),
                             OrderDate = (DateTime)dr["OrderDate"],
                             Canceled = dr["Canceled"].ToString(),
@@ -50,7 +51,7 @@ namespace WebProveedoresN.Data
         {
             bool isValid = false;
 
-            using (SqlConnection connection = DBConexion.ObtenerConexion())
+            using (SqlConnection connection = DBConnectiion.GetConnection())
             {
                 string storedProcedure = "sp_ValidateOrderNumber";
                 using (var cmd = new SqlCommand(storedProcedure, connection))
@@ -73,7 +74,7 @@ namespace WebProveedoresN.Data
         public static string ObtenerOrderNumberId(string orderNumber)
         {
             var orderNumberId = string.Empty;
-            using (var connection = DBConexion.ObtenerConexion())
+            using (var connection = DBConnectiion.GetConnection())
             {
                 string query = "SELECT IdOrder FROM Orders WHERE OrderNumber = @OrderNumber";
                 using (var cmd = new SqlCommand(query, connection))

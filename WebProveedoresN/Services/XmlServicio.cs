@@ -22,10 +22,10 @@ namespace WebProveedoresN.Services
                         var archivo = new LecturaXmlDTO
                         {
                             // Comprobante
-                            FolioFactura = element.Attribute("Folio")?.Value,
+                            Folio = element.Attribute("Folio")?.Value ?? "0",
                             Version = double.Parse(element.Attribute("Version")?.Value ?? "0"),
-                            Serie = element.Attribute("Serie")?.Value,
-                            Sello = element.Attribute("Sello")?.Value,
+                            Serie = element.Attribute("Serie")?.Value ?? "0",
+                            Sello = element.Attribute("Sello")?.Value ?? "0",
                             // Provedor
                             EmisorNombre = element.Element("{http://www.sat.gob.mx/cfd/4}Emisor")?.Attribute("Nombre")?.Value,
                             EmisorRfc = element.Element("{http://www.sat.gob.mx/cfd/4}Emisor")?.Attribute("Rfc")?.Value,
@@ -85,10 +85,8 @@ namespace WebProveedoresN.Services
             }
         }
 
-        public static string SaveXmlDataInDatabase(List<LecturaXmlDTO> archivos, string orderNumber, string supplierName,string idUsuario, string ipUsuario)
-        {
-             return DBArchivos.GuardarDatosEnSqlServer(archivos, orderNumber, supplierName, idUsuario, ipUsuario);
-        }
+        public static string SaveXmlDataInDatabase(List<LecturaXmlDTO> archivos, int idOrder, string orderNumber, string supplierName,string idUsuario, string ipUsuario) => DBArchivos.SaveXmlDataInDatabase(archivos, idOrder, orderNumber, supplierName, idUsuario, ipUsuario);
+        
 
         public static bool SearchInvoice(string UUID)
         {

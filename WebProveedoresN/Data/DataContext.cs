@@ -11,6 +11,8 @@ namespace WebProveedoresN.Data
                 
         }
         public DbSet<Order> Orders { get; set; }
+        public DbSet<Supplier> Suppliers { get; set; }
+        public DbSet<Usuario> Usuarios { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

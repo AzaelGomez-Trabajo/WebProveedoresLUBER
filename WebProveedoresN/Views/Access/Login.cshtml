@@ -1,4 +1,4 @@
-﻿@model UsuarioDTO;
+﻿@model WebProveedoresN.Entities.Usuario;
 @{
     Layout = null;
 }
@@ -38,8 +38,8 @@
                         <div class="mb-3">
                             <div class="d-grid">
                                 <button class="btn btn-outline-primary" type="submit">Ingresar </button>
-                                <a class="btn btn-link" href="@Url.Action("Registrar","Inicio")">No tienes una cuenta? Registrate!</a>
-                                <a class="btn btn-link" href="@Url.Action("Restablecer","Inicio")">Has olvidado tu contraseña?</a>
+                                <a class="btn btn-link" href="@Url.Action("Registrar","Start")">No tienes una cuenta? Registrate!</a>
+                                <a class="btn btn-link" href="@Url.Action("Restablecer","Start")">Has olvidado tu contraseña?</a>
                             </div>
                         </div>
 

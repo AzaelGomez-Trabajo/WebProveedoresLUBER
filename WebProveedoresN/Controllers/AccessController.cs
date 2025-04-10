@@ -4,7 +4,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
 using WebProveedoresN.Data;
-using WebProveedoresN.Models;
+using WebProveedoresN.Entities;
 using WebProveedoresN.Services;
 
 namespace WebProveedoresN.Controllers
@@ -17,9 +17,9 @@ namespace WebProveedoresN.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> Login(UsuarioDTO model)
+        public async Task<IActionResult> Login(Usuario model)
         {
-            var usuario = DBInicio.ValidarUsuario(model.Correo, UtilityService.ConvertirSHA256(model.Clave));
+            var usuario = StartService.ValidateUser(model.Correo, UtilityService.ConvertirSHA256(model.Clave));
             if (usuario != null && usuario.Nombre != null)
             {
                 if (!usuario.Confirmado)
@@ -30,15 +30,15 @@ namespace WebProveedoresN.Controllers
                 {
                     ViewBag.Message = $"Se ha solicitado restablecer su cuenta, favor revise su bandeja del correo {model.Correo}.";
                 }
-                else 
+                else
                 {
                     // crear las claims para el usuario con las cookies
                     var claims = new List<Claim>
                     {
                         new(ClaimTypes.Name, usuario.Nombre),
                         new(ClaimTypes.Email, usuario.Correo),
-                        new("SupplierName", usuario.Empresa),
-                        new("SupplierId", usuario.SupplierId.ToString()),
+                        new("SupplierCode", usuario.SupplierCode),
+                        new("SupplierName", usuario.SupplierName),
                         new("IdUsuario", usuario.IdUsuario.ToString()),
                     };
 
@@ -53,10 +53,10 @@ namespace WebProveedoresN.Controllers
                     await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, new ClaimsPrincipal(claimsIdentity));
                     // termina la autenticación
 
-                    return RedirectToAction("ListOrders", "Orders", new { empresa = usuario.Empresa });
+                    return RedirectToAction("ListOrders", "Orders", new { empresa = usuario.SupplierName });
                 }
             }
-            else 
+            else
             {
                 ViewBag.Message = "Correo o contraseña incorrectos";
             }
@@ -81,6 +81,5 @@ namespace WebProveedoresN.Controllers
             await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
             return RedirectToAction("Login", "Access");
         }
-
     }
 }

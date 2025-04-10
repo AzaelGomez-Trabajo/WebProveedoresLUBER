@@ -45,7 +45,7 @@
                         <td>@item.Invoices.ToString()</td>
                         <td>@item.TotalInvoice.ToString("C")</td>
                         <td>
-                            <a asp-action="Upload" asp-controller="Archivos" asp-route-orderNumber="@item.OrderNumber" class="btn btn-outline-primary btn-sm">
+                            <a asp-action="Upload" asp-controller="Archivos" asp-route-orderNumber="@item.OrderNumber" asp-route-orderId="@item.Id" class="btn btn-outline-primary btn-sm">
                                 <i class="bi bi-cloud-upload-fill"></i> Cargar
                             </a>
                             <button class="btn btn-outline-secondary btn-sm" onclick="mostrarDocumentos('@item.OrderNumber')">
