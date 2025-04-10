@@ -5,7 +5,7 @@
     ViewData["Title"] = "Órdenes de Compra";
 }
 @Html.AntiForgeryToken()
-
+<Loading/>
 <div class="card">
     <div class="card-header">
         <h2 class="text-center">Órdenes de Compra para: </h2>
@@ -31,7 +31,7 @@
                     <th>Moneda</th>
                     <th># Factura(s)</th>
                     <th>Monto factura(s)</th>
-                    <th>Factura(s)</th>
+                    <th></th>
                 </tr>
             </thead>
             <tbody>
@@ -45,7 +45,8 @@
                         <td>@item.Invoices.ToString()</td>
                         <td>@item.TotalInvoice.ToString("C")</td>
                         <td>
-                            <a asp-action="Upload" asp-controller="Archivos" asp-route-orderNumber="@item.OrderNumber" asp-route-orderId="@item.Id" class="btn btn-outline-primary btn-sm">
+                            <a asp-action="Details" asp-route-id="@item.Id" class="btn btn-outline-secondary btn-sm">Detalles</a>
+                            @*<a asp-action="Upload" asp-controller="Archivos" asp-route-orderNumber="@item.OrderNumber" asp-route-orderId="@item.Id" class="btn btn-outline-primary btn-sm">
                                 <i class="bi bi-cloud-upload-fill"></i> Cargar
                             </a>
                             <button class="btn btn-outline-secondary btn-sm" onclick="mostrarDocumentos('@item.OrderNumber')">
@@ -53,9 +54,10 @@
                             </button>
                             <button class="btn btn-outline-danger btn-sm" onclick="cerrarEmbed('@item.OrderNumber')">
                                 <i class="bi bi-x-circle-fill"> Cerrar</i>
-                            </button>                           <div id="embed-container-@item.OrderNumber" style="display:none;">
+                            </button>   
+                            <div id="embed-container-@item.OrderNumber" style="display:none;">
                                 <div id="embed-list-@item.OrderNumber"></div>
-                            </div>
+                            </div>*@
                         </td>
                     </tr>
                 }
@@ -78,7 +80,7 @@
     </div>
 </div>
 
-@section Scripts {
+@* @section Scripts {
     <script>
         function mostrarDocumentos(orderNumber) {
             $.ajax({
@@ -110,7 +112,7 @@
                     }
                 }
             });
-        }      
+        }
         function cerrarEmbed(orderNumber) {
             $.ajax({
                 url: '@Url.Action("CerrarEmbed", "Archivos")',
@@ -127,4 +129,4 @@
             });
         }
     </script>
-}
+} *@

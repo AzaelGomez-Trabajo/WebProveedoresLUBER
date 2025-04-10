@@ -36,7 +36,6 @@ namespace WebProveedoresN.Data
                             TotalInvoice = (decimal)dr["TotalInvoice"],
                         });
                     }
-
                 }
                 conexion.Close();
             }
@@ -89,6 +88,42 @@ namespace WebProveedoresN.Data
             return orderNumberId;
         }
 
-
+        public static OrderDTO GetOrderByIdAsync(int orderId)
+        {
+            OrderDTO order = null;
+            try
+            {
+                using var conexion = DBConnectiion.GetConnection();
+                conexion.Open();
+                var storedProcedure = "sp_GetOrderById";
+                using (var cmd = new SqlCommand(storedProcedure, conexion))
+                {
+                    cmd.Parameters.AddWithValue("@Id", orderId);
+                    cmd.CommandType = CommandType.StoredProcedure;
+                    using var dr = cmd.ExecuteReader();
+                    if (dr.Read())
+                    {
+                        order = new OrderDTO()
+                        {
+                            Id = (int)dr["Id"],
+                            OrderNumber = dr["OrderNumber"].ToString(),
+                            OrderDate = (DateTime)dr["OrderDate"],
+                            Canceled = dr["Canceled"].ToString(),
+                            IdEstatus = dr["IdEstatus"].ToString(),
+                            TotalAmount = (decimal)dr["TotalAmount"],
+                            Currency = dr["Currency"].ToString(),
+                            Invoices = (int)dr["Invoices"],
+                            TotalInvoice = (decimal)dr["TotalInvoice"],
+                        };
+                    }
+                }
+                conexion.Close();
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+            return order;
+        }
     }
 }

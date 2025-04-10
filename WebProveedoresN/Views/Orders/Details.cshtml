@@ -1,0 +1,106 @@
+﻿@model OrderDTO
+@{
+    ViewData["Title"] = "Details";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+@Html.AntiForgeryToken()
+
+<div class="card">
+    <div class="card-header">
+        <h2 class="text-center">Detalles de la Orden de Compra @ViewBag.OrderNumber</h2>
+    </div>
+    <div class="card-body">
+        <p>
+            <a asp-action="Details" class="btn btn-outline-success btn-sm"><i class="bi bi-arrow-repeat">  Actualizar</i></a>
+            <a asp-action="ListOrders" class="btn btn-outline-info btn-sm"><i class="bi bi-arrow-left-circle">  Regresar</i></a>
+        </p>
+        <h3>Detalles de la Orden de Compra</h3>
+        <p><strong>Número de Orden:</strong> @Model.OrderNumber</p>
+        <p><strong>Fecha:</strong> @Model.OrderDate.ToShortDateString()</p>
+        <p><strong>Importe Total:</strong> @Model.TotalAmount.ToString("C")</p>
+        <p><strong>Moneda:</strong> @Model.Currency.ToString()</p>
+        <p><strong># Factura(s):</strong> @Model.Invoices.ToString()</p>
+        <p><strong>Monto factura(s):</strong> @Model.TotalInvoice.ToString("C")</p>
+        <div>
+            <form asp-action="Upload" asp-controller="Archivos" method="get" style="display:inline;">
+                <input type="hidden" name="orderNumber" value="@Model.OrderNumber" />
+                <input type="hidden" name="orderId" value="@Model.Id" />
+                <button type="submit" class="btn btn-outline-primary btn-sm" @(Model.TotalAmount <= Model.TotalInvoice ? "disabled" : "")>
+                    <i class="bi bi-cloud-upload-fill"> Cargar</i>
+                </button>
+            </form>
+            <button class="btn btn-outline-secondary btn-sm" onclick="mostrarDocumentos(@Model.OrderNumber)">
+                <i class="bi bi-cloud-download-fill"> Mostrar</i>
+            </button>
+            <button class="btn btn-outline-danger btn-sm" onclick="cerrarEmbed(@Model.OrderNumber)" style="display: none">
+                <i class="bi bi-x-circle-fill"> Cerrar</i>
+            </button>
+
+            <div id="embed-container-@Model.OrderNumber" style="display:none;">
+                <div id="embed-list-@Model.OrderNumber"></div>
+            </div>
+        </div>
+        @*         <h3>Documentos Adjuntos</h3>
+        <ul>
+            @foreach (var document in Model.Documents)
+            {
+                <li>@document.FileName - <a href="@Url.Action("Download", "Documents", new { id = document.Id })">Descargar</a></li>
+            }
+        </ul> *@
+    </div>
+</div>
+@section Scripts {
+    <script>
+        function mostrarDocumentos(orderNumber) {
+            $.ajax({
+                url: '@Url.Action("ObtenerDocumentos", "Archivos")',
+                type: 'GET',
+                data: { orderNumber: orderNumber },
+                success: function (response) {
+                    if (response.success) {
+                        var embedContainer = $('#embed-container-' + orderNumber);
+                        var embedList = $('#embed-list-' + orderNumber);
+                        var closeButton = $('button[onclick="cerrarEmbed(' + orderNumber + ')"]');
+                        embedList.empty();
+                        if (response.documents.length > 0) {
+                            response.documents.forEach(function (document) {
+                                var embedElement = $('<embed>', {
+                                    src: '/UploadedFiles/' + document.name + document.extension,
+                                    type: 'application/pdf',
+                                    width: '100%',
+                                    height: '500px',
+                                    class: 'mb-2'
+                                });
+                                embedList.append(embedElement);
+                            });
+                            embedContainer.show();
+                            closeButton.show();
+                        } else {
+                            alert('No se encontraron documentos.');
+                            closeButton.hide();
+                        }
+                    } else {
+                        alert(response.message);
+                    }
+                }
+            });
+        }
+        function cerrarEmbed(orderNumber) {
+            $.ajax({
+                url: '@Url.Action("CerrarEmbed", "Archivos")',
+                type: 'POST',
+                data: { orderNumber: orderNumber },
+                success: function (response) {
+                    if (response.success) {
+                        var embedContainer = $('#embed-container-' + orderNumber);
+                        var closeButton = $('button[onclick="cerrarEmbed(' + orderNumber + ')"]');
+                        embedContainer.hide();
+                        closeButton.hide();
+                    } else {
+                        alert('Error al cerrar el embed.');
+                    }
+                }
+            });
+        }
+    </script>
+}

@@ -40,7 +40,7 @@
                     <div class="mb-3" style="text-align:center">
                         <div class="d-grid">
                             <input type="submit" value="Guardar" class="btn btn-outline-primary" />
-                            <a class="btn btn-link" href="@Url.Action("ListOrders","Orders")">Regresar</a>
+                            <a class="btn btn-link" href="@Url.Action("Details","Orders", new { id = ViewBag.OrderId })">Regresar</a>
                         </div>
                     </div>
                     <div id="progressBar" class="progress" style="display:none;">

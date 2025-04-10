@@ -7,12 +7,12 @@ namespace WebProveedoresN.Services
 {
     public class OrderService : IOrderService
     {
-        private readonly DataContext _context;
+        //private readonly DataContext _context;
 
-        public OrderService(DataContext context)
-        {
-            _context = context;
-        }
+        //public OrderService(DataContext context)
+        //{
+        //    _context = context;
+        //}
 
         public async Task<List<OrderDTO>> GetOrdersAsync(string supplierCode, int parameter1, int parameter2, string searchString, int pageNumber, int pageSize)
         {
@@ -48,10 +48,14 @@ namespace WebProveedoresN.Services
             return await Task.FromResult(orders.Count);
         }
 
-
-        public static List<OrderDTO> GetOrders(string empresa, int parametro1, int parametro2) => DBOrders.ListOrders(empresa, parametro1, parametro2);
-        
-        public static string ObtenerOrderNumberIdInDatabase(string orderNumber) => DBOrders.ObtenerOrderNumberId(orderNumber);
-
+        public async Task<OrderDTO> GetOrderByIdAsync(int Id)
+        {
+              var order = DBOrders.GetOrderByIdAsync(Id);
+            if (order == null)
+            {
+                return null;
+            }
+            return await Task.FromResult(order);
+        }
     }
 }
