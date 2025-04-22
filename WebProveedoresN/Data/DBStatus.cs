@@ -5,7 +5,7 @@ namespace WebProveedoresN.Data
 {
     public class DBStatus
     {
-        public static List<StatusDTO> ObtenerEstatus()
+        public static List<StatusDTO> GetStatus()
         {
             var status = new List<StatusDTO>();
             using (var conexion = DBConnectiion.GetConnection())

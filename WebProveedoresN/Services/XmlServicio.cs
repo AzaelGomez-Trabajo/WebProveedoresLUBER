@@ -40,7 +40,7 @@ namespace WebProveedoresN.Services
 
                         foreach (var conceptoElement in element.Descendants("{http://www.sat.gob.mx/cfd/4}Concepto"))
                         {
-                            var concepto = new ConceptoDTO()
+                            var concepto = new ConceptDTO()
                             {
                                 Cantidad = decimal.Parse(conceptoElement.Attribute("Cantidad")?.Value ?? "0"),
                                 Descripcion = conceptoElement.Attribute("Descripcion")?.Value,
@@ -77,20 +77,20 @@ namespace WebProveedoresN.Services
             return document.ToString();
         }
 
-        public static void SaveFilesToDatabase(List<ArchivoDTO> archivos)
+        public static void SaveFilesToDatabase(List<FileDTO> archivos)
         {
             foreach (var archivo in archivos)
             {
-                DBArchivos.SaveFileToDatabase(archivo);
+                DBFiles.SaveFileToDatabase(archivo);
             }
         }
 
-        public static string SaveXmlDataInDatabase(List<LecturaXmlDTO> archivos, int idOrder, string orderNumber, string supplierName,string idUsuario, string ipUsuario) => DBArchivos.SaveXmlDataInDatabase(archivos, idOrder, orderNumber, supplierName, idUsuario, ipUsuario);
+        public static string SaveXmlDataInDatabase(List<LecturaXmlDTO> archivos, int idOrder, string orderNumber, string supplierName,string idUsuario, string ipUsuario) => DBFiles.SaveXmlDataInDatabase(archivos, idOrder, orderNumber, supplierName, idUsuario, ipUsuario);
         
 
         public static bool SearchInvoice(string UUID)
         {
-            return DBArchivos.BuscarFactura(UUID);
+            return DBFiles.BuscarFactura(UUID);
         }
     
         public static List<CFDIModel> GetCFDIStatus(string RfcEmisor, string RfcReceptor, string Total, string UUID, string Sello)

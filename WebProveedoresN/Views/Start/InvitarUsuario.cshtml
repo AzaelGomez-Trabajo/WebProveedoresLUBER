@@ -33,8 +33,12 @@
                 <input asp-for="Clave" type="password" class="form-control">
                 <span asp-validation-for="Clave" class="text-danger"></span>
             </div>
-            <button type="submit" class="btn btn-outline-primary">Enviar Invitacion</button> |
-            <a asp-action="Listar" asp-controller="Start" class="btn btn-outline-warning"> Volver a la lista</a>
+            <button type="submit" class="btn btn-outline-primary btn-sm">
+                <i class="bi bi-envelope-arrow-up-fill"> Enviar Invitacion</i>
+            </button> |
+            <a asp-action="Listar" asp-controller="Start" class="btn btn-outline-info btn-sm">
+                <i class="bi bi-arrow-left-circle">  Regresar</i>
+            </a>
         </form>
 
     </div>

@@ -1,6 +1,6 @@
 ﻿@model WebProveedoresN.Entities.Supplier
 @{
-    ViewData["Title"] = "Registrar";
+    ViewData["Title"] = "Register";
     Layout = null;
     var message = TempData["Message"] as string;
     ViewBag.Message = message;
@@ -28,7 +28,7 @@
                     @if (ViewBag.Creado == null)
                     {
                         
-                        <form action="@Url.Action("Registrar","Start")" method="post">
+                        <form action="@Url.Action("Register","Start")" method="post">
                             @Html.AntiForgeryToken()
                              <div class="mb-3">
                                 <label>Empresa</label>
@@ -50,7 +50,7 @@
 
                             <div class="mb-3">
                                 <div class="d-grid">
-                                    <button class="btn btn-outline-primary" type="submit">Registrarse </button>
+                                    <button class="btn btn-outline-primary btn-sm" type="submit"><i class="bi bi-floppy"/> Registrarse </button>
                                     <a class="btn btn-link" href="@Url.Action("Login","Access")">Ya tienes una cuenta? Inicia sesion</a>
                                 </div>
                             </div>

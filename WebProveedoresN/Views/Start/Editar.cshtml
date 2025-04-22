@@ -2,7 +2,7 @@
 @{
     ViewData["Title"] = "Editar";
     Layout = "~/Views/Shared/_Layout.cshtml";
-    var message = TempData["Message"] as string; 
+    var message = TempData["Message"] as string;
     var status = ViewBag.Status as List<StatusDTO>;
 }
 <div class="card">
@@ -11,12 +11,12 @@
     </div>
     <div class="card-body">
         <form asp-action="Editar" asp-controller="Start" method="post">
-            <input asp-for="Token" type="hidden" class="form-control"/>
-            <input asp-for="Clave" type="hidden" class="form-control"/>
-            <input asp-for="SupplierName" type="hidden" class="form-control"/>
-            <input asp-for="IdUsuario" type="hidden" class="form-control"/>
-            <input asp-for="Confirmado" type="hidden" class="form-control"/>
-            <input asp-for="Restablecer" type="hidden" class="form-control"/>
+            <input asp-for="Token" type="hidden" class="form-control" />
+            <input asp-for="Clave" type="hidden" class="form-control" />
+            <input asp-for="SupplierName" type="hidden" class="form-control" />
+            <input asp-for="IdUsuario" type="hidden" class="form-control" />
+            <input asp-for="Confirmado" type="hidden" class="form-control" />
+            <input asp-for="Restablecer" type="hidden" class="form-control" />
             <input asp-for="Roles" type="hidden" class="form-control" />
             <input asp-for="SupplierCode" type="hidden" class="form-control" />
             @if (!string.IsNullOrEmpty(message))
@@ -27,12 +27,12 @@
             }
             <div class="mb-3">
                 <label class="form-label">Nombre Completo </label>
-                <input asp-for="Nombre" type="text" class="form-control" >
+                <input asp-for="Nombre" type="text" class="form-control">
                 <span asp-validation-for="Nombre" class="text-danger"></span>
             </div>
             <div class="mb-3">
                 <label class="form-label">Correo</label>
-                <input asp-for="Correo" type="email" class="form-control" >
+                <input asp-for="Correo" type="email" class="form-control">
                 <span asp-validation-for="Correo" class="text-danger"></span>
             </div>
             <div class="mb-3">
@@ -47,8 +47,12 @@
                 <span asp-validation-for="IdStatus" class="text-danger"></span>
             </div>
 
-            <button type="submit" class="btn btn-outline-primary"><i class="bi bi-floppy2-fill btn-sm"> Guardar</i> </button> |
-            <a asp-action="Listar" asp-controller="Start" class="btn btn-outline-info btn-sm"><i class="bi bi-arrow-left-circle">  Regresar</i></a>
+            <button type="submit" class="btn btn-outline-primary btn-sm">
+                <i class="bi bi-floppy2-fill"> Guardar</i>
+            </button> |
+            <a asp-action="Listar" asp-controller="Start" class="btn btn-outline-info btn-sm">
+                <i class="bi bi-arrow-left-circle"> Regresar</i>
+            </a>
         </form>
     </div>
 </div>

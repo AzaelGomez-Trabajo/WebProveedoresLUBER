@@ -19,8 +19,8 @@
             }
             else
             {
-                <a asp-action="InvitarUsuario" asp-controller="Start" class="btn btn-outline-success">
-                    <i class="bi bi-plus-circle"></i> Invitar Nuevo
+                <a asp-action="InvitarUsuario" asp-controller="Start" class="btn btn-outline-success btn-sm">
+                    <i class="bi bi-plus-circle"> Invitar Nuevo</i>
                 </a>
                 <hr />
                 <table class="table table-bordered">
@@ -70,7 +70,9 @@
                                 </td>
                                 <td>@string.Join(", ", item.Roles)</td>
                                 <td>
-                                    <a asp-action="Editar" asp-controller="Start" class="btn btn-outline-primary btn-sm" asp-route-Token="@item.Token">Editar</a>
+                                    <a asp-action="Editar" asp-controller="Start" class="btn btn-outline-warning btn-sm" asp-route-Token="@item.Token">
+                                        <i class="bi bi-pen-fill"> Editar</i>
+                                    </a>
                                 </td>
                             </tr>
                         }

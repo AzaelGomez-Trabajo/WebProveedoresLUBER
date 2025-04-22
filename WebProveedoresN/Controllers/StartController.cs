@@ -55,8 +55,6 @@ namespace WebProveedoresN.Controllers
         [Authorize(Roles = "Administrador")]
         public IActionResult InvitarUsuario(Usuario model)
         {
-            //model.SupplierCode = User.FindFirst("SupplierCode")?.Value;
-            //model.SupplierName = User.FindFirst("SupplierName")?.Value;
             if (!ModelState.IsValid)
             {
                 return View(model);
@@ -83,7 +81,7 @@ namespace WebProveedoresN.Controllers
                 string content = System.IO.File.ReadAllText(path);
                 string url = string.Format("{0}://{1}{2}", Request.Scheme, Request.Host, "/Start/ConfirmEmail?token=" + model.Token);
                 string htmlBody = string.Format(content, model.Nombre, url);
-                var correoDTO = new CorreoDTO()
+                var correoDTO = new EmalDTO()
                 {
                     Para = model.Correo,
                     Asunto = "Invitación",
@@ -108,7 +106,7 @@ namespace WebProveedoresN.Controllers
                 SupplierName = ViewBag.SupplierName,
                 SupplierCode = ViewBag.SupplierCode,
             };
-            ViewBag.Status = StatusService.ObtenerEstatus() ?? [];
+            ViewBag.Status = StatusService.GetStatus() ?? [];
             ViewBag.Roles = RoleService.GetRoles() ?? [];
             return View(usuario);
         }
@@ -118,7 +116,7 @@ namespace WebProveedoresN.Controllers
         {
             if (!ModelState.IsValid)
             {
-                ViewBag.Status = StatusService.ObtenerEstatus() ?? [];
+                ViewBag.Status = StatusService.GetStatus() ?? [];
                 ViewBag.Roles = RoleService.GetRoles() ?? [];
                 return View(model);
             }
@@ -144,7 +142,7 @@ namespace WebProveedoresN.Controllers
 
                 string htmlBody = string.Format(content, model.Nombre, url);
 
-                var correoDTO = new CorreoDTO()
+                var correoDTO = new EmalDTO()
                 {
                     Para = model.Correo,
                     Asunto = "Correo confirmacion",
@@ -164,7 +162,7 @@ namespace WebProveedoresN.Controllers
         public IActionResult Editar(string token)
         {
             // Metodo solo devuelve la vista
-            ViewBag.Status = DBStatus.ObtenerEstatus() ?? [];
+            ViewBag.Status = StatusService.GetStatus() ?? [];
             var usuario = DBStart.GetUserByToken(token);
 
             return View(usuario);
@@ -176,7 +174,7 @@ namespace WebProveedoresN.Controllers
         {
             if (!ModelState.IsValid)
             {
-                ViewBag.Status = DBStatus.ObtenerEstatus() ?? [];
+                ViewBag.Status = StatusService.GetStatus() ?? [];
                 return View();
             }
             var respuesta = DBStart.Editar(model);
@@ -191,13 +189,13 @@ namespace WebProveedoresN.Controllers
             }
         }
 
-        public ActionResult Registrar()
+        public ActionResult Register()
         {
             return View();
         }
 
         [HttpPost]
-        public ActionResult Registrar(Supplier supplier)
+        public ActionResult Register(Supplier supplier)
         {
             var answer = false;
             if (string.IsNullOrEmpty(supplier.Code))
@@ -254,7 +252,7 @@ namespace WebProveedoresN.Controllers
 
                     string htmlBody = string.Format(content, usuario.Nombre, url);
 
-                    var correoDTO = new CorreoDTO()
+                    var correoDTO = new EmalDTO()
                     {
                         Para = correo,
                         Asunto = "Restablecer cuenta",

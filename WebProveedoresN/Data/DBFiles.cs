@@ -5,9 +5,9 @@ using WebProveedoresN.Models;
 
 namespace WebProveedoresN.Data
 {
-    public class DBArchivos
+    public class DBFiles
     {
-        public static void SaveFileToDatabase(ArchivoDTO archivo)
+        public static void SaveFileToDatabase(FileDTO archivo)
         {
             using (SqlConnection connection = DBConnectiion.GetConnection())
             {
@@ -133,9 +133,9 @@ namespace WebProveedoresN.Data
             return isValid;
         }
 
-        public static async Task<List<ArchivoDTO>> ObtenerDocumentosAsync(string orderNumber)
+        public static async Task<List<FileDTO>> ObtenerDocumentosAsync(string orderNumber)
         {
-            var documents = new List<ArchivoDTO>();
+            var documents = new List<FileDTO>();
 
             using (var connection = DBConnectiion.GetConnection())
             {
@@ -150,7 +150,7 @@ namespace WebProveedoresN.Data
                 {
                     while (await reader.ReadAsync())
                     {
-                        documents.Add(new ArchivoDTO
+                        documents.Add(new FileDTO
                         {
                             Name = reader["Name"].ToString(),
                             Extension = ".pdf",

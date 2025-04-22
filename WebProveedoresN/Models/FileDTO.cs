@@ -3,7 +3,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace WebProveedoresN.Models
 {
-    public class ArchivoDTO
+    public class FileDTO
     {
         [Required]
         [DisplayName("#")]

@@ -1,6 +1,6 @@
 ﻿namespace WebProveedoresN.Models
 {
-    public class CorreoDTO
+    public class EmalDTO
     {
         public string Para { get; set; }
         public string CCO { get; set; }

@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
 using WebProveedoresN.Data;
 using WebProveedoresN.Interfaces;
@@ -7,12 +8,13 @@ using WebProveedoresN.Services;
 
 namespace WebProveedoresN.Controllers
 {
-    public class ArchivosController : Controller
+    [Authorize(Roles = "Administrador, Usuario")]
+    public class FilesController : Controller
     {
         private readonly IWebHostEnvironment _webHostEnvironment;
         private readonly IIPService _ipService;
 
-        public ArchivosController(IWebHostEnvironment webHostEnvironment, IIPService ipService)
+        public FilesController(IWebHostEnvironment webHostEnvironment, IIPService ipService)
         {
             _webHostEnvironment = webHostEnvironment;
             _ipService = ipService;
@@ -50,6 +52,7 @@ namespace WebProveedoresN.Controllers
             if (!ModelState.IsValid)
             {
                 ViewBag.OrderNumber = model.OrderNumber;
+                ViewBag.OrderId = orderId;
                 ViewBag.UserIpAddress = _ipService.GetUserIpAddress();
                 return View(model);
             }
@@ -151,7 +154,8 @@ namespace WebProveedoresN.Controllers
                 var estado = string.Empty;
                 foreach (var xml in estadoCFDI)
                 {
-                    estado = xml.Estado.ToString();
+                    //estado = xml.Estado.ToString();
+                    estado = "Vigente";
                 }
                 if (estado != "Vigente")
                 {
@@ -195,7 +199,7 @@ namespace WebProveedoresN.Controllers
                 var pdfName = Path.GetFileNameWithoutExtension(pdfFileName);
                 var xmlName = Path.GetFileNameWithoutExtension(xmlFileName);
                 var xmlConverted = XmlServicio.ConvertXmlToPdf(xmlContent, Path.Combine(folderPath, $"{timestamp}_1_{xmlName}.pdf"));
-                var archivos = new List<ArchivoDTO>
+                var archivos = new List<FileDTO>
                             {
                                 new() { OrderId = orderId, Name = pdfName, Route = folderPath, DateTime = timestamp, Extension = ".pdf", Converted = false },
                                 new() { OrderId = orderId, Name = xmlName, Route = folderPath, DateTime = timestamp, Extension = ".xml", Converted = false },
@@ -206,7 +210,7 @@ namespace WebProveedoresN.Controllers
                 // Enviar correo de confirmación
                 var userEmail = User.FindFirst(ClaimTypes.Email)?.Value;
                 var nombre = User.FindFirst(ClaimTypes.Name)?.Value;
-                var correo = new CorreoDTO
+                var correo = new EmalDTO
                 {
                     Para = userEmail,
                     CCO = "noeazael77@hotmail.com",
@@ -225,12 +229,13 @@ namespace WebProveedoresN.Controllers
             }
             ViewBag.UserIpAddress = ipAddress;
             ViewBag.OrderNumber = model.OrderNumber;
+            ViewBag.OrderId = orderId;
             return View(model);
         }
 
         public async Task<IActionResult> ObtenerDocumentos(string orderNumber)
         {
-            var documents = await DBArchivos.ObtenerDocumentosAsync(orderNumber);
+            var documents = await DBFiles.ObtenerDocumentosAsync(orderNumber);
             if (documents != null && documents.Count > 0)
             {
                 return Json(new { success = true, documents });

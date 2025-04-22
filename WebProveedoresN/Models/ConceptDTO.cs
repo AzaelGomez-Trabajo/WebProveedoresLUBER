@@ -2,7 +2,7 @@
 
 namespace WebProveedoresN.Models
 {
-    public class ConceptoDTO
+    public class ConceptDTO
     {
         [Display(Name = "Cantidad")]
         public decimal Cantidad { get; set; }

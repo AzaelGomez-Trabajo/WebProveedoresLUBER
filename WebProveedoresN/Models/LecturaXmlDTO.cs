@@ -33,7 +33,7 @@ namespace WebProveedoresN.Models
         public string ReceptorRfc { get; set; }
 
         // Datos de los conceptos de la factura
-        public List<ConceptoDTO> Conceptos { get; set; } = [];
+        public List<ConceptDTO> Conceptos { get; set; } = [];
 
         // Importes
         [Display(Name = "Subtotal")]

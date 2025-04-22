@@ -3,7 +3,7 @@ using System.Text;
 
 namespace WebProveedoresN.Services
 {
-    public class UtilityService
+    public static class UtilityService
     {
         public static string ConvertirSHA256(string texto)
         {

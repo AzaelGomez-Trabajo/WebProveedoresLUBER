@@ -8,7 +8,7 @@ namespace WebProveedoresN.Services
 {
     public static class CorreoServicio
     {
-        public static void EnviarCorreo(CorreoDTO correo, string nombre)
+        public static void EnviarCorreo(EmalDTO correo, string nombre)
         {
 
             var message = new MimeMessage();

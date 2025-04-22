@@ -15,7 +15,7 @@
                   Serie="FAC" 
                   SubTotal="150.00" 
                   TipoDeComprobante="I" 
-                  Total="174.00" 
+                  Total="52174.00" 
                   Version="4.0" 
                   xsi:schemaLocation="http://www.sat.gob.mx/cfd/4 http://www.sat.gob.mx/sitio_internet/cfd/4/cfdv40.xsd">
   <cfdi:Emisor Nombre="MARIO ANTONIO MUÑOZ CAMPOY"
@@ -67,7 +67,7 @@
 					 ClaveProdServ="90101501"
 					 ClaveUnidad="ACT"
 					 Descripcion="CONSUMO 2"
-					 Importe="6000.00"
+					 Importe="600.00"
 					 ObjetoImp="02"
 					 Unidad="Actividad"
 					 ValorUnitario="150.00">

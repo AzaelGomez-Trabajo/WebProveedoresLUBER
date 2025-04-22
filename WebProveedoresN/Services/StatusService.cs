@@ -5,6 +5,6 @@ namespace WebProveedoresN.Services
 {
     public static class StatusService
     {
-        public static List<StatusDTO> ObtenerEstatus() => DBStatus.ObtenerEstatus();
+        public static List<StatusDTO> GetStatus() => DBStatus.GetStatus();
     }
 }

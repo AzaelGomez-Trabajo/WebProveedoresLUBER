@@ -22,7 +22,7 @@
         <p><strong># Factura(s):</strong> @Model.Invoices.ToString()</p>
         <p><strong>Monto factura(s):</strong> @Model.TotalInvoice.ToString("C")</p>
         <div>
-            <form asp-action="Upload" asp-controller="Archivos" method="get" style="display:inline;">
+            <form asp-action="Upload" asp-controller="Files" method="get" style="display:inline;">
                 <input type="hidden" name="orderNumber" value="@Model.OrderNumber" />
                 <input type="hidden" name="orderId" value="@Model.Id" />
                 <button type="submit" class="btn btn-outline-primary btn-sm" @(Model.TotalAmount <= Model.TotalInvoice ? "disabled" : "")>
@@ -53,7 +53,7 @@
     <script>
         function mostrarDocumentos(orderNumber) {
             $.ajax({
-                url: '@Url.Action("ObtenerDocumentos", "Archivos")',
+                url: '@Url.Action("ObtenerDocumentos", "Files")',
                 type: 'GET',
                 data: { orderNumber: orderNumber },
                 success: function (response) {
@@ -87,7 +87,7 @@
         }
         function cerrarEmbed(orderNumber) {
             $.ajax({
-                url: '@Url.Action("CerrarEmbed", "Archivos")',
+                url: '@Url.Action("CerrarEmbed", "Files")',
                 type: 'POST',
                 data: { orderNumber: orderNumber },
                 success: function (response) {

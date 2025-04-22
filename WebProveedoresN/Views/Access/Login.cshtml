@@ -10,10 +10,11 @@
     <meta name="viewport" content="width=device-width" />
     <title>Login</title>
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css">
 </head>
 <body>
     <div class="row justify-content-center mt-5">
-        <div class="col-5">
+        <div class="col-3">
             <div class="card">
                 <div class="card-header"><h3 class="text-center">Login</h3></div>
                 <div class="card-body">
@@ -37,8 +38,10 @@
 
                         <div class="mb-3">
                             <div class="d-grid">
-                                <button class="btn btn-outline-primary" type="submit"><i class="bi bi-door-open"> Ingresar</i></button>
-                                <a class="btn btn-link" href="@Url.Action("Registrar","Start")">No tienes una cuenta? Registrate!</a>
+                                <button class="btn btn-outline-primary" type="submit">
+                                    <i class="bi bi-door-open"> Ingresar</i>
+                                </button>
+                                <a class="btn btn-link" href="@Url.Action("Register","Start")">No tienes una cuenta? Registrate!</a>
                                 <a class="btn btn-link" href="@Url.Action("Restablecer","Start")">Has olvidado tu contraseña?</a>
                             </div>
                         </div>

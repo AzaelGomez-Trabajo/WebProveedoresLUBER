@@ -447,7 +447,7 @@ namespace WebProveedoresN.Data
                         respuesta = true;
 
                         // Enviar correo de confirmación
-                        var correo = new CorreoDTO
+                        var correo = new EmalDTO
                         {
                             Para = usuario.Correo,
                             Asunto = "Confirmación de registro",
