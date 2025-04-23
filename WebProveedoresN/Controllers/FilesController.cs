@@ -21,7 +21,7 @@ namespace WebProveedoresN.Controllers
         }
 
         // GET: Archivos/Upload
-        public ActionResult Upload(string orderNumber, int orderId)
+        public ActionResult Upload(string orderNumber)
         {
             if (string.IsNullOrEmpty(orderNumber))
             {
@@ -37,7 +37,7 @@ namespace WebProveedoresN.Controllers
             ViewBag.NombreEmpresa = supplierName;
             ViewBag.SupplierCode = User.FindFirst("SupplierCode")?.Value;
             ViewBag.UserIpAddress = _ipService.GetUserIpAddress();
-            ViewBag.OrderId = orderId;
+            //ViewBag.OrderId = orderId;
             var model = new LoadFileDTO
             {
                 OrderNumber = orderNumber,
@@ -47,12 +47,12 @@ namespace WebProveedoresN.Controllers
 
         // POST: Archivos/Upload
         [HttpPost]
-        public ActionResult Upload(LoadFileDTO model, int orderId)
+        public ActionResult Upload(LoadFileDTO model)
         {
             if (!ModelState.IsValid)
             {
                 ViewBag.OrderNumber = model.OrderNumber;
-                ViewBag.OrderId = orderId;
+                //ViewBag.OrderId = orderId;
                 ViewBag.UserIpAddress = _ipService.GetUserIpAddress();
                 return View(model);
             }
@@ -165,7 +165,7 @@ namespace WebProveedoresN.Controllers
                     return View(model);
                 }
                 // Guardar los datos del XML en la base de datos
-                var result = XmlServicio.SaveXmlDataInDatabase(datos, orderId, ordenCompra, supplierName, idUsuario, ipAddress);
+                var result = XmlServicio.SaveXmlDataInDatabase(datos, ordenCompra, supplierName, idUsuario, ipAddress);
 
                 if (result != "OK")
                 {
@@ -201,9 +201,9 @@ namespace WebProveedoresN.Controllers
                 var xmlConverted = XmlServicio.ConvertXmlToPdf(xmlContent, Path.Combine(folderPath, $"{timestamp}_1_{xmlName}.pdf"));
                 var archivos = new List<FileDTO>
                             {
-                                new() { OrderId = orderId, Name = pdfName, Route = folderPath, DateTime = timestamp, Extension = ".pdf", Converted = false },
-                                new() { OrderId = orderId, Name = xmlName, Route = folderPath, DateTime = timestamp, Extension = ".xml", Converted = false },
-                                new() { OrderId = orderId, Name = xmlName, Route = folderPath, DateTime = timestamp, Extension = ".pdf", Converted = true }
+                                new() { OrderNumber = model.OrderNumber, Name = pdfName, Route = folderPath, DateTime = timestamp, Extension = ".pdf", Converted = false },
+                                new() { OrderNumber = model.OrderNumber, Name = xmlName, Route = folderPath, DateTime = timestamp, Extension = ".xml", Converted = false },
+                                new() { OrderNumber = model.OrderNumber, Name = xmlName, Route = folderPath, DateTime = timestamp, Extension = ".pdf", Converted = true }
                             };
                 XmlServicio.SaveFilesToDatabase(archivos);
 
@@ -229,7 +229,7 @@ namespace WebProveedoresN.Controllers
             }
             ViewBag.UserIpAddress = ipAddress;
             ViewBag.OrderNumber = model.OrderNumber;
-            ViewBag.OrderId = orderId;
+            //ViewBag.OrderId = orderId;
             return View(model);
         }
 

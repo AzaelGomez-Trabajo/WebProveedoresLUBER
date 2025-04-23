@@ -50,10 +50,10 @@ namespace WebProveedoresN.Data
                 {
                     var usuario = new Usuario
                     {
-                        Nombre = dr["Nombre"].ToString(),
-                        Correo = dr["Correo"].ToString(),
-                        Clave = dr["Clave"].ToString(),
-                        Token = dr["Token"].ToString(),
+                        Nombre = dr["Nombre"].ToString()!,
+                        Correo = dr["Correo"].ToString()!,
+                        Clave = dr["Clave"].ToString()!,
+                        Token = dr["Token"].ToString()!,
                         Restablecer = Convert.ToBoolean(dr["Restablecer"]),
                         Confirmado = Convert.ToBoolean(dr["Confirmado"]),
                         IdStatus = Convert.ToInt32(dr["StatusId"]),
@@ -61,7 +61,7 @@ namespace WebProveedoresN.Data
                     };
                     if (!dr.IsDBNull(dr.GetOrdinal("Rol")))
                     {
-                        usuario.Roles.Add(dr["Rol"].ToString());
+                        usuario.Roles.Add(dr["Rol"].ToString()!);
                     }
                     usuarios.Add(usuario);
                 }
@@ -91,12 +91,12 @@ namespace WebProveedoresN.Data
                         usuario = new Usuario
                         {
                             IdUsuario = Convert.ToInt32(dr["Id"]),
-                            Nombre = dr["Nombre"].ToString(),
-                            SupplierCode = dr["SupplierCode"].ToString(),
-                            SupplierName = dr["Empresa"].ToString(),
-                            Correo = dr["Correo"].ToString(),
-                            Clave = dr["Clave"].ToString(),
-                            Token = dr["Token"].ToString(),
+                            Nombre = dr["Nombre"].ToString()!,
+                            SupplierCode = dr["SupplierCode"].ToString()!,
+                            SupplierName = dr["Empresa"].ToString()!,
+                            Correo = dr["Correo"].ToString()!,
+                            Clave = dr["Clave"].ToString()!,
+                            Token = dr["Token"].ToString()!,
                             Restablecer = Convert.ToBoolean(dr["Restablecer"]),
                             Confirmado = Convert.ToBoolean(dr["Confirmado"]),
                             IdStatus = Convert.ToInt32(dr["StatusId"]),
@@ -104,7 +104,7 @@ namespace WebProveedoresN.Data
                         };
                         if (!dr.IsDBNull(dr.GetOrdinal("Rol")))
                         {
-                            usuario.Roles.Add(dr["Rol"].ToString());
+                            usuario.Roles.Add(dr["Rol"].ToString()!);
                         }
                     }
                 }
@@ -135,12 +135,12 @@ namespace WebProveedoresN.Data
                         usuario = new Usuario
                         {
                             IdUsuario = Convert.ToInt32(dr["Id"]),
-                            SupplierCode = dr["Code"].ToString(),
-                            SupplierName = dr["Name"].ToString(),
-                            Nombre = dr["Nombre"].ToString(),
+                            SupplierCode = dr["Code"].ToString()!,
+                            SupplierName = dr["Name"].ToString()!,
+                            Nombre = dr["Nombre"].ToString()!,
                             Correo = correo,
                             Clave = clave,
-                            Token = dr["Token"].ToString(),
+                            Token = dr["Token"].ToString()!,
                             Restablecer = Convert.ToBoolean(dr["Restablecer"]),
                             Confirmado = Convert.ToBoolean(dr["Confirmado"]),
                             IdStatus = Convert.ToInt32(dr["StatusId"]),
@@ -148,7 +148,7 @@ namespace WebProveedoresN.Data
                         };
                         if (!dr.IsDBNull(dr.GetOrdinal("Rol")))
                         {
-                            usuario.Roles.Add(dr["Rol"].ToString());
+                            usuario.Roles.Add(dr["Rol"].ToString()!);
                         }
                     }
                 }

@@ -4,51 +4,56 @@
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 @Html.AntiForgeryToken()
-
-<div class="card">
-    <div class="card-header">
-        <h2 class="text-center">Detalles de la Orden de Compra @ViewBag.OrderNumber</h2>
-    </div>
-    <div class="card-body">
-        <p>
-            <a asp-action="Details" class="btn btn-outline-success btn-sm"><i class="bi bi-arrow-repeat">  Actualizar</i></a>
-            <a asp-action="ListOrders" class="btn btn-outline-info btn-sm"><i class="bi bi-arrow-left-circle">  Regresar</i></a>
-        </p>
-        <h3>Detalles de la Orden de Compra</h3>
-        <p><strong>Número de Orden:</strong> @Model.OrderNumber</p>
-        <p><strong>Fecha:</strong> @Model.OrderDate.ToShortDateString()</p>
-        <p><strong>Importe Total:</strong> @Model.TotalAmount.ToString("C")</p>
-        <p><strong>Moneda:</strong> @Model.Currency.ToString()</p>
-        <p><strong># Factura(s):</strong> @Model.Invoices.ToString()</p>
-        <p><strong>Monto factura(s):</strong> @Model.TotalInvoice.ToString("C")</p>
-        <div>
-            <form asp-action="Upload" asp-controller="Files" method="get" style="display:inline;">
-                <input type="hidden" name="orderNumber" value="@Model.OrderNumber" />
-                <input type="hidden" name="orderId" value="@Model.Id" />
-                <button type="submit" class="btn btn-outline-primary btn-sm" @(Model.TotalAmount <= Model.TotalInvoice ? "disabled" : "")>
-                    <i class="bi bi-cloud-upload-fill"> Cargar</i>
-                </button>
-            </form>
-            <button class="btn btn-outline-secondary btn-sm" onclick="mostrarDocumentos(@Model.OrderNumber)">
-                <i class="bi bi-cloud-download-fill"> Mostrar</i>
-            </button>
-            <button class="btn btn-outline-danger btn-sm" onclick="cerrarEmbed(@Model.OrderNumber)" style="display: none">
-                <i class="bi bi-x-circle-fill"> Cerrar</i>
-            </button>
-
-            <div id="embed-container-@Model.OrderNumber" style="display:none;">
-                <div id="embed-list-@Model.OrderNumber"></div>
-            </div>
+@if (Model is null)
+{
+    <p>No se encontraron detalles para esta orden.</p>
+}
+else
+{
+    <div class="card">
+        <div class="card-header">
+            <h2 class="text-center">Detalles de la Orden de Compra @Model.OrderNumber</h2>
         </div>
-        @*         <h3>Documentos Adjuntos</h3>
+        <div class="card-body">
+            <p>
+                <a asp-action="Details" asp-route-orderNumber="@Model.OrderNumber" class="btn btn-outline-success btn-sm"><i class="bi bi-arrow-repeat">  Actualizar</i></a>
+                <a asp-action="ListOrders" class="btn btn-outline-info btn-sm"><i class="bi bi-arrow-left-circle">  Regresar</i></a>
+            </p>
+            <p><strong>Número de Orden:</strong> @Model.OrderNumber</p>
+            <p><strong>Fecha:</strong> @Model.OrderDate.ToShortDateString()</p>
+            <p><strong>Importe Total:</strong> @Model.TotalAmount.ToString("C")</p>
+            <p><strong>Moneda:</strong> @Model.Currency.ToString()</p>
+            <p><strong># Factura(s):</strong> @Model.Invoices.ToString()</p>
+            <p><strong>Monto factura(s):</strong> @Model.TotalInvoice.ToString("C")</p>
+            <div>
+                <form asp-action="Upload" asp-controller="Files" method="get" style="display:inline;">
+                    <input type="hidden" name="orderNumber" value="@Model.OrderNumber" />
+                    <input type="hidden" name="orderId" value="@Model.Id" />
+                    <button type="submit" class="btn btn-outline-primary btn-sm" @(Model.TotalAmount <= Model.TotalInvoice ? "disabled" : "")>
+                        <i class="bi bi-cloud-upload-fill"> Cargar</i>
+                    </button>
+                </form>
+                <button class="btn btn-outline-secondary btn-sm" onclick="mostrarDocumentos(@Model.OrderNumber)">
+                    <i class="bi bi-cloud-download-fill"> Mostrar</i>
+                </button>
+                <button class="btn btn-outline-danger btn-sm" onclick="cerrarEmbed(@Model.OrderNumber)" style="display: none">
+                    <i class="bi bi-x-circle-fill"> Cerrar</i>
+                </button>
+
+                <div id="embed-container-@Model.OrderNumber" style="display:none;">
+                    <div id="embed-list-@Model.OrderNumber"></div>
+                </div>
+            </div>
+            @*         <h3>Documentos Adjuntos</h3>
         <ul>
             @foreach (var document in Model.Documents)
             {
                 <li>@document.FileName - <a href="@Url.Action("Download", "Documents", new { id = document.Id })">Descargar</a></li>
             }
         </ul> *@
+        </div>
     </div>
-</div>
+}
 @section Scripts {
     <script>
         function mostrarDocumentos(orderNumber) {

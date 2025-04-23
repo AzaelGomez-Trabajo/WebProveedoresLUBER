@@ -85,7 +85,7 @@ namespace WebProveedoresN.Services
             }
         }
 
-        public static string SaveXmlDataInDatabase(List<LecturaXmlDTO> archivos, int idOrder, string orderNumber, string supplierName,string idUsuario, string ipUsuario) => DBFiles.SaveXmlDataInDatabase(archivos, idOrder, orderNumber, supplierName, idUsuario, ipUsuario);
+        public static string SaveXmlDataInDatabase(List<LecturaXmlDTO> archivos, string orderNumber, string supplierName,string idUsuario, string ipUsuario) => DBFiles.SaveXmlDataInDatabase(archivos, orderNumber, supplierName, idUsuario, ipUsuario);
         
 
         public static bool SearchInvoice(string UUID)

@@ -1,4 +1,4 @@
-﻿@model WebProveedoresN.Models.LoadFileDTO
+﻿@model LoadFileDTO
 @{
     ViewBag.Title = "Cargar Archivos";
     Layout = "~/Views/Shared/_Layout.cshtml";
@@ -42,7 +42,7 @@
                             <button type="submit" class="btn btn-outline-primary">
                                 <i class="bi bi-floppy"></i> Guardar
                             </button>
-                            <a class="btn btn-link" href="@Url.Action("Details","Orders", new { id = ViewBag.OrderId })">
+                            <a class="btn btn-link" href="@Url.Action("Details","Orders", new { orderNumber = ViewBag.OrderNumber })">
                                 <i class="bi bi-arrow-left-circle"></i> Regresar
                             </a>
                         </div>

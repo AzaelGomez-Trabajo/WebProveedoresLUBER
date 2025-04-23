@@ -9,7 +9,7 @@
 <div class="card">
     <div class="card-header">
         <h4 class="text-center">Órdenes de Compra para: </h4>
-        <h4 class="text-center">@ViewBag.Empresa</h4>
+        <h4 class="text-center">@User.FindFirst("SupplierName")!.Value</h4>
     </div>
     <div class="card-body">
         <form method="get" asp-action="ListOrders" class="d-flex justify-content-between align-items-center mb-3">
@@ -19,7 +19,7 @@
                 </a>
             </p>
             <div class=" input-group mb-3" style="max-width: 300px">
-                <input type="text" name="searchString" value="@ViewBag.SearchString" placeholder="Número de orden" class="form-control" />
+                <input type="text" name="searchString" value="@ViewBag.SearchString" placeholder="Número de orden..." class="form-control" />
                 <button type="submit" class="btn btn-outline-primary btn-sm"><i class="bi bi-binoculars-fill"> Buscar</i></button>
             </div>
         </form>
@@ -44,11 +44,11 @@
                             <td>@item.OrderNumber</td>
                             <td>@item.OrderDate.ToShortDateString()</td>
                             <td>@item.TotalAmount.ToString("C")</td>
-                            <td>@item.Currency.ToString()</td>
+                            <td>@item.Currency!.ToString()</td>
                             <td>@item.Invoices.ToString()</td>
                             <td>@item.TotalInvoice.ToString("C")</td>
                             <td>
-                                <a asp-action="Details" asp-route-id="@item.Id" class="btn btn-outline-info btn-sm">
+                                <a asp-action="Details" asp-route-orderNumber="@item.OrderNumber" asp-route-supplierCode="@item." class="btn btn-outline-info btn-sm">
                                     <i class="bi bi-ticket-detailed-fill"> Detalles</i>
                                 </a>
                             </td>

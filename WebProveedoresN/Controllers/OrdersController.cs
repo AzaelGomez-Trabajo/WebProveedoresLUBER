@@ -14,30 +14,30 @@ namespace WebProveedoresN.Controllers
         }
 
         //GET: Orders/Index
-        public async Task<ActionResult> ListOrders(string searchString = null, int pageNumber = 1)
+        public async Task<ActionResult> ListOrders(string searchString = null!, int pageNumber = 1)
         {
             int pageSize = 10;
-            var supplierCode = User.FindFirst("SupplierCode").Value;
-            ViewBag.Empresa = User.FindFirst("SupplierName").Value;
+            var supplierCode = User.FindFirst("SupplierCode")!.Value;
+            //ViewBag.Empresa = User.FindFirst("SupplierName")!.Value;
 
-            var orders = await _orderService.GetOrdersAsync(supplierCode, 1, 0, searchString, pageNumber, pageSize);
+            var orders = await _orderService.GetOrdersAsync(supplierCode, 1, 0, "", searchString, pageNumber, pageSize);
             if (!orders.Any() && pageNumber > 1)
             {
                 return RedirectToAction("ListOrders", new { pageNumber = 1, searchString });
             }
 
-            int totalRecords = await _orderService.GetTotalOrdersAsync(supplierCode, 1, 0, searchString);
+            int totalRecords = await _orderService.GetTotalOrdersAsync(supplierCode, 1, 0, "", searchString);
             int totalPages = (int)Math.Ceiling(totalRecords / (double)pageSize);
 
-            ViewBag.TotalPages = totalPages;
-            ViewBag.PageNumber = pageNumber;
-            ViewBag.SearchString = searchString;
+            //ViewBag.TotalPages = totalPages;
+            //ViewBag.PageNumber = pageNumber;
+            //ViewBag.SearchString = searchString;
 
             return View(PaginationDTO<OrderDTO>.CreatePagination(orders, pageNumber, pageSize));
         }
 
-        [HttpPost]
-        public IActionResult UploadFile(int orderId, IFormFile file)
+        [HttpPost("UploadFile")]
+        public IActionResult UploadFile(string orderNumber, IFormFile file)
         {
             if (file != null && file.Length > 0)
             {
@@ -48,33 +48,26 @@ namespace WebProveedoresN.Controllers
                 }
                 // Lógica adicional para asociar el archivo con la orden
             }
-            return RedirectToAction("Details", new { id = orderId });
-        }
-
-        [HttpGet]
-        public IActionResult GetDocuments(int orderId)
-        {
-            var documents = new List<string>
-            {
-                "document1.pdf",
-                "document2.pdf"
-            };
-            return Json(new { success = true, documents });
+            return RedirectToAction("Details", new { orderNumber });
         }
 
         //GET: Orders/Details/5
         [HttpGet]
-        public async Task<ActionResult> Details(int id)
+        public async Task<ActionResult> Details(OrderDetailDTO orderDetailDTO)
         {
-            var order = await _orderService.GetOrderByIdAsync(id);
+            if(orderDetailDTO is null)
+            {
+                return BadRequest("El número de orden no puede estar vacío.");
+            }
+            var order = await _orderService.GetOrderByOrderNumberAsync(orderDetailDTO);
             if (order == null)
             {
-                return NotFound();
+                return NotFound("No se encontró la orden especificada.");
             }
             return View(order);
         }
 
-        [HttpPost]
+        [HttpPost("CloseEmbed")]
         public IActionResult CloseEmbed(int orderId)
         {
             return Json(new { success = true });

@@ -11,13 +11,13 @@ namespace WebProveedoresN.Data
         {
             using (SqlConnection connection = DBConnectiion.GetConnection())
             {
-                string query = "INSERT INTO Archivos (Name, Route, DateTime, OrderId, Extension, Converted) VALUES (@Name, @Route, @DateTime, @OrderId, @Extension, @Converted)";
+                string query = $"INSERT INTO Archivos (Name, Route, DateTime, OrderId, OrderNumber, Extension, Converted) VALUES (@Name, @Route, @DateTime, SELECT Id FROM Orders WHERE OrderNumber = {archivo.OrderNumber}, @OrderNumber, @Extension, @Converted)";
                 using (SqlCommand cmd = new SqlCommand(query, connection))
                 {
                     cmd.Parameters.AddWithValue("@Name", archivo.Name);
                     cmd.Parameters.AddWithValue("@Route", archivo.Route);
                     cmd.Parameters.AddWithValue("@DateTime", archivo.DateTime);
-                    cmd.Parameters.AddWithValue("@OrderId", archivo.OrderId);
+                    cmd.Parameters.AddWithValue("@OrderNumber", archivo.OrderNumber);
                     cmd.Parameters.AddWithValue("@Extension", archivo.Extension);
                     cmd.Parameters.AddWithValue("@Converted", archivo.Converted);
                     cmd.CommandType = CommandType.Text;
@@ -28,7 +28,7 @@ namespace WebProveedoresN.Data
             }
         }
 
-        public static string SaveXmlDataInDatabase(List<LecturaXmlDTO> archivos, int orderId, string orderNumber, string supplierName, string idUsuario, string ipUsuario)
+        public static string SaveXmlDataInDatabase(List<LecturaXmlDTO> archivos, string orderNumber, string supplierName, string idUsuario, string ipUsuario)
         {
             var isValid = string.Empty;
             foreach (var model in archivos)
@@ -65,12 +65,11 @@ namespace WebProveedoresN.Data
                             }
 
                             // Inserta datos en la tabla OrdersFacturas
-                            var queryOrderFactura = "INSERT INTO OrdersFacturas (IdOrder, IdFactura, IdUsuario, IpUsuario) OUTPUT INSERTED.IdFactura VALUES (@IdOrder, @IdFactura, @IdUsuario, @IpUsuario)";
+                            var queryOrderFactura = $"INSERT INTO OrdersFacturas (IdOrder, IdFactura, IdUsuario, IpUsuario) OUTPUT INSERTED.IdFactura VALUES (SELECT Id FROM Orders WHERE OrderNumber = {orderNumber}, @IdFactura, @IdUsuario, @IpUsuario)";
                             using (var cmd = new SqlCommand(queryOrderFactura, connection))
                             {
                                 cmd.CommandType = CommandType.Text;
                                 cmd.Parameters.Clear();
-                                cmd.Parameters.AddWithValue("@IdOrder", orderId);
                                 cmd.Parameters.AddWithValue("@IdFactura", archivoId);
                                 cmd.Parameters.AddWithValue("@IdUsuario", idUsuario);
                                 cmd.Parameters.AddWithValue("@IpUsuario", ipUsuario);

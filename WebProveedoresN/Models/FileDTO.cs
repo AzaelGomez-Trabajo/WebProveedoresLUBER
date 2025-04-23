@@ -23,7 +23,7 @@ namespace WebProveedoresN.Models
 
         [Required]
         [DisplayName("Numero de Órden")]
-        public int OrderId { get; set; }
+        public string OrderNumber { get; set; }
 
         [Required]
         [DisplayName("Extención")]
