@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using WebProveedoresN.Data;
+using WebProveedoresN.DTOs;
 using WebProveedoresN.Entities;
 using WebProveedoresN.Models;
 using WebProveedoresN.Services;
@@ -19,14 +20,18 @@ namespace WebProveedoresN.Controllers
         [Authorize(Roles = "Administrador")]
         public IActionResult Listar(Usuario usuario)
         {
+            if (usuario is null)
+            {
+                throw new ArgumentNullException(nameof(usuario));
+            }
+
             try
             {
-                var supplierCode = User.FindFirst("SupplierCode")?.Value;
+                var supplierCode = User.FindFirst("SupplierCode")!.Value;
                 if (supplierCode == null)
                 {
                     return RedirectToAction("Login", "Access");
                 }
-                ViewBag.SupplierCode = supplierCode;
 
                 // Metodo que devuelve una lista de usuarios
                 var usuarios = DBStart.ListarUsuariosConRoles(supplierCode);
@@ -44,8 +49,8 @@ namespace WebProveedoresN.Controllers
         {
             var usuario = new Usuario()
             {
-                SupplierName = User.FindFirst("SupplierName")?.Value,
-                SupplierCode = User.FindFirst("SupplierCode")?.Value,
+                SupplierName = User.FindFirst("SupplierName")!.Value,
+                SupplierCode = User.FindFirst("SupplierCode")!.Value,
 
             };
             return View(usuario);
@@ -98,29 +103,29 @@ namespace WebProveedoresN.Controllers
 
         [HttpGet]
         public IActionResult Guardar()
-        {
-            ViewBag.SupplierName = TempData["SupplierName"]?.ToString();
-            ViewBag.SupplierCode = TempData["SupplierCode"]?.ToString();
-            var usuario = new Usuario()
-            {
-                SupplierName = ViewBag.SupplierName,
-                SupplierCode = ViewBag.SupplierCode,
-            };
-            ViewBag.Status = StatusService.GetStatus() ?? [];
-            ViewBag.Roles = RoleService.GetRoles() ?? [];
-            return View(usuario);
+         {
+            return View();
         }
 
         [HttpPost]
-        public IActionResult Guardar(Usuario model)
+        public IActionResult Guardar(RegisterDTO registerDTO)
         {
             if (!ModelState.IsValid)
             {
-                ViewBag.Status = StatusService.GetStatus() ?? [];
-                ViewBag.Roles = RoleService.GetRoles() ?? [];
-                return View(model);
+                //ViewBag.Status = StatusService.GetStatus() ?? [];
+                //ViewBag.Roles = RoleService.GetRoles() ?? [];
+                return View(registerDTO);
             }
 
+            var model = new Usuario()
+            {
+                SupplierName = TempData["SupplierName"]?.ToString() ?? string.Empty,
+                SupplierCode = TempData["SupplierCode"]?.ToString() ?? string.Empty,
+                Nombre = registerDTO.Nombre,
+                Correo = registerDTO.Correo,
+                Clave = registerDTO.Clave,
+                //Roles = new List<string> { "Proveedor" }
+            };
             if (model.Clave != null)
             {
                 model.Clave = UtilityService.ConvertirSHA256(model.Clave);
@@ -131,7 +136,7 @@ namespace WebProveedoresN.Controllers
             model.IdStatus = 1;
 
             // Metodo que recibe un objeto de tipo UsuarioModel para guardar en la base de datos
-            var respuesta = StartService.SaveUserWithRoles(model); ;
+            var respuesta = StartService.SaveUserWithRoles(model); 
 
             TempData["Message"] = respuesta;
             if (respuesta.Contains("exitosamente"))
@@ -200,8 +205,8 @@ namespace WebProveedoresN.Controllers
             var answer = false;
             if (string.IsNullOrEmpty(supplier.Code))
             {
-                ViewBag.SupplierName = supplier.Name;
-                return View();
+                //ViewBag.SupplierName = supplier.Name;
+                return View(supplier);
             }
 
             answer = StartService.ValidateSupplier(supplier);
@@ -221,6 +226,7 @@ namespace WebProveedoresN.Controllers
             }
             TempData["SupplierName"] = supplier.Name;
             TempData["SupplierCode"] = supplier.Code;
+
             return RedirectToAction("Guardar");
         }
 

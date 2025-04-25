@@ -1,4 +1,4 @@
-﻿@model WebProveedoresN.Entities.Usuario
+﻿@model WebProveedoresN.DTOs.RegisterDTO
 @{
     ViewData["Title"] = "Guardar";
     Layout = "~/Views/Shared/_Layout.cshtml";
@@ -11,9 +11,9 @@
     <div class="card-body">
 
         <form asp-action="Guardar" asp-controller="Start" method="post">
-            <input asp-for="SupplierName" type="hidden" class="form-control" />
+@*             <input asp-for="SupplierName" type="hidden" class="form-control" />
             <input asp-for="SupplierCode" type="hidden" class="form-control" />
-            @if (!string.IsNullOrEmpty(message))
+ *@            @if (!string.IsNullOrEmpty(message))
             {
                 <div class="alert alert-info">
                     @message

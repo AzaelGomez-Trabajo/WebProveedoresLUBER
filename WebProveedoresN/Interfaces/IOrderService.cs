@@ -5,10 +5,12 @@ namespace WebProveedoresN.Interfaces
 {
     public interface IOrderService
     {
-        Task<List<OrderDetail>> GetOrderByOrderNumberAsync(OrderDetailDTO orderDetailDTO);
+        Task<List<OrderDetail>> GetOrderDetailsByOrderNumberAsync(OrderDetailDTO orderDetailDTO);
 
-        Task<List<OrderDTO>> GetOrdersAsync(string SupplierCode, int action, int orderNumber, string DocumentType, string searchString, int pageNumber, int pageSize);
+        Task<Order> GetOrderByOrderNumberAsync(int orderNumber);
 
-        Task<int> GetTotalOrdersAsync(string empresa, int parametro1, int parametro2, string parameter4, string searchString);
+        Task<List<Order>> GetOrdersAsync(OrderDetailDTO orderDetailDTO, string searchString, int pageNumber, int pageSize);
+
+        Task<int> GetTotalOrdersAsync(OrderDetailDTO orderDetailDTO, string searchString);
     }
 }

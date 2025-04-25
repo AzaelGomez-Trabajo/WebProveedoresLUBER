@@ -7,9 +7,9 @@ namespace WebProveedoresN.Data
 {
     public class DBOrders
     {
-        public static List<OrderDTO> ListOrders(string supplierCode, int action, int orderNumber, string documentType)
+        public static List<Order> ListOrders(OrderDetailDTO orderDetailDTO)
         {
-            var orders = new List<OrderDTO>();
+            var orders = new List<Order>();
             try
             {
                 using var conexion = DBConnectiion.GetConnection();
@@ -17,15 +17,15 @@ namespace WebProveedoresN.Data
                 var storedProcedure = "sp_GetOrders";
                 using (var cmd = new SqlCommand(storedProcedure, conexion))
                 {
-                    cmd.Parameters.AddWithValue("@Parameter1", action);
-                    cmd.Parameters.AddWithValue("@Parameter2", orderNumber);
-                    cmd.Parameters.AddWithValue("@Parameter3", supplierCode);
-                    cmd.Parameters.AddWithValue("@Parameter4", documentType);
+                    cmd.Parameters.AddWithValue("@Parameter1", orderDetailDTO.Action);
+                    cmd.Parameters.AddWithValue("@Parameter2", orderDetailDTO.OrderNumber);
+                    cmd.Parameters.AddWithValue("@Parameter3", orderDetailDTO.SupplierCode);
+                    cmd.Parameters.AddWithValue("@Parameter4", orderDetailDTO.DocumentType);
                     cmd.CommandType = CommandType.StoredProcedure;
                     using var dr = cmd.ExecuteReader();
                     while (dr.Read())
                     {
-                        orders.Add(new OrderDTO()
+                        orders.Add(new Order()
                         {
                             DocumentType = dr["DocumentType"].ToString(),
                             OrderNumber = dr["OrderNumber"].ToString(),
@@ -33,7 +33,7 @@ namespace WebProveedoresN.Data
                             Canceled = dr["Canceled"].ToString(),
                             TotalAmount = (decimal)dr["TotalAmount"],
                             IdEstatus = dr["IdEstatus"].ToString(),
-                            Currency = dr["Currency"].ToString(),
+                            DocCurOrder = dr["Currency"].ToString()!,
                             Property = dr["Property"].ToString(),
                             Invoices = (int)dr["Invoices"],
                             TotalInvoice = (decimal)dr["TotalInvoice"],
@@ -49,7 +49,46 @@ namespace WebProveedoresN.Data
             return orders;
         }
 
-        public static bool ValidateOrderNumberInDatabase(OrderDTO model)
+        public static Order GetOrderNumber(string orderNumber)
+        {
+            var order = new Order();
+            try
+            {
+                using var conexion = DBConnectiion.GetConnection();
+                conexion.Open();
+                var storedProcedure = "sp_GetOrderByOrderNumber";
+                using (var cmd = new SqlCommand(storedProcedure, conexion))
+                {
+                    cmd.Parameters.AddWithValue("@OrderNumber", orderNumber);
+                    cmd.CommandType = CommandType.StoredProcedure;
+                    using var dr = cmd.ExecuteReader();
+                    if (dr.Read())
+                    {
+                        order = new Order()
+                        {
+                            DocumentType = dr["DocumentType"].ToString(),
+                            OrderNumber = dr["OrderNumber"].ToString(),
+                            OrderDate = (DateTime)dr["OrderDate"],
+                            Canceled = dr["Canceled"].ToString(),
+                            IdEstatus = dr["IdEstatus"].ToString(),
+                            TotalAmount = (decimal)dr["TotalAmount"],
+                            DocCurOrder = dr["Currency"].ToString()!,
+                            Property = dr["Property"].ToString() ?? string.Empty,
+                            Invoices = (int)dr["Invoices"],
+                            TotalInvoice = (decimal)dr["TotalInvoice"],
+                        };
+                    }
+                }
+                conexion.Close();
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+            return order;
+        }
+
+        public static bool ValidateOrderNumberInDatabase(Order model)
         {
             bool isValid = false;
 
@@ -91,14 +130,14 @@ namespace WebProveedoresN.Data
             return orderNumberId;
         }
 
-        public static List<OrderDetail> GetOrderByOrderNumber(OrderDetailDTO orderDetailDTO)
+        public static List<OrderDetail> GetOrderDetailsByOrderNumber(OrderDetailDTO orderDetailDTO)
         {
             var orders = new List<OrderDetail>();
             try
             {
                 using var conexion = DBConnectiion.GetConnection();
                 conexion.Open();
-                var storedProcedure = "sp_GetOrderByOrderNumber";
+                var storedProcedure = "sp_GetOrderDetailsByOrderNumber";
                 using (var cmd = new SqlCommand(storedProcedure, conexion))
                 {
                     cmd.Parameters.AddWithValue("@Action", orderDetailDTO.Action);
@@ -111,23 +150,22 @@ namespace WebProveedoresN.Data
                     {
                         orders.Add(new OrderDetail()
                         {
-
-                            DocumentTypeOrder = dr["Tipo Documento"].ToString()!,
-                            OrderNumber = (int)dr["DocNum"],
-                            LineNum = (int)dr["LineNum"],
-                            ItemCode = dr["ItemCode"].ToString()!,
-                            QuantityOrder = (decimal)dr["Quantity"],
-                            OpenQty = (decimal)dr["OpenQty"],
-                            DocCurOrder = dr["DocCur"].ToString()!,
-                            TotalOrder = (decimal)dr["Total"],
-                            DocumentType = dr["Tipo Documento"].ToString(),
-                            DocNum = (int)dr["DocNum"],
-                            CardCode = dr["CardCode"].ToString(),
-                            CardName = dr["CardName"].ToString(),
-                            DocStatus = dr["DocStatus"].ToString(),
-                            DocCur = dr["DocCur"].ToString(),
-                            Total = (decimal)dr["Total"],
-                            Quantity = (decimal)dr["Quantity"],
+                            DocumentTypeOrder = dr["Tipo Documento 1"].ToString() ?? string.Empty,
+                            OrderNumber = dr["DocNum1"].ToString() ?? string.Empty,
+                            LineNum = dr["LineNum1"] != DBNull.Value ? (int)dr["LineNum1"] : 0,
+                            ItemCode = dr["ItemCode1"].ToString() ?? string.Empty,
+                            QuantityOrder = dr["Quantity1"] != DBNull.Value ? (decimal)dr["Quantity1"] : 0,
+                            OpenQty = dr["OpenQty1"] != DBNull.Value ? (decimal)dr["OpenQty1"] : 0,
+                            DocCurOrder = dr["DocCur1"].ToString() ?? string.Empty,
+                            TotalOrder = dr["Total1"] != DBNull.Value ? (decimal)dr["Total1"] : 0,
+                            DocumentType = dr["Tipo Documento 2"].ToString() ?? string.Empty,
+                            DocNum = dr["DocNum"] != DBNull.Value ? (int)dr["DocNum"] : 0,
+                            CardCode = dr["CardCode"].ToString() ?? string.Empty,
+                            CardName = dr["CardName"].ToString() ?? string.Empty,
+                            DocStatus = dr["DocStatus"].ToString() ?? string.Empty,
+                            DocCur = dr["DocCur"].ToString() ?? string.Empty,
+                            Total = dr["Total"] != DBNull.Value ? (decimal)dr["Total"] : 0,
+                            Quantity = dr["Quantity"] != DBNull.Value ? (decimal)dr["Quantity"] : 0,
                         });
                     }
                 }

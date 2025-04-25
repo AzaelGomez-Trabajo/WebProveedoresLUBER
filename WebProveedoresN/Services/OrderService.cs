@@ -8,17 +8,10 @@ namespace WebProveedoresN.Services
 {
     public class OrderService : IOrderService
     {
-        //private readonly DataContext _context;
-
-        //public OrderService(DataContext context)
-        //{
-        //    _context = context;
-        //}
-
-        public async Task<List<OrderDTO>> GetOrdersAsync(string supplierCode, int action, int orderNumber, string DocumentType, string searchString, int pageNumber, int pageSize)
+        public async Task<List<Order>> GetOrdersAsync(OrderDetailDTO orderDetailDTO, string searchString, int pageNumber, int pageSize)
         {
             // Obtener todos los registros desde la base de datos
-            var orders = DBOrders.ListOrders(supplierCode, action, orderNumber, DocumentType);
+            var orders = DBOrders.ListOrders(orderDetailDTO);
 
             // Filtrar los resultados si se proporciona un searchString
             if (!string.IsNullOrEmpty(searchString))
@@ -35,10 +28,10 @@ namespace WebProveedoresN.Services
             return await Task.FromResult(paginatedOrders);
         }
 
-        public async Task<int> GetTotalOrdersAsync(string supplierCode, int parameter1, int parameter2, string parameter4, string searchString)
+        public async Task<int> GetTotalOrdersAsync(OrderDetailDTO orderDetailDTO, string searchString)
         {
             // Obtener todos los registros desde la base de datos
-            var orders = DBOrders.ListOrders(supplierCode, parameter1, parameter2, parameter4);
+            var orders = DBOrders.ListOrders(orderDetailDTO);
 
             // Filtrar los resultados si se proporciona un searchString
             if (!string.IsNullOrEmpty(searchString))
@@ -49,14 +42,24 @@ namespace WebProveedoresN.Services
             return await Task.FromResult(orders.Count);
         }
 
-        public async Task<List<OrderDetail>> GetOrderByOrderNumberAsync(OrderDetailDTO orderDetailDTO)
+        public async Task<List<OrderDetail>> GetOrderDetailsByOrderNumberAsync(OrderDetailDTO orderDetailDTO)
         {
-              var orderDetail = DBOrders.GetOrderByOrderNumber(orderDetailDTO);
+              var orderDetail = DBOrders.GetOrderDetailsByOrderNumber(orderDetailDTO);
             if (orderDetail == null)
             {
                 return null!;
             }
             return await Task.FromResult(orderDetail);
+        }
+
+        public async Task<Order> GetOrderByOrderNumberAsync(int orderNumber)
+        {
+            var order = DBOrders.GetOrderNumber(orderNumber.ToString());
+            if (order == null)
+            {
+                return null!;
+            }
+            return await Task.FromResult(order);
         }
     }
 }

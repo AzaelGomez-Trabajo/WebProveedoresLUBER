@@ -1,5 +1,5 @@
-﻿@using WebProveedoresN.Models
-@model PaginationDTO<OrderDTO>
+﻿@using WebProveedoresN.Entities
+@model PaginationDTO<Order>
 
 @{
     ViewData["Title"] = "Órdenes de Compra";
@@ -23,8 +23,7 @@
                 <button type="submit" class="btn btn-outline-primary btn-sm"><i class="bi bi-binoculars-fill"> Buscar</i></button>
             </div>
         </form>
-        <hr />
-        <div class="table-responsive">
+        <div class="table-striped">
             <table class="table text-center">
                 <thead>
                     <tr>
@@ -44,13 +43,18 @@
                             <td>@item.OrderNumber</td>
                             <td>@item.OrderDate.ToShortDateString()</td>
                             <td>@item.TotalAmount.ToString("C")</td>
-                            <td>@item.Currency!.ToString()</td>
+                            <td>@item.DocCurOrder.ToString()</td>
                             <td>@item.Invoices.ToString()</td>
                             <td>@item.TotalInvoice.ToString("C")</td>
                             <td>
-                                <a asp-action="Details" asp-route-orderNumber="@item.OrderNumber" asp-route-supplierCode="@item." class="btn btn-outline-info btn-sm">
-                                    <i class="bi bi-ticket-detailed-fill"> Detalles</i>
-                                </a>
+                                <form asp-action="Details" method="get" style="display:inline">
+                                    <input type="hidden" name="orderNumber" value="@item.OrderNumber" />
+                                    <input type="hidden" name="supplierCode" value="@ViewBag.SupplierCode" />
+                                    <input type="hidden" name="documentType" value="@item.DocumentType" />
+                                    <button type="submit" class="btn btn-outline-info btn-sm">
+                                        <i class="bi bi-ticket-detailed-fill"> Detalles</i>
+                                    </button>
+                                </form>
                             </td>
                         </tr>
                     }

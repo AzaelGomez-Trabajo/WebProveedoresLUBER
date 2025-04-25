@@ -2,13 +2,9 @@
 
 namespace WebProveedoresN.Entities
 {
-    public class OrderDetail
+    public class OrderDetail : Order
     {
-        [Display(Name = "Tipo de Documento")]
         public string DocumentTypeOrder { get; set; } = null!;
-
-        [Display(Name = "Número de Orden")]
-        public int? OrderNumber { get; set; }
 
         [Display(Name = "Número de Línea")]
         public int? LineNum { get; set; }
@@ -22,17 +18,14 @@ namespace WebProveedoresN.Entities
         [Display(Name = "Cantidad faltante")]
         public decimal OpenQty { get; set; } = 0;
 
-        [Display(Name = "Moneda")]
-        public string DocCurOrder { get; set; } = null!;
-
         [Display(Name = "Faltante")]
         public decimal TotalOrder { get; set; } = 0;
 
         [Display(Name = "Tipo Documento")]
-        public string? DocumentType { get; set; }
+        public new string? DocumentType { get; set; }
 
         [Display(Name = "Número de Documento")]
-        public int? DocNum { get; set; }
+        public int? DocNum { get; set; } = 0;
 
         [Display(Name = "Número de Proveedor")]
         public string? CardCode { get; set; }
@@ -47,10 +40,9 @@ namespace WebProveedoresN.Entities
         public string? DocCur { get; set; }
 
         [Display(Name = "Faltante")]
-        public decimal Total { get; set; } = 0;
+        public decimal? Total { get; set; } = 0;
 
         [Display(Name = "Cantidad Cubierta")]
-        public decimal? Quantity { get; set; }
-
+        public decimal? Quantity { get; set; } = 0;
     }
 }

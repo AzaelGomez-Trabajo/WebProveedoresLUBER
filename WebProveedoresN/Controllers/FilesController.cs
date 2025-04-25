@@ -233,6 +233,22 @@ namespace WebProveedoresN.Controllers
             return View(model);
         }
 
+        [HttpPost("UploadFile")]
+        public IActionResult UploadFile(string orderNumber, IFormFile file)
+        {
+            if (file != null && file.Length > 0)
+            {
+                var filePath = Path.Combine("wwwroot/UploadedFiles", file.FileName);
+                using (var stream = new FileStream(filePath, FileMode.Create))
+                {
+                    file.CopyTo(stream);
+                }
+                // Lógica adicional para asociar el archivo con la orden
+            }
+            return RedirectToAction("Details", new { orderNumber });
+        }
+
+
         public async Task<IActionResult> ObtenerDocumentos(string orderNumber)
         {
             var documents = await DBFiles.ObtenerDocumentosAsync(orderNumber);

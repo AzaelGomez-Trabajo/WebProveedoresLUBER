@@ -11,7 +11,7 @@
             <div class="card">
                 <div class="card-header">
                     <h3 class="text-center">
-                        Subir Factura para la Orden de Compra @Html.Encode(@ViewBag.OrderNumber)
+                        Subir Factura para la Orden de Compra @Model.OrderNumber
                     </h3>
                 </div>
                 <div class="card-body">
@@ -42,7 +42,7 @@
                             <button type="submit" class="btn btn-outline-primary">
                                 <i class="bi bi-floppy"></i> Guardar
                             </button>
-                            <a class="btn btn-link" href="@Url.Action("Details","Orders", new { orderNumber = ViewBag.OrderNumber })">
+                            <a class="btn btn-link" href="@Url.Action("Details","Orders", new { orderNumber = @Model.OrderNumber })">
                                 <i class="bi bi-arrow-left-circle"></i> Regresar
                             </a>
                         </div>
