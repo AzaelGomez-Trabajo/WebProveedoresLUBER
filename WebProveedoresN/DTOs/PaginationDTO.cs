@@ -1,15 +1,15 @@
-﻿using Microsoft.EntityFrameworkCore;
-namespace WebProveedoresN.Models
+﻿namespace WebProveedoresN.DTOs
 {
     public class PaginationDTO<T> : List<T>
     {
         public int PageNumber { get; private set; }
         public int TotalPages { get; private set; }
+
         public PaginationDTO(List<T> items, int count, int pageNumber, int pageSize)
         {
             PageNumber = pageNumber;
             TotalPages = (int)Math.Ceiling(count / (double)pageSize);
-            this.AddRange(items);
+            AddRange(items);
         }
 
         public bool HasPreviousPage => PageNumber > 1;

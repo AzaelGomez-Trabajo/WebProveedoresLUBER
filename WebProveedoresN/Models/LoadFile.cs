@@ -3,21 +3,21 @@ using System.ComponentModel.DataAnnotations;
 
 namespace WebProveedoresN.Models
 {
-	public class LoadFileDTO
+	public class LoadFile
 	{
-        [Required]
+        [Required(ErrorMessage = "El campo {0} es obligatorio.")]
         [DisplayName("Archivo PDF")]
         //[FileExtensions(Extensions = ".pdf", ErrorMessage = "Por favor, suba un archivo PDF.")]
         [FileSize(2 * 1024 * 1024)]
-        public IFormFile FilePDF { get; set; }
-        [Required]
+        public IFormFile FilePDF { get; set; } = null!;
+        [Required(ErrorMessage = "El campo {0} es obligatorio.")]
         [DisplayName("Archivo XML")]
         //[FileExtensions(Extensions = ".xml", ErrorMessage = "Por favor, suba un archivo XML.")]
-        public IFormFile FileXML { get; set; }
+        public IFormFile? FileXML { get; set; } = null!;
+
         [Required]
         [DisplayName("Número de Orden de Compra")]
-        public string OrderNumber { get; set; }
-
+        public string OrderNumber { get; set; } = null!;
     }
     public class FileSizeAttribute : ValidationAttribute
     {
@@ -27,7 +27,7 @@ namespace WebProveedoresN.Models
             _maxFileSize = maxFileSize;
         }
 
-        protected override ValidationResult IsValid(object value, ValidationContext validationContext)
+        protected override ValidationResult? IsValid(object? value, ValidationContext validationContext)
         {
             if (value is IFormFile file)
             {

@@ -1,4 +1,4 @@
-﻿@model WebProveedoresN.Entities.Usuario
+﻿@model WebProveedoresN.DTOs.InviteUserDTO
 @{
     ViewData["Title"] = "Invitar Usuario";
     Layout = "~/Views/Shared/_Layout.cshtml";
@@ -9,9 +9,7 @@
         <h3>Invitar Usuario</h3>
     </div>
     <div class="card-body">
-        <form asp-action="InvitarUsuario" asp-controller="Start" method="post">
-            <input asp-for="SupplierName" type="hidden" class="form-control" />
-            <input asp-for="SupplierCode" type="hidden" class="form-control" />
+        <form asp-action="InviteUser" asp-controller="Start" method="post">
             @if (!string.IsNullOrEmpty(message))
             {
                 <div class="alert alert-info">
@@ -20,18 +18,23 @@
             }
             <div class="mb-3">
                 <label class="form-label">Nombre Completo </label>
-                <input asp-for="Nombre" type="text" class="form-control">
-                <span asp-validation-for="Nombre" class="text-danger"></span>
+                <input asp-for="Name" type="text" class="form-control">
+                <span asp-validation-for="Name" class="text-danger"></span>
             </div>
             <div class="mb-3">
                 <label class="form-label">Correo</label>
-                <input asp-for="Correo" type="text" class="form-control">
-                <span asp-validation-for="Correo" class="text-danger"></span>
+                <input asp-for="Email" type="text" class="form-control">
+                <span asp-validation-for="Email" class="text-danger"></span>
             </div>
             <div class="mb-3">
                 <label class="form-label">Contraseña</label>
-                <input asp-for="Clave" type="password" class="form-control">
-                <span asp-validation-for="Clave" class="text-danger"></span>
+                <input asp-for="Password" type="password" class="form-control">
+                <span asp-validation-for="Password" class="text-danger"></span>
+            </div>
+            <div class="mb-3">
+                <label class="form-label">Confirma Contraseña</label>
+                <input asp-for="ConfirmPassword" type="password" class="form-control">
+                <span asp-validation-for="ConfirmPassword" class="text-danger"></span>
             </div>
             <button type="submit" class="btn btn-outline-primary btn-sm">
                 <i class="bi bi-envelope-arrow-up-fill"> Enviar Invitacion</i>

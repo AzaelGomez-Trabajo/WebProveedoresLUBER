@@ -1,6 +1,5 @@
-﻿using iTextSharp.text;
-using Microsoft.AspNetCore.Mvc;
-using WebProveedoresN.Entities;
+﻿using Microsoft.AspNetCore.Mvc;
+using WebProveedoresN.DTOs;
 using WebProveedoresN.Interfaces;
 using WebProveedoresN.Models;
 
@@ -15,12 +14,17 @@ namespace WebProveedoresN.Controllers
             _orderService = orderService;
         }
 
+        public IActionResult ListOrders()
+        {
+            return View();
+        }
+
         //GET: Orders/Index
+        [HttpGet]
         public async Task<ActionResult> ListOrders(string searchString = null!, int pageNumber = 1)
         {
             int pageSize = 10;
             var supplierCode = User.FindFirst("SupplierCode")!.Value;
-            //ViewBag.Empresa = User.FindFirst("SupplierName")!.Value;
             ViewBag.SupplierCode = supplierCode;
 
             var orderDetailDTO = new OrderDetailDTO
@@ -48,15 +52,29 @@ namespace WebProveedoresN.Controllers
         }
 
         //GET: Orders/Details/5
-        [HttpGet]
-        public async Task<ActionResult> Details(int orderNumber, string supplierCode, string documentType)
+        [HttpGet("Details")]
+        public IActionResult Details()
         {
+            return View();
+        }
+
+        [HttpPost("Details")]
+        public async Task<ActionResult> Details(OrderDetailsDTO orderDetailsDTO)
+        {
+            if (orderDetailsDTO == null || orderDetailsDTO.OrderNumber == 0)
+            {
+                return BadRequest("El número de orden no puede estar vacío.");
+            }
+            ViewBag.OrderNumber = orderDetailsDTO.OrderNumber;
+            ViewBag.SupplierCode = orderDetailsDTO.SupplierCode;
+            ViewBag.DocumentType = orderDetailsDTO.DocumentType;
+
             var orderDetailDTO = new OrderDetailDTO
             {
                 Action = 3,
-                OrderNumber = orderNumber,
-                SupplierCode = supplierCode,
-                DocumentType = documentType
+                OrderNumber = orderDetailsDTO.OrderNumber,
+                SupplierCode = ViewBag.SupplierCode.ToString(),
+                DocumentType = orderDetailsDTO.DocumentType
             };
             if (orderDetailDTO is null)
             {
@@ -68,7 +86,7 @@ namespace WebProveedoresN.Controllers
                 return NotFound("No se encontró la orden especificada.");
             }
 
-            var orders = await _orderService.GetOrderByOrderNumberAsync(orderNumber);
+            var orders = await _orderService.GetOrderByOrderNumberAsync(orderDetailsDTO.OrderNumber);
 
             if (orders != null)
             {
@@ -91,11 +109,5 @@ namespace WebProveedoresN.Controllers
         {
             return Json(new { success = true });
         }
-
-        //[HttpPost]
-        //public IActionResult Details(Order order)
-        //{
-        //    return View(order);
-        //}
     }
 }

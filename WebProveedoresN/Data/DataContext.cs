@@ -1,6 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using WebProveedoresN.Models;
-using WebProveedoresN.Entities;
 
 namespace WebProveedoresN.Data
 {

@@ -9,7 +9,7 @@
   <ItemGroup>
     <Content Include="Plantilla\Invitacion.html" />
     <Content Include="Plantilla\Confirmar.html" />
-    <Content Include="Plantilla\Restablecer.html" />
+    <Content Include="Plantilla\ResetPassword.html" />
   </ItemGroup>
 
   <ItemGroup>

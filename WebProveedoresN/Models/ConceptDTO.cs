@@ -8,7 +8,7 @@ namespace WebProveedoresN.Models
         public decimal Cantidad { get; set; }
 
         [Display(Name = "Descripcion")]
-        public string Descripcion { get; set; }
+        public string? Descripcion { get; set; }
 
         [Display(Name = "Importe")]
         public decimal Importe { get; set; }

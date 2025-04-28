@@ -1,6 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using WebProveedoresN.Data;
-using WebProveedoresN.Entities;
+using WebProveedoresN.DTOs;
 using WebProveedoresN.Interfaces;
 using WebProveedoresN.Models;
 
@@ -44,7 +44,7 @@ namespace WebProveedoresN.Services
 
         public async Task<List<OrderDetail>> GetOrderDetailsByOrderNumberAsync(OrderDetailDTO orderDetailDTO)
         {
-              var orderDetail = DBOrders.GetOrderDetailsByOrderNumber(orderDetailDTO);
+            var orderDetail = DBOrders.GetOrderDetailsByOrderNumber(orderDetailDTO);
             if (orderDetail == null)
             {
                 return null!;

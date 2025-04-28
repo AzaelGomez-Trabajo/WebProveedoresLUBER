@@ -3,8 +3,7 @@ using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
-using WebProveedoresN.Data;
-using WebProveedoresN.Entities;
+using WebProveedoresN.DTOs;
 using WebProveedoresN.Services;
 
 namespace WebProveedoresN.Controllers
@@ -17,18 +16,18 @@ namespace WebProveedoresN.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> Login(Usuario model)
+        public async Task<IActionResult> Login(LoginDTO loginDTO)
         {
-            var usuario = StartService.ValidateUser(model.Correo, UtilityService.ConvertirSHA256(model.Clave));
+            var usuario = StartService.ValidateUser(loginDTO.Email, UtilityService.ConvertirSHA256(loginDTO.Password));
             if (usuario != null && usuario.Nombre != null)
             {
                 if (!usuario.Confirmado)
                 {
-                    ViewBag.Message = $"Falta confirmar su cuenta, favor revise su bandeja del correo {model.Correo}.";
+                    ViewBag.Message = $"Falta confirmar su cuenta, favor revise su bandeja del correo {usuario.Correo}.";
                 }
                 else if (usuario.Restablecer)
                 {
-                    ViewBag.Message = $"Se ha solicitado restablecer su cuenta, favor revise su bandeja del correo {model.Correo}.";
+                    ViewBag.Message = $"Se ha solicitado restablecer su cuenta, favor revise su bandeja del correo {usuario.Correo}.";
                 }
                 else
                 {
@@ -53,7 +52,7 @@ namespace WebProveedoresN.Controllers
                     await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, new ClaimsPrincipal(claimsIdentity));
                     // termina la autenticación
 
-                    return RedirectToAction("ListOrders", "Orders", new { empresa = usuario.SupplierName });
+                    return RedirectToAction("ListOrders", "Orders");
                 }
             }
             else

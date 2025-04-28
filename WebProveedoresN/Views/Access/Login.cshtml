@@ -1,4 +1,4 @@
-﻿@model WebProveedoresN.Entities.Usuario;
+﻿@model WebProveedoresN.DTOs.LoginDTO;
 @{
     Layout = null;
 }
@@ -19,15 +19,17 @@
                 <div class="card-header"><h3 class="text-center">Login</h3></div>
                 <div class="card-body">
 
-                    <form asp-controller="Access" asp-action="Login" method="post">
+                    <form asp-action ="Login" asp-controller="Access" method="post">
 
                         <div class="mb-3">
                             <label class="form-label">Correo:</label>
-                            <input type="email" class="form-control" asp-for="Correo" required />
+                            <input type="email" class="form-control" asp-for="Email" />
+                            <span asp-validation-for="Email" class="text-danger"></span>
                         </div>
                         <div class="mb-3">
                             <label class="form-label">Contraseña:</label>
-                            <input type="password" class="form-control" asp-for="Clave" required />
+                            <input type="password" class="form-control" asp-for="Password" />
+                            <span asp-validation-for="Password" class="text-danger"></span>
                         </div>
                         @if (ViewBag.Message != null)
                         {
@@ -42,7 +44,7 @@
                                     <i class="bi bi-door-open"> Ingresar</i>
                                 </button>
                                 <a class="btn btn-link" href="@Url.Action("Register","Start")">No tienes una cuenta? Registrate!</a>
-                                <a class="btn btn-link" href="@Url.Action("Restablecer","Start")">Has olvidado tu contraseña?</a>
+                                <a class="btn btn-link" href="@Url.Action("ResetPassword","Start")">Has olvidado tu contraseña?</a>
                             </div>
                         </div>
 
@@ -53,5 +55,8 @@
         </div>
     </div>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validation/1.19.3/jquery.validate.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validation-unobtrusive/3.2.12/jquery.validate.unobtrusive.min.js"></script>
 </body>
 </html>

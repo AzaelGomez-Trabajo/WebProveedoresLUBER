@@ -1,6 +1,6 @@
 ﻿using Microsoft.Data.SqlClient;
 using System.Data;
-using WebProveedoresN.Entities;
+using WebProveedoresN.DTOs;
 using WebProveedoresN.Models;
 using WebProveedoresN.Services;
 
@@ -324,34 +324,60 @@ namespace WebProveedoresN.Data
             }
         }
 
-        public static string RestablecerActualizar(int restablecer, string clave, string token)
+        public static string ResetPassword(UpdateDTO updateDTO)
         {
             try
             {
                 using (var oconexion = DBConnectiion.GetConnection())
                 {
                     oconexion.Open();
-                    var storedProcedure = "sp_Restablecer";
+                    var storedProcedure = "sp_ResetPassword";
                     using var cmd = new SqlCommand(storedProcedure, oconexion);
                     cmd.CommandType = CommandType.StoredProcedure;
-                    cmd.Parameters.AddWithValue("@restablecer", restablecer);
-                    cmd.Parameters.AddWithValue("@clave", clave);
-                    cmd.Parameters.AddWithValue("@token", token);
+                    cmd.Parameters.AddWithValue("@Restablecer", updateDTO.Restablecer);
+                    cmd.Parameters.AddWithValue("@Clave", updateDTO.Password);
+                    cmd.Parameters.AddWithValue("@Token", updateDTO.Token);
                     cmd.ExecuteNonQuery();
                     return "Usuario guardado exitosamente.";
                 }
             }
             catch (SqlException ex)
             {
-                var error = ex.Message;
-                return $"Error al guardar los datos en SQL Server - {error}";
+                return $"Error al guardar los datos en SQL Server - {ex.Message}";
             }
             catch (Exception ex)
             {
-                var error = ex.Message;
-                return $"Error inesperado al guardar los datos en SQL Server - {error}";
+                return $"Error inesperado al guardar los datos en SQL Server - {ex.Message}";
             }
         }
+
+        public static string UpdatePassword(UpdateDTO updateDTO)
+        {
+            try
+            {
+                using (var oconexion = DBConnectiion.GetConnection())
+                {
+                    oconexion.Open();
+                    var storedProcedure = "sp_UpdatePassword";
+                    using var cmd = new SqlCommand(storedProcedure, oconexion);
+                    cmd.CommandType = CommandType.StoredProcedure;
+                    cmd.Parameters.AddWithValue("@Restablecer", updateDTO.Restablecer);
+                    cmd.Parameters.AddWithValue("@Clave", updateDTO.Password);
+                    cmd.Parameters.AddWithValue("@Token", updateDTO.Token);
+                    cmd.ExecuteNonQuery();
+                    return "Usuario guardado exitosamente.";
+                }
+            }
+            catch (SqlException ex)
+            {
+                return $"Error al guardar los datos en SQL Server - {ex.Message}";
+            }
+            catch (Exception ex)
+            {
+                return $"Error inesperado al guardar los datos en SQL Server - {ex.Message}";
+            }
+        }
+
 
         public static string ConfirmEmail(string token)
         {
@@ -380,9 +406,9 @@ namespace WebProveedoresN.Data
             }
         }
 
-        public static Usuario Obtener(string correo)
+        public static Usuario GetUser(EmailDTO emailDTO)
         {
-            Usuario usuario = null;
+            Usuario usuario = null!;
             try
             {
                 using (SqlConnection oconexion = DBConnectiion.GetConnection())
@@ -391,7 +417,7 @@ namespace WebProveedoresN.Data
                     query += " where Correo = @correo";
 
                     var cmd = new SqlCommand(query, oconexion);
-                    cmd.Parameters.AddWithValue("@correo", correo);
+                    cmd.Parameters.AddWithValue("@correo", emailDTO.Email);
                     cmd.CommandType = CommandType.Text;
 
                     oconexion.Open();
@@ -402,11 +428,11 @@ namespace WebProveedoresN.Data
                         {
                             usuario = new Usuario()
                             {
-                                Nombre = dr["Nombre"].ToString(),
-                                Clave = dr["Clave"].ToString(),
+                                Nombre = dr["Nombre"].ToString()!,
+                                Clave = dr["Clave"].ToString()!,
                                 Restablecer = (bool)dr["Restablecer"],
                                 Confirmado = (bool)dr["Confirmado"],
-                                Token = dr["Token"].ToString()
+                                Token = dr["Token"].ToString()!
                             };
                         }
                     }

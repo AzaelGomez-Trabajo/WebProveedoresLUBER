@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace WebProveedoresN.Entities
+namespace WebProveedoresN.Models
 {
     public class OrderDetail : Order
     {

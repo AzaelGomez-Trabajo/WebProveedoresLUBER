@@ -1,5 +1,5 @@
 ﻿using WebProveedoresN.Data;
-using WebProveedoresN.Entities;
+using WebProveedoresN.Models;
 
 namespace WebProveedoresN.Services
 {

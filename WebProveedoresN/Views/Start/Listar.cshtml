@@ -1,4 +1,4 @@
-﻿@model List<WebProveedoresN.Entities.Usuario>
+﻿@model List<Usuario>
 @{
     ViewData["Title"] = "Listar";
     Layout = "~/Views/Shared/_Layout.cshtml";
@@ -19,7 +19,7 @@
             }
             else
             {
-                <a asp-action="InvitarUsuario" asp-controller="Start" class="btn btn-outline-success btn-sm">
+                <a asp-action="InviteUser" asp-controller="Start" class="btn btn-outline-success btn-sm">
                     <i class="bi bi-plus-circle"> Invitar Nuevo</i>
                 </a>
                 <hr />

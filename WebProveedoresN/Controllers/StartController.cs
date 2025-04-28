@@ -2,7 +2,6 @@
 using Microsoft.AspNetCore.Mvc;
 using WebProveedoresN.Data;
 using WebProveedoresN.DTOs;
-using WebProveedoresN.Entities;
 using WebProveedoresN.Models;
 using WebProveedoresN.Services;
 
@@ -45,33 +44,30 @@ namespace WebProveedoresN.Controllers
         }
 
         [Authorize(Roles = "Administrador")]
-        public IActionResult InvitarUsuario()
+        public IActionResult InviteUser()
         {
-            var usuario = new Usuario()
-            {
-                SupplierName = User.FindFirst("SupplierName")!.Value,
-                SupplierCode = User.FindFirst("SupplierCode")!.Value,
-
-            };
-            return View(usuario);
+            return View();
         }
 
         [HttpPost]
         [Authorize(Roles = "Administrador")]
-        public IActionResult InvitarUsuario(Usuario model)
+        public IActionResult InviteUser(InviteUserDTO inviteUserDTO)
         {
             if (!ModelState.IsValid)
             {
-                return View(model);
+                return View(inviteUserDTO);
             }
-            if (model.Clave != null)
+            var model = new Usuario()
             {
-                model.Clave = UtilityService.ConvertirSHA256(model.Clave);
-            }
-            model.Token = UtilityService.GenerarToken();
-            model.Restablecer = false;
-            model.Confirmado = false;
-            model.IdStatus = 1;
+                SupplierCode = User.FindFirst("SupplierCode")?.Value!,
+                Nombre = inviteUserDTO.Name,
+                Correo = inviteUserDTO.Email,
+                Clave = UtilityService.ConvertirSHA256(inviteUserDTO.Password),
+                Token = UtilityService.GenerarToken(),
+                Restablecer = false,
+                Confirmado = false,
+                IdStatus = 1,
+            };
             var respuesta = DBStart.SaveGuestWithRoles(model);
             TempData["Message"] = respuesta;
             if (respuesta.Contains("duplicate"))
@@ -98,7 +94,7 @@ namespace WebProveedoresN.Controllers
                 TempData["Message"] = respuesta;
                 return RedirectToAction("Listar");
             }
-            return View(model);
+            return View(inviteUserDTO);
         }
 
         [HttpGet]
@@ -112,8 +108,6 @@ namespace WebProveedoresN.Controllers
         {
             if (!ModelState.IsValid)
             {
-                //ViewBag.Status = StatusService.GetStatus() ?? [];
-                //ViewBag.Roles = RoleService.GetRoles() ?? [];
                 return View(registerDTO);
             }
 
@@ -236,31 +230,38 @@ namespace WebProveedoresN.Controllers
             return View();
         }
 
-        public ActionResult Restablecer()
+        public ActionResult ResetPassword()
         {
             return View();
         }
 
         [HttpPost]
-        public ActionResult Restablecer(string correo)
+        public ActionResult ResetPassword(EmailDTO emailDTO)
         {
-            Usuario usuario = DBStart.Obtener(correo);
-            ViewBag.Correo = correo;
+
+            Usuario usuario = DBStart.GetUser(emailDTO);
+            //ViewBag.Correo = correo;
+            var update = new UpdateDTO()
+            {
+                Restablecer = true,
+                Token = usuario.Token,
+                Password = UtilityService.ConvertirSHA256(usuario.Clave)
+            };
             if (usuario != null)
             {
-                var respuesta = DBStart.RestablecerActualizar(1, usuario.Clave, usuario.Token);
+                var respuesta = DBStart.ResetPassword(update);
 
                 if (respuesta.Contains("exitosamente"))
                 {
-                    string path = Path.Combine(_webHostEnvironment.ContentRootPath, "Plantilla", "Restablecer.html");
+                    string path = Path.Combine(_webHostEnvironment.ContentRootPath, "Plantilla", "ResetPassword.html");
                     string content = System.IO.File.ReadAllText(path);
-                    string url = string.Format("{0}://{1}{2}", Request.Scheme, Request.Host, "/Inicio/Actualizar?token=" + usuario.Token);
+                    string url = string.Format("{0}://{1}{2}", Request.Scheme, Request.Host, "/Start/UpdatePassword?token=" + update.Token);
 
                     string htmlBody = string.Format(content, usuario.Nombre, url);
 
                     var correoDTO = new EmalDTO()
                     {
-                        Para = correo,
+                        Para = emailDTO.Email,
                         Asunto = "Restablecer cuenta",
                         Contenido = htmlBody
                     };
@@ -281,26 +282,28 @@ namespace WebProveedoresN.Controllers
             return View();
         }
 
-        public ActionResult Actualizar(string token)
+        public ActionResult UpdatePassword(string token)
         {
-            ViewBag.Token = token;
-            return View();
+            var updateDto = new UpdateDTO
+            {
+                Token = token
+            };
+            return View(updateDto);
         }
 
         [HttpPost]
-        public ActionResult Actualizar(string token, string clave, string confirmarClave)
+        public ActionResult UpdatePassword(UpdateDTO updateDTO)
         {
-            ViewBag.Token = token;
-            if (clave != confirmarClave)
+            if (updateDTO.Password != updateDTO.PasswordConfirm)
             {
-                ViewBag.Message = "Las contraseñas no coinciden";
-                return View();
+                return View(updateDTO);
             }
-
-            var respuesta = DBStart.RestablecerActualizar(0, UtilityService.ConvertirSHA256(clave), token);
+            updateDTO.Restablecer = false;
+            updateDTO.Password = UtilityService.ConvertirSHA256(updateDTO.Password);
+            var respuesta = DBStart.UpdatePassword(updateDTO);
 
             if (respuesta.Contains("exitosamente"))
-                ViewBag.Restablecido = true;
+                ViewBag.Restablecido = false;
             else
                 ViewBag.Message = "No se pudo actualizar";
 

@@ -1,4 +1,4 @@
-﻿using WebProveedoresN.Entities;
+﻿using WebProveedoresN.DTOs;
 using WebProveedoresN.Models;
 
 namespace WebProveedoresN.Interfaces

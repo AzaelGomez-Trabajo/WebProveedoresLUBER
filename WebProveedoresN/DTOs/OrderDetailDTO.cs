@@ -1,4 +1,4 @@
-﻿namespace WebProveedoresN.Models
+﻿namespace WebProveedoresN.DTOs
 {
     public class OrderDetailDTO
     {

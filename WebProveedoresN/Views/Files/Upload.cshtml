@@ -1,33 +1,33 @@
-﻿@model LoadFileDTO
+﻿@model LoadFile
 @{
     ViewBag.Title = "Cargar Archivos";
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
-<form method="post" enctype="multipart/form-data">
-    @Html.AntiForgeryToken()
-    <div class="row justify-content-center mt-5">
-        <div class="col-5">
-            <div class="card">
-                <div class="card-header">
-                    <h3 class="text-center">
-                        Subir Factura para la Orden de Compra @Model.OrderNumber
-                    </h3>
-                </div>
-                <div class="card-body">
-
-                    <div class="form-group">
-                        @Html.LabelFor(model => model.FilePDF, htmlAttributes: new { @class = "control-label" })
-                        <input type="file" id="pdfFile" name="FilePDF" class="form-control" accept=".pdf" />
-                        @Html.ValidationMessageFor(model => model.FilePDF, "", new { @class = "text-danger" })
-                        <p id="pdfFileName" class="text-info"></p>
+<div class="row justify-content-center mt-5">
+    <div class="col-5">
+        <div class="card">
+            <div class="card-header">
+                <h3 class="text-center">
+                    Subir Factura para la Orden de Compra @ViewBag.OrderNumber
+                </h3>
+                <input type="hidden" name="orderNumber" value="@ViewBag.OrderNumber" />
+                <input type="hidden" name="supplierCode" value="@ViewBag.SupplierCode" />
+                <input type="hidden" name="documentType" value="@ViewBag.DocumentType" />
+            </div>
+            <div class="card-body">
+                <form method="post" enctype="multipart/form-data">
+                    @Html.AntiForgeryToken()
+                    <div class="mb-3">
+                        <label asp-for="FilePDF" class="form-label">Archivo PDF</label>
+                        <input asp-for="FilePDF" class="form-control" type="file" accept=".pdf" />
+                        <span asp-validation-for="FilePDF" class="text-danger"></span>
                     </div>
                     <br />
-                    <div class="form-group">
-                        @Html.LabelFor(model => model.FileXML, htmlAttributes: new { @class = "control-label" })
-                        <input type="file" id="xmlFile" name="FileXML" class="form-control" accept=".xml" />
-                        @Html.ValidationMessageFor(model => model.FileXML, "", new { @class = "text-danger" })
-                        <p id="xmlFileName" class="text-info"></p>
+                    <div class="mb-3">
+                        <label asp-for="FileXML" class="form-label">Archivo XML</label>
+                        <input asp-for="FileXML" class="form-control" type="file" accept=".xml" />
+                        <span asp-validation-for="FileXML" class="text-danger"></span>
                     </div>
 
                     @if (ViewBag.Message != null)
@@ -39,22 +39,43 @@
 
                     <div class="mb-3" style="text-align:center">
                         <div class="d-grid">
+                            <input type="hidden" asp-for="OrderNumber" />
                             <button type="submit" class="btn btn-outline-primary">
                                 <i class="bi bi-floppy"></i> Guardar
                             </button>
-                            <a class="btn btn-link" href="@Url.Action("Details","Orders", new { orderNumber = @Model.OrderNumber })">
-                                <i class="bi bi-arrow-left-circle"></i> Regresar
-                            </a>
+                            @*<a asp-action="Details"
+                               asp-controller="Orders"
+                               asp-route-orderNumber="@ViewBag.OrderNumber"
+                               asp-route-supplierCode="@ViewBag.SupplierCode"
+                               asp-route-documentType="@ViewBag.DocumentType"
+                               class="btn btn-link"><i class="bi bi-arrow-left-circle">  Regresar</i></a>
+                            <a class="btn btn-link" href="@Url.Action("Details","Orders")"><i class="bi bi-arrow-left-circle"></i> Regresar </a> 
+                        <form asp-action="Details" asp-controller="Orders" method="post" style="display:inline">
+                            <input type="hidden" name="orderNumber" value="@ViewBag.OrderNumber" />
+                            <input type="hidden" name="supplierCode" value="@ViewBag.SupplierCode" />
+                            <input type="hidden" name="documentType" value="@ViewBag.DocumentType" />
+                            <button type="submit" class="btn btn-link">
+                                <i class="bi bi-arrow-left-circle"> Regresar</i>
+                            </button>
+                        </form>*@
                         </div>
+                        <a asp-action="Details"
+                           asp-controller="Orders"
+                           asp-route-OrderNumber="@ViewBag.OrderNumber"
+                           asp-route-SupplierCode="@ViewBag.SupplierCode"
+                           asp-route-DocumentType="@ViewBag.DocumentType"
+                           class="btn btn-link">
+                            <i class="bi bi-arrow-left-circle"></i> Regresar
+                        </a>
                     </div>
-                    <div id="progressBar" class="progress" style="display:none;">
-                        <div class="progress-bar" role="progressbar" style="width: 0%;" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"></div>
-                    </div>
+                </form>
+                <div id="progressBar" class="progress" style="display:none;">
+                    <div class="progress-bar" role="progressbar" style="width: 0%;" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"></div>
                 </div>
             </div>
         </div>
     </div>
-</form>
+</div>
 
 @section Scripts {
     <script>

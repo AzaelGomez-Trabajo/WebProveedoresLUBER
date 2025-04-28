@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
 using WebProveedoresN.Data;
+using WebProveedoresN.DTOs;
 using WebProveedoresN.Interfaces;
 using WebProveedoresN.Models;
 using WebProveedoresN.Services;
@@ -20,41 +21,39 @@ namespace WebProveedoresN.Controllers
             _ipService = ipService;
         }
 
-        // GET: Archivos/Upload
-        public ActionResult Upload(string orderNumber)
+        // GET: Files/Upload
+        public ActionResult Upload(OrderDetailsDTO orderDetailsDTO)
         {
-            if (string.IsNullOrEmpty(orderNumber))
+            ViewBag.OrderNumber = orderDetailsDTO.OrderNumber;
+            ViewBag.SupplierCode = orderDetailsDTO.SupplierCode;
+            ViewBag.DocumentType = orderDetailsDTO.DocumentType;
+            var model = new UploadBeforeDTO
             {
-                return RedirectToAction("ListOrders", "Orders");
-            }
-            var supplierName = User.FindFirst("SupplierName")?.Value;
-
-            if (string.IsNullOrEmpty(supplierName))
-            {
-                return RedirectToAction("Login", "Access");
-            }
-            ViewBag.OrderNumber = orderNumber;
-            ViewBag.NombreEmpresa = supplierName;
-            ViewBag.SupplierCode = User.FindFirst("SupplierCode")?.Value;
-            ViewBag.UserIpAddress = _ipService.GetUserIpAddress();
-            //ViewBag.OrderId = orderId;
-            var model = new LoadFileDTO
-            {
-                OrderNumber = orderNumber,
+                DocumentType = orderDetailsDTO.DocumentType,
+                OrderNumber = orderDetailsDTO.OrderNumber
             };
+
             return View(model);
         }
 
         // POST: Archivos/Upload
-        [HttpPost]
-        public ActionResult Upload(LoadFileDTO model)
+        [HttpPost("Upload")]
+        public ActionResult Upload(UploadBeforeDTO upload)
         {
+
             if (!ModelState.IsValid)
             {
-                ViewBag.OrderNumber = model.OrderNumber;
-                //ViewBag.OrderId = orderId;
-                ViewBag.UserIpAddress = _ipService.GetUserIpAddress();
-                return View(model);
+                ViewBag.OrderNumber = upload.OrderNumber;
+                ViewBag.DocumentType = upload.DocumentType;
+                return View(upload);
+            }
+            var model = new LoadFile
+            {
+                OrderNumber = upload.OrderNumber.ToString(),
+            };
+            if (model.FileXML == null && model.FilePDF == null)
+            {
+                return View();
             }
             ViewBag.UserIpAddress = _ipService.GetUserIpAddress();
             var supplierName = User.FindFirst("SupplierName")?.Value;
@@ -70,9 +69,9 @@ namespace WebProveedoresN.Controllers
             var ipAddress = _ipService.GetUserIpAddress();
             try
             {
-                var pdfFile = model.FilePDF;
-                var xmlFile = model.FileXML;
-                var ordenCompra = model.OrderNumber;
+                var pdfFile = model.FilePDF!;
+                var xmlFile = model.FileXML!;
+                var ordenCompra = model.OrderNumber!;
 
                 // Validar el tipo de archivo
                 if (pdfFile.ContentType != "application/pdf")
@@ -208,8 +207,8 @@ namespace WebProveedoresN.Controllers
                 XmlServicio.SaveFilesToDatabase(archivos);
 
                 // Enviar correo de confirmación
-                var userEmail = User.FindFirst(ClaimTypes.Email)?.Value;
-                var nombre = User.FindFirst(ClaimTypes.Name)?.Value;
+                var userEmail = User.FindFirst(ClaimTypes.Email)?.Value!;
+                var nombre = User.FindFirst(ClaimTypes.Name)?.Value!;
                 var correo = new EmalDTO
                 {
                     Para = userEmail,
