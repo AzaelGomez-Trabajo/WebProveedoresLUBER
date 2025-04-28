@@ -28,7 +28,7 @@ namespace WebProveedoresN.Data
                         orders.Add(new Order()
                         {
                             DocumentType = dr["DocumentType"].ToString(),
-                            OrderNumber = dr["OrderNumber"].ToString(),
+                            OrderNumber = (int)dr["OrderNumber"],
                             OrderDate = (DateTime)dr["OrderDate"],
                             Canceled = dr["Canceled"].ToString(),
                             TotalAmount = (decimal)dr["TotalAmount"],
@@ -67,7 +67,7 @@ namespace WebProveedoresN.Data
                         order = new Order()
                         {
                             DocumentType = dr["DocumentType"].ToString(),
-                            OrderNumber = dr["OrderNumber"].ToString(),
+                            OrderNumber = (int)dr["OrderNumber"],
                             OrderDate = (DateTime)dr["OrderDate"],
                             Canceled = dr["Canceled"].ToString(),
                             IdEstatus = dr["IdEstatus"].ToString(),
@@ -112,9 +112,9 @@ namespace WebProveedoresN.Data
             return isValid;
         }
 
-        public static string ObtenerOrderNumber(string orderNumber)
+        public static int ObtenerOrderNumber(string orderNumber)
         {
-            var orderNumberId = string.Empty;
+            var orderNumberId = 0;
             using (var connection = DBConnectiion.GetConnection())
             {
                 string query = "SELECT IdOrder FROM Orders WHERE OrderNumber = @OrderNumber";
@@ -123,7 +123,7 @@ namespace WebProveedoresN.Data
                     cmd.Parameters.AddWithValue("@OrderNumber", orderNumber);
                     cmd.CommandType = CommandType.Text;
                     connection.Open();
-                    orderNumberId = cmd.ExecuteScalar().ToString();
+                    orderNumberId = (int)cmd.ExecuteScalar();
                     connection.Close();
                 }
             }
@@ -150,22 +150,27 @@ namespace WebProveedoresN.Data
                     {
                         orders.Add(new OrderDetail()
                         {
-                            DocumentTypeOrder = dr["Tipo Documento 1"].ToString() ?? string.Empty,
-                            OrderNumber = dr["DocNum1"].ToString() ?? string.Empty,
-                            LineNum = dr["LineNum1"] != DBNull.Value ? (int)dr["LineNum1"] : 0,
-                            ItemCode = dr["ItemCode1"].ToString() ?? string.Empty,
-                            QuantityOrder = dr["Quantity1"] != DBNull.Value ? (decimal)dr["Quantity1"] : 0,
-                            OpenQty = dr["OpenQty1"] != DBNull.Value ? (decimal)dr["OpenQty1"] : 0,
-                            DocCurOrder = dr["DocCur1"].ToString() ?? string.Empty,
+                            DocumentTypeOrder = dr["TipoDocumento1"].ToString() ?? string.Empty,
+                            OrderNumber = dr["NoDocumento1"] != DBNull.Value ? (int)dr["NoDocumento1"] : 0,
+                            LineNum = dr["NoLinea1"] != DBNull.Value ? (int)dr["NoLinea1"] : 0,
+                            ItemCode = dr["CodigoArticulo1"].ToString() ?? string.Empty,
+                            QuantityOrder = dr["Cantidad1"] != DBNull.Value ? (decimal)dr["Cantidad1"] : 0,
+                            OpenQty = dr["CantidadPendiente1"] != DBNull.Value ? (decimal)dr["CantidadPendiente1"] : 0,
+                            DocCurOrder = dr["Moneda1"].ToString() ?? string.Empty,
+                            Tax = dr["Impuesto1"] != DBNull.Value ? (decimal)dr["Impuesto1"] : 0,
+                            PricePerItem = dr["PrecioxArticulo1"] != DBNull.Value ? (decimal)dr["PrecioxArticulo1"] : 0,
+                            TotalItem = dr["LineaTotal1"] != DBNull.Value ? (decimal)dr["LineaTotal1"] : 0,
+                            TotalTaxItem = dr["LineaTotalIVA1"] != DBNull.Value ? (decimal)dr["LineaTotalIVA1"] : 0,
                             TotalOrder = dr["Total1"] != DBNull.Value ? (decimal)dr["Total1"] : 0,
-                            DocumentType = dr["Tipo Documento 2"].ToString() ?? string.Empty,
-                            DocNum = dr["DocNum"] != DBNull.Value ? (int)dr["DocNum"] : 0,
-                            CardCode = dr["CardCode"].ToString() ?? string.Empty,
-                            CardName = dr["CardName"].ToString() ?? string.Empty,
-                            DocStatus = dr["DocStatus"].ToString() ?? string.Empty,
-                            DocCur = dr["DocCur"].ToString() ?? string.Empty,
-                            Total = dr["Total"] != DBNull.Value ? (decimal)dr["Total"] : 0,
-                            Quantity = dr["Quantity"] != DBNull.Value ? (decimal)dr["Quantity"] : 0,
+                            DocumentType = dr["TipoDocumento2"].ToString() ?? string.Empty,
+                            DocNum = dr["NoDocumento2"] != DBNull.Value ? (int)dr["NoDocumento2"] : 0,
+                            InvoiceSupplier = dr["FacturaProveedor2"].ToString() ?? string.Empty,
+                            CardCode = dr["CodigoProveedor2"].ToString() ?? string.Empty,
+                            CardName = dr["NombreProveedor2"].ToString() ?? string.Empty,
+                            DocStatus = dr["Status2"].ToString() ?? string.Empty,
+                            DocCur = dr["Moneda2"].ToString() ?? string.Empty,
+                            Quantity = dr["Cantidad2"] != DBNull.Value ? (decimal)dr["Cantidad2"] : 0,
+                            Total = dr["Total2"] != DBNull.Value ? (decimal)dr["Total2"] : 0,
                         });
                     }
                 }

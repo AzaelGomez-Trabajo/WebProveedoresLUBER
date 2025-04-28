@@ -12,8 +12,6 @@
                     Subir Factura para la Orden de Compra @ViewBag.OrderNumber
                 </h3>
                 <input type="hidden" name="orderNumber" value="@ViewBag.OrderNumber" />
-                <input type="hidden" name="supplierCode" value="@ViewBag.SupplierCode" />
-                <input type="hidden" name="documentType" value="@ViewBag.DocumentType" />
             </div>
             <div class="card-body">
                 <form method="post" enctype="multipart/form-data">
@@ -49,7 +47,7 @@
                                asp-route-supplierCode="@ViewBag.SupplierCode"
                                asp-route-documentType="@ViewBag.DocumentType"
                                class="btn btn-link"><i class="bi bi-arrow-left-circle">  Regresar</i></a>
-                            <a class="btn btn-link" href="@Url.Action("Details","Orders")"><i class="bi bi-arrow-left-circle"></i> Regresar </a> 
+                            <a class="btn btn-link" href="@Url.Action("Details","Orders")"><i class="bi bi-arrow-left-circle"></i> Regresar </a> *@
                         <form asp-action="Details" asp-controller="Orders" method="post" style="display:inline">
                             <input type="hidden" name="orderNumber" value="@ViewBag.OrderNumber" />
                             <input type="hidden" name="supplierCode" value="@ViewBag.SupplierCode" />
@@ -57,16 +55,16 @@
                             <button type="submit" class="btn btn-link">
                                 <i class="bi bi-arrow-left-circle"> Regresar</i>
                             </button>
-                        </form>*@
-                        </div>
-                        <a asp-action="Details"
+                        </form>
+                            @*</div>
+                        <a asp-action="DetailsOrder"
                            asp-controller="Orders"
                            asp-route-OrderNumber="@ViewBag.OrderNumber"
                            asp-route-SupplierCode="@ViewBag.SupplierCode"
                            asp-route-DocumentType="@ViewBag.DocumentType"
                            class="btn btn-link">
                             <i class="bi bi-arrow-left-circle"></i> Regresar
-                        </a>
+                        </a>*@
                     </div>
                 </form>
                 <div id="progressBar" class="progress" style="display:none;">

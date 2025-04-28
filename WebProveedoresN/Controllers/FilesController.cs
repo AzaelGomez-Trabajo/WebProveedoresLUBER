@@ -22,35 +22,40 @@ namespace WebProveedoresN.Controllers
         }
 
         // GET: Files/Upload
-        public ActionResult Upload(OrderDetailsDTO orderDetailsDTO)
-        {
-            ViewBag.OrderNumber = orderDetailsDTO.OrderNumber;
-            ViewBag.SupplierCode = orderDetailsDTO.SupplierCode;
-            ViewBag.DocumentType = orderDetailsDTO.DocumentType;
-            var model = new UploadBeforeDTO
-            {
-                DocumentType = orderDetailsDTO.DocumentType,
-                OrderNumber = orderDetailsDTO.OrderNumber
-            };
+        //public ActionResult Upload(int orderNumber)
+        //{
+        //    ViewBag.OrderNumber = orderNumber;
+        //    var model = new LoadFile
+        //    {
+        //        OrderNumber = orderNumber,
+        //    };
 
+        //    return View(model);
+        //}
+
+        [HttpGet]
+        public IActionResult Upload(int orderNumber, List<int> selectedInvoices)
+        {
+            ViewBag.OrderNumbeer = orderNumber;
+            ViewBag.SelectedInvoices = selectedInvoices;
+
+            var model = new LoadFile
+            {
+                OrderNumber = orderNumber,
+            };
             return View(model);
         }
 
         // POST: Archivos/Upload
         [HttpPost("Upload")]
-        public ActionResult Upload(UploadBeforeDTO upload)
+        public ActionResult Upload(LoadFile model)
         {
 
             if (!ModelState.IsValid)
             {
-                ViewBag.OrderNumber = upload.OrderNumber;
-                ViewBag.DocumentType = upload.DocumentType;
-                return View(upload);
+                ViewBag.OrderNumber = model.OrderNumber;
+                return View();
             }
-            var model = new LoadFile
-            {
-                OrderNumber = upload.OrderNumber.ToString(),
-            };
             if (model.FileXML == null && model.FilePDF == null)
             {
                 return View();
@@ -164,7 +169,7 @@ namespace WebProveedoresN.Controllers
                     return View(model);
                 }
                 // Guardar los datos del XML en la base de datos
-                var result = XmlServicio.SaveXmlDataInDatabase(datos, ordenCompra, supplierName, idUsuario, ipAddress);
+                var result = XmlServicio.SaveXmlDataInDatabase(datos, ordenCompra.ToString(), supplierName!, idUsuario!, ipAddress);
 
                 if (result != "OK")
                 {

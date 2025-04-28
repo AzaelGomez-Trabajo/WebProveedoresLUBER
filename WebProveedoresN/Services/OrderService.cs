@@ -16,7 +16,7 @@ namespace WebProveedoresN.Services
             // Filtrar los resultados si se proporciona un searchString
             if (!string.IsNullOrEmpty(searchString))
             {
-                orders = orders.Where(o => o.OrderNumber!.Contains(searchString)).ToList();
+                orders = orders.Where(o => o.OrderNumber.ToString()!.Contains(searchString)).ToList();
             }
 
             // Aplicar la paginación en memoria
@@ -36,7 +36,7 @@ namespace WebProveedoresN.Services
             // Filtrar los resultados si se proporciona un searchString
             if (!string.IsNullOrEmpty(searchString))
             {
-                orders = orders.Where(o => o.OrderNumber!.Contains(searchString)).ToList();
+                orders = orders.Where(o => o.OrderNumber.ToString()!.Contains(searchString)).ToList();
             }
 
             return await Task.FromResult(orders.Count);

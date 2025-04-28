@@ -6,8 +6,8 @@
 
         public int OrderNumber { get; set; }
 
-        public string SupplierCode { get; set; } = null!;
+        public string? SupplierCode { get; set; }
 
-        public string DocumentType { get; set; } = null!;
+        public string? DocumentType { get; set; }
     }
 }

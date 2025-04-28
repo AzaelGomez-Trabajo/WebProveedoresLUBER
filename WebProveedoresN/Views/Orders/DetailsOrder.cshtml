@@ -1,7 +1,7 @@
 ﻿@using WebProveedoresN.Models
 @model List<OrderDetail>
 @{
-    ViewData["Title"] = "Details";
+    ViewData["Title"] = "Detalles Orden -";
     Layout = "~/Views/Shared/_Layout.cshtml";
     OrderDetail? details = null;
 }
@@ -14,60 +14,83 @@ else
 {
     <div class="card">
         <div class="card-header">
-            <h2 class="text-center">Detalles de la Orden de Compra @ViewBag.OrderNumber</h2>
-            <p>
-                <a asp-action="Details" class="btn btn-outline-success btn-sm"><i class="bi bi-arrow-repeat">  Actualizar</i></a>
-                <a asp-action="ListOrders" class="btn btn-outline-info btn-sm"><i class="bi bi-arrow-left-circle">  Regresar</i></a>
-            </p>
+            <span class="fs-2">
+                Detalles de la Orden de Compra @ViewBag.OrderNumber
+            </span>
+            <form asp-action="DetailsOrder" method="post">
+                <input type="hidden" name="orderNumber" value="@ViewBag.OrderNumber" />
+                <input type="hidden" name="supplierCode" value="@ViewBag.SupplierCode" />
+                <input type="hidden" name="documentType" value="@ViewBag.DocumentType" />
+                <button type="submit" class="btn btn-outline-info btn-sm">
+                    <i class="bi bi-arrow-repeat"> Actualizar</i>
+                </button>
+                <a asp-action="ListOrders" class="btn btn-outline-info btn-sm"><i class="bi bi-arrow-left-circle"> Regresar</i></a>
+            </form>
         </div>
         <div class="card-body">
             <div class="row">
                 <div class="col-4">
-                    <div class="mb-3">
-                        <p><strong>Número de Orden:</strong> @ViewBag.OrderNumber</p>
+                    <div class="mb-1">
+                        <p><strong>Número de Orden:</strong> @ViewBag.OrderNumber.ToString()</p>
                         <p><strong>Fecha:</strong> @(ViewBag.OrderDate != null ? ((DateTime)ViewBag.OrderDate).ToShortDateString() : "No disponible")</p>
                         <p><strong>Importe Total:</strong> @(ViewBag.TotalAmount != null ? ((decimal)ViewBag.TotalAmount).ToString("C") : "No disponible")</p>
                         <p><strong>Moneda:</strong> @(ViewBag.Currency ?? "No disponible")</p>
                         <p><strong># Factura(s):</strong> @(ViewBag.Invoices ?? "0")</p>
                         <p><strong>Monto factura(s):</strong> @(ViewBag.TotalInvoices != null ? ((decimal)ViewBag.TotalInvoices).ToString("C") : "0")</p>
-                        <div>
-                            <form id="uploadForm" asp-action="Upload" asp-controller="Files" method="get" style="display:inline;" onsubmit="return enviarFormulario(event)">
-                                <input type="hidden" name="orderNumber" value="@ViewBag.OrderNumber" />
-                                <input type="hidden" name="supplierCode" value="@ViewBag.SupplierCode" />
-                                <input type="hidden" name="documentType" value="@ViewBag.DocumentType" />
-                                <button type="submit" class="btn btn-outline-primary btn-sm" @((decimal)ViewBag.TotalAmount <= (decimal)ViewBag.TotalInvoice ? "disabled" : "")>
-                                    <i class="bi bi-cloud-upload-fill"> Cargar</i>
-                                </button>
-                            </form>
-                            <button class="btn btn-outline-secondary btn-sm" onclick="mostrarDocumentos(@ViewBag.OrderNumber)">
-                                <i class="bi bi-cloud-download-fill"> Mostrar</i>
-                            </button>
-                            <button class="btn btn-outline-danger btn-sm" onclick="cerrarEmbed(@ViewBag.OrderNumber)" style="display: none">
-                                <i class="bi bi-x-circle-fill"> Cerrar</i>
-                            </button>
+                    </div>
+                </div>
 
-                            <div id="embed-container-@ViewBag.OrderNumber" style="display:none;">
-                                <div id="embed-list-@ViewBag.OrderNumber"></div>
-                            </div>
-                        </div>
+                <div class="col-8 ms-auto">
+                    <div class="mb-0">
+                        <table class="table-striped" style="border: 2px solid black; border-collapse:collapse; width: 100%;">
+                            <thead>
+                                <tr style="border: 1px solid black">
+                                    <th class="text-center">Código del Artículo</th>
+                                    <th class="text-center">Cantidad </th>
+                                    <th class="text-center">Faltante</th>
+                                    <th class="text-center">Precio Unitario</th>
+                                    <th class="text-center">Importe </th>
+                                    <th class="text-center">IVA</th>
+                                    <th class="text-center">Importe Total</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var item in Model)
+                                {
+                                    <tr style="border: 1px solid black">
+                                        <td style="border: 1px solid black">@item.ItemCode</td>
+                                        <td class="text-end" style="border: 1px solid black">@string.Format("{0:N2}", @item.QuantityOrder)</td>
+                                        <td class="text-end" style="border: 1px solid black">@string.Format("{0:N2}", @item.OpenQty)</td>
+                                        <td class="text-end" style="border: 1px solid black">@string.Format("{0:C2}", @item.PricePerItem)</td>
+                                        <td class="text-end" style="border: 1px solid black">@string.Format("{0:C2}", @item.TotalItem)</td>
+                                        <td class="text-end" style="border: 1px solid black">@string.Format("{0:C2}", (@item.Tax / 100) * @item.TotalItem)</td>
+                                        <td class="text-end" style="border: 1px solid black">@string.Format("{0:C2}", @item.TotalTaxItem)</td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
                     </div>
                 </div>
                 @if (ViewBag.DocumentType == "Pedido")
                 {
-                    <div class="col-8">
-                        <div class="mb-3">
+                    <div class="col-12">
+                        <span class="fs-3">
                             <label><strong>Entrada de Mercancía</strong></label>
-                            @if (Model != null && Model.Any())
-                            {
+                        </span>
+                        @if (Model == null)
+                        {
+                            <form id="uploadForm" asp-action="Upload" asp-controller="Files" method="post" style="display:inline;" onsubmit="return enviarFormulario(event)">
+                                <input type="hidden" name="orderNumber" value="@ViewBag.OrderNumber" />
                                 <table class="table table-striped">
                                     <thead>
                                         <tr>
                                             <th><input type="checkbox" id="selectAll" /></th>
                                             <th class="text-center">#</th>
+                                            <th class="text-center">Factura</th>
                                             <th class="text-center">Codigo producto</th>
                                             <th class="text-center">Moneda</th>
+                                            <th class="text-center">Cantidad</th>
                                             <th class="text-center">Total</th>
-                                            <th class="text-center">Monto</th>
                                         </tr>
                                     </thead>
                                     <tbody>
@@ -78,22 +101,38 @@ else
                                             {
                                                 <tr>
                                                     <td><input type="checkbox" name="selectedDocuments" value="@details!.DocNum" /></td>
-                                                    <td>@details.DocNum</td>
+                                                    <td class="text-center">@details.DocNum</td>
+                                                    <td class="text-center">@details.InvoiceSupplier</td>
                                                     <td>@details.ItemCode</td>
-                                                    <td>@details.DocCur</td>
-                                                    <td>@string.Format("{0:C4}", details.Total)</td>
-                                                    <td>@string.Format("{0:N2}", details.Quantity)</td>
+                                                    <td class="text-center">@details.DocCur</td>
+                                                    <td class="text-end">@string.Format("{0:N2}", details.Quantity)</td>
+                                                    <td class="text-end">@string.Format("{0:C2}", details.Total)</td>
                                                 </tr>
                                             }
                                         }
                                     </tbody>
                                 </table>
-                            }
-                            else
-                            {
-                                <p>Todavía no se ha cargado la entrada de mercancia</p>
-                            }
-                        </div>
+                                <div>
+                                    <button type="submit" class="btn btn-outline-primary btn-sm" @((decimal)ViewBag.TotalAmount <= (decimal)ViewBag.TotalInvoice ? "disabled" : "")>
+                                        <i class="bi bi-cloud-upload-fill"> Cargar Factura</i>
+                                    </button>
+                                    <button class="btn btn-outline-secondary btn-sm" onclick="mostrarDocumentos(@ViewBag.OrderNumber)">
+                                        <i class="bi bi-cloud-download-fill"> Mostrar Factura</i>
+                                    </button>
+                                    <button class="btn btn-outline-danger btn-sm" onclick="cerrarEmbed(@ViewBag.OrderNumber)" style="display: none">
+                                        <i class="bi bi-x-circle-fill"> Cerrar Factura</i>
+                                    </button>
+
+                                    <div id="embed-container-@ViewBag.OrderNumber" style="display:none;">
+                                        <div id="embed-list-@ViewBag.OrderNumber"></div>
+                                    </div>
+                                </div>
+                            </form>
+                        }
+                        else
+                        {
+                            <p>Todavía no se ha cargado la entrada de mercancia</p>
+                        }
                     </div>
                 }
                 else
@@ -109,19 +148,8 @@ else
     </div>
 }
 @section Scripts {
-    @*     <script>
-        function validarSeleccion() {
-            const checkboxes = document.querySelectorAll('input[name="selectedDocuments"]:checked');
-            if (checkboxes.length === 0) {
-                alert('Por favor, selecciona al menos un documento antes de continuar.');
-                return false; // Evita que el formulario se envíe
-            }
-            return true; // Permite que el formulario se envíe
-        }
-    </script>
- *@    
     <script>
-        async function enviarFormulario(event) {
+        async function enviarFormulario1(event) {
             event.preventDefault(); // Evita el envío tradicional del formulario
 
             // Validar que al menos un checkbox esté seleccionado

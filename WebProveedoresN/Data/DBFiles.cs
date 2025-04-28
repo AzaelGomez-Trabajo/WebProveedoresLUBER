@@ -9,19 +9,19 @@ namespace WebProveedoresN.Data
     {
         public static void SaveFileToDatabase(FileDTO archivo)
         {
+            string storedProcedure = "sp_SaveFileToDatabase";
             using (SqlConnection connection = DBConnectiion.GetConnection())
             {
-                string query = $"INSERT INTO Archivos (Name, Route, DateTime, OrderId, OrderNumber, Extension, Converted) VALUES (@Name, @Route, @DateTime, SELECT Id FROM Orders WHERE OrderNumber = {archivo.OrderNumber}, @OrderNumber, @Extension, @Converted)";
-                using (SqlCommand cmd = new SqlCommand(query, connection))
+                using (SqlCommand cmd = new SqlCommand(storedProcedure, connection))
                 {
+                    connection.Open();
                     cmd.Parameters.AddWithValue("@Name", archivo.Name);
                     cmd.Parameters.AddWithValue("@Route", archivo.Route);
                     cmd.Parameters.AddWithValue("@DateTime", archivo.DateTime);
                     cmd.Parameters.AddWithValue("@OrderNumber", archivo.OrderNumber);
                     cmd.Parameters.AddWithValue("@Extension", archivo.Extension);
                     cmd.Parameters.AddWithValue("@Converted", archivo.Converted);
-                    cmd.CommandType = CommandType.Text;
-                    connection.Open();
+                    cmd.CommandType = CommandType.StoredProcedure;
                     cmd.ExecuteNonQuery();
                     connection.Close();
                 }
@@ -127,9 +127,10 @@ namespace WebProveedoresN.Data
                     cmd.Parameters.AddWithValue("@TotalInvoice", totalInvoice);
                     cmd.CommandType = CommandType.StoredProcedure;
                     isValid = cmd.ExecuteScalar().ToString();
+                    connection.Close();
                 }
             }
-            return isValid;
+            return isValid!;
         }
 
         public static async Task<List<FileDTO>> ObtenerDocumentosAsync(string orderNumber)

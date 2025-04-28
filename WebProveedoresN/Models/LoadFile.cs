@@ -17,7 +17,7 @@ namespace WebProveedoresN.Models
 
         [Required]
         [DisplayName("Número de Orden de Compra")]
-        public string OrderNumber { get; set; } = null!;
+        public int OrderNumber { get; set; }
     }
     public class FileSizeAttribute : ValidationAttribute
     {

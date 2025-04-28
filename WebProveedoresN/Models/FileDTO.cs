@@ -11,23 +11,23 @@ namespace WebProveedoresN.Models
 
         [Required]
         [DisplayName("Nombre")]
-        public string Name { get; set; }
+        public string Name { get; set; } = null!;
 
         [Required]
         [DisplayName("Ruta")]
-        public string Route { get; set; }
+        public string Route { get; set; } = null!;
 
         [Required]
         [DisplayName("Fecha y Hora")]
-        public string DateTime { get; set; }
+        public string DateTime { get; set; } = null!;
 
         [Required]
         [DisplayName("Numero de Órden")]
-        public string OrderNumber { get; set; }
+        public int OrderNumber { get; set; }
 
         [Required]
         [DisplayName("Extención")]
-        public string Extension { get; set; }
+        public string Extension { get; set; } = null!;
 
         [Required]
         [DisplayName("Convertido")]

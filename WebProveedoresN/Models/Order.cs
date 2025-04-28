@@ -10,7 +10,7 @@ namespace WebProveedoresN.Models
 
         [Required]
         [DisplayName("Orden de Compra")]
-        public string? OrderNumber { get; set; }
+        public int OrderNumber { get; set; }
 
         [Required]
         [DisplayName("Nombre del proveedor")]

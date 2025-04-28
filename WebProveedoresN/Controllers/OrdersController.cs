@@ -58,8 +58,8 @@ namespace WebProveedoresN.Controllers
             return View();
         }
 
-        [HttpPost("Details")]
-        public async Task<ActionResult> Details(OrderDetailsDTO orderDetailsDTO)
+        [HttpPost("DetailsOrder")]
+        public async Task<ActionResult> DetailsOrder(OrderDetailsDTO orderDetailsDTO)
         {
             if (orderDetailsDTO == null || orderDetailsDTO.OrderNumber == 0)
             {
@@ -73,7 +73,7 @@ namespace WebProveedoresN.Controllers
             {
                 Action = 3,
                 OrderNumber = orderDetailsDTO.OrderNumber,
-                SupplierCode = ViewBag.SupplierCode.ToString(),
+                SupplierCode = orderDetailsDTO.SupplierCode,
                 DocumentType = orderDetailsDTO.DocumentType
             };
             if (orderDetailDTO is null)
