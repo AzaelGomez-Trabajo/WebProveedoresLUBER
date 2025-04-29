@@ -21,45 +21,79 @@ namespace WebProveedoresN.Controllers
             _ipService = ipService;
         }
 
-        // GET: Files/Upload
-        //public ActionResult Upload(int orderNumber)
-        //{
-        //    ViewBag.OrderNumber = orderNumber;
-        //    var model = new LoadFile
-        //    {
-        //        OrderNumber = orderNumber,
-        //    };
+        [HttpPost("Upload")]
+        public IActionResult Upload(string orderNumber, List<int> selectedDocuments)
+        {
+            if (string.IsNullOrEmpty(orderNumber) || selectedDocuments == null || !selectedDocuments.Any())
+            {
+                return BadRequest("Faltan datos necesarios para procesar la solicitud.");
+            }
 
-        //    return View(model);
-        //}
+            // Guardar los parámetros en TempData
+            TempData["OrderNumber"] = orderNumber;
+            TempData["SelectedDocuments"] = string.Join(",", selectedDocuments);
+
+            // Redirigir a la vista de carga de archivos
+            try
+            {
+                return Redirect("/Files/UploadSaves");
+            }
+            catch (Exception ex)
+            {
+                return BadRequest($"Error en la redireccion: {ex.Message}");
+            }
+        }
 
         [HttpGet]
-        public IActionResult Upload(int orderNumber, List<int> selectedInvoices)
+        public IActionResult UploadSaves()
         {
-            ViewBag.OrderNumbeer = orderNumber;
-            ViewBag.SelectedInvoices = selectedInvoices;
+            var orderNumber = TempData["OrderNumber"] as string;
+            var selectedDocuments = TempData["SelectedDocuments"] as string;
 
+            if (string.IsNullOrEmpty(orderNumber) || string.IsNullOrEmpty(selectedDocuments))
+            {
+                return BadRequest("No se encontraron datos para procesar.");
+            }
+
+            ViewBag.OrderNumber = orderNumber;
+            ViewBag.SelectedDocuments = selectedDocuments.Split(',').Select(int.Parse).ToList();
+            ViewBag.SupplierCode = User.FindFirst("SupplierCode")?.Value;
+
+            // Pasar los datos a la vista
             var model = new LoadFile
             {
-                OrderNumber = orderNumber,
+                OrderNumber = int.Parse(orderNumber),
+                SelectedDocuments = ViewBag.SelectedDocuments,
             };
+
             return View(model);
         }
 
-        // POST: Archivos/Upload
-        [HttpPost("Upload")]
-        public ActionResult Upload(LoadFile model)
-        {
 
+        // POST: Files/UploadSaves
+        [HttpPost("UploadSaves")]
+        public IActionResult UploadSaves(LoadFile model)
+        {
+            var selectedDocument = string.Empty;
             if (!ModelState.IsValid)
             {
                 ViewBag.OrderNumber = model.OrderNumber;
                 return View();
             }
-            if (model.FileXML == null && model.FilePDF == null)
+
+            if (model.SelectedDocuments is null || !model.SelectedDocuments.Any())
             {
-                return View();
+                ModelState.AddModelError("SelectedDocuments", "Debe seleccionar al menos un documento.");
+                return View(model);
             }
+
+            // Procesar los documentos seleccionados
+            foreach (var doc in model.SelectedDocuments)
+            {
+                selectedDocument = doc.ToString();
+
+            }
+
             ViewBag.UserIpAddress = _ipService.GetUserIpAddress();
             var supplierName = User.FindFirst("SupplierName")?.Value;
             // Obtener el SupplierId del claim
@@ -78,12 +112,13 @@ namespace WebProveedoresN.Controllers
                 var xmlFile = model.FileXML!;
                 var ordenCompra = model.OrderNumber!;
 
+
                 // Validar el tipo de archivo
                 if (pdfFile.ContentType != "application/pdf")
                 {
                     ModelState.AddModelError("FilePDF", "El archivo debe ser un PDF.");
                     ViewBag.OrderNumber = model.OrderNumber;
-                    ViewBag.UserIpAddress = ipAddress;
+                    //ViewBag.UserIpAddress = ipAddress;
                     return View(model);
                 }
 
@@ -91,7 +126,7 @@ namespace WebProveedoresN.Controllers
                 {
                     ModelState.AddModelError("FileXML", "El archivo debe ser un XML.");
                     ViewBag.OrderNumber = model.OrderNumber;
-                    ViewBag.UserIpAddress = ipAddress;
+                    //ViewBag.UserIpAddress = ipAddress;
                     return View(model);
                 }
 
@@ -100,7 +135,7 @@ namespace WebProveedoresN.Controllers
                 {
                     ModelState.AddModelError("FilePDF", "El archivo PDF no debe exceder los 2 MB.");
                     ViewBag.OrderNumber = model.OrderNumber;
-                    ViewBag.UserIpAddress = ipAddress;
+                    //ViewBag.UserIpAddress = ipAddress;
                     return View(model);
                 }
 
@@ -108,7 +143,7 @@ namespace WebProveedoresN.Controllers
                 {
                     ModelState.AddModelError("FileXML", "El archivo XML no debe exceder los 2 MB.");
                     ViewBag.OrderNumber = model.OrderNumber;
-                    ViewBag.UserIpAddress = ipAddress;
+                    //ViewBag.UserIpAddress = ipAddress;
                     return View(model);
                 }
 
@@ -127,22 +162,31 @@ namespace WebProveedoresN.Controllers
                 {
                     ModelState.AddModelError("FileXML", "El archivo XML no es válido.");
                     ViewBag.OrderNumber = model.OrderNumber;
-                    ViewBag.UserIpAddress = ipAddress;
+                    //ViewBag.UserIpAddress = ipAddress;
                     return View(model);
                 }
 
                 // Leer el contenido del archivo XML
                 var rfcReceptor = string.Empty;
+                var invoice = string.Empty;
                 var datos = XmlServicio.GetDataFromXml(xmlContent);
                 foreach (var dato in datos)
                 {
                     dato.SupplierCode = supplierCode;
                     rfcReceptor = dato.ReceptorRfc;
+                    invoice = dato.Folio;
+                }
+
+                if (selectedDocument! != invoice!)
+                {
+                    ViewBag.Message = "La factura no corresponde a la factura registrada en la Entrada de Mercancia";
+                    return View(model);
                 }
 
                 if (!rfcReceptor.Equals("CIN041008173"))
                 {
                     ViewBag.Message = "La factura no es para LUBER Lubricantes.";
+                    return View(model);
                 }
 
                 var facturaUnica = XmlServicio.SearchInvoice(datos[0].UUID);
@@ -165,7 +209,7 @@ namespace WebProveedoresN.Controllers
                 {
                     ViewBag.Message = $"El CFDI no está vigente. Estado: {estado}.";
                     ViewBag.OrderNumber = model.OrderNumber;
-                    ViewBag.UserIpAddress = ipAddress;
+                    //ViewBag.UserIpAddress = ipAddress;
                     return View(model);
                 }
                 // Guardar los datos del XML en la base de datos

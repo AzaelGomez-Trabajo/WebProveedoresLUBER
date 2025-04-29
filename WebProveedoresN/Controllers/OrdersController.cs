@@ -83,7 +83,7 @@ namespace WebProveedoresN.Controllers
             var orderDetails = await _orderService.GetOrderDetailsByOrderNumberAsync(orderDetailDTO);
             if (orderDetails == null)
             {
-                return NotFound("No se encontró la orden especificada.");
+                return NotFound("No se encontró la Orden de Compra especificada.");
             }
 
             var orders = await _orderService.GetOrderByOrderNumberAsync(orderDetailsDTO.OrderNumber);
@@ -96,8 +96,8 @@ namespace WebProveedoresN.Controllers
                 ViewBag.OrderNumber = orders.OrderNumber;
                 ViewBag.Currency = orders.DocCurOrder;
                 ViewBag.OrderDate = orders.OrderDate;
-                ViewBag.Invoces = orders.Invoices;
-                ViewBag.TotalInvoice = orders.TotalInvoice;
+                ViewBag.Invoices = orders.Invoices;
+                ViewBag.TotalInvoices = orders.TotalInvoice;
             }
 
             //var order = orders.FirstOrDefault();
@@ -105,7 +105,7 @@ namespace WebProveedoresN.Controllers
         }
 
         [HttpPost("CloseEmbed")]
-        public IActionResult CloseEmbed(int orderNumber)
+        public IActionResult CloseEmbed()
         {
             return Json(new { success = true });
         }

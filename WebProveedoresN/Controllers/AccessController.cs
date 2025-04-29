@@ -18,6 +18,10 @@ namespace WebProveedoresN.Controllers
         [HttpPost]
         public async Task<IActionResult> Login(LoginDTO loginDTO)
         {
+            if (!ModelState.IsValid)
+            {
+                return View(loginDTO);
+            }
             var usuario = StartService.ValidateUser(loginDTO.Email, UtilityService.ConvertirSHA256(loginDTO.Password));
             if (usuario != null && usuario.Nombre != null)
             {

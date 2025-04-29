@@ -65,11 +65,19 @@ namespace WebProveedoresN.Data
                             }
 
                             // Inserta datos en la tabla OrdersFacturas
-                            var queryOrderFactura = $"INSERT INTO OrdersFacturas (IdOrder, IdFactura, IdUsuario, IpUsuario) OUTPUT INSERTED.IdFactura VALUES (SELECT Id FROM Orders WHERE OrderNumber = {orderNumber}, @IdFactura, @IdUsuario, @IpUsuario)";
+                            var queryOrderFactura = @"INSERT INTO OrdersFacturas (IdOrder, IdFactura, IdUsuario, IpUsuario)
+                            OUTPUT INSERTED.IdFactura 
+                            VALUES (
+                                (SELECT Id FROM Orders WHERE OrderNumber = @OrderNumber),
+                                @IdFactura,
+                                @IdUsuario,
+                                @IpUsuario
+                                )";
                             using (var cmd = new SqlCommand(queryOrderFactura, connection))
                             {
                                 cmd.CommandType = CommandType.Text;
                                 cmd.Parameters.Clear();
+                                cmd.Parameters.AddWithValue("@OrderNumber", orderNumber);
                                 cmd.Parameters.AddWithValue("@IdFactura", archivoId);
                                 cmd.Parameters.AddWithValue("@IdUsuario", idUsuario);
                                 cmd.Parameters.AddWithValue("@IpUsuario", ipUsuario);

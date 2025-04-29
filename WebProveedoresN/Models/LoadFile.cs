@@ -18,6 +18,8 @@ namespace WebProveedoresN.Models
         [Required]
         [DisplayName("Número de Orden de Compra")]
         public int OrderNumber { get; set; }
+
+        public List<int> SelectedDocuments { get; set; } = [];
     }
     public class FileSizeAttribute : ValidationAttribute
     {

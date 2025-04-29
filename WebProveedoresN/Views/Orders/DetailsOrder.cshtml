@@ -41,9 +41,9 @@ else
                 </div>
 
                 <div class="col-8 ms-auto">
-                    <div class="mb-0">
-                        <table class="table-striped" style="border: 2px solid black; border-collapse:collapse; width: 100%;">
-                            <thead>
+                    <div class="table-responsive mb-0">
+                        <table class="table-striped table-hover" style="border: 2px solid black; border-collapse:collapse; width: 100%;">
+                            <thead class="table-dark">
                                 <tr style="border: 1px solid black">
                                     <th class="text-center">Código del Artículo</th>
                                     <th class="text-center">Cantidad </th>
@@ -68,6 +68,14 @@ else
                                     </tr>
                                 }
                             </tbody>
+                            <tfoot>
+                                <tr class="table-secondary">
+                                    <td colspan="4" class="text-end"><strong>Total:</strong></td>
+                                    <td class="text-end">@string.Format("{0:C2}", Model.Sum(x => x.TotalItem))</td>
+                                    <td class="text-end">@string.Format("{0:C2}", Model.Sum(x => (x.Tax / 100) * x.TotalItem))</td>
+                                    <td class="text-end">@string.Format("{0:C2}", Model.Sum(x => x.TotalTaxItem))</td>
+                                </tr>
+                            </tfoot>
                         </table>
                     </div>
                 </div>
@@ -77,57 +85,58 @@ else
                         <span class="fs-3">
                             <label><strong>Entrada de Mercancía</strong></label>
                         </span>
-                        @if (Model == null)
+                        @if (Model != null && Model.Any())
                         {
-                            <form id="uploadForm" asp-action="Upload" asp-controller="Files" method="post" style="display:inline;" onsubmit="return enviarFormulario(event)">
-                                <input type="hidden" name="orderNumber" value="@ViewBag.OrderNumber" />
-                                <table class="table table-striped">
-                                    <thead>
-                                        <tr>
-                                            <th><input type="checkbox" id="selectAll" /></th>
-                                            <th class="text-center">#</th>
-                                            <th class="text-center">Factura</th>
-                                            <th class="text-center">Codigo producto</th>
-                                            <th class="text-center">Moneda</th>
-                                            <th class="text-center">Cantidad</th>
-                                            <th class="text-center">Total</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        @foreach (var item in Model)
-                                        {
-                                            details = item;
-                                            @if (details.DocNum != 0)
+                            <div class="table-responsive">
+                                <form id="uploadForm" asp-action="Upload" asp-controller="Files" method="post" style="display:inline;" onsubmit="return validarYRedirigir()">
+                                    <input type="hidden" name="orderNumber" value="@ViewBag.OrderNumber" />
+                                    <table class="table table-striped">
+                                        <thead class="table-dark">
+                                            <tr>
+                                                <th>@*<input type="checkbox" id="selectAll" />*@</th>
+                                                <th class="text-center">#</th>
+                                                <th class="text-center">Factura</th>
+                                                <th class="text-center">Codigo producto</th>
+                                                <th class="text-center">Moneda</th>
+                                                <th class="text-center">Cantidad</th>
+                                                <th class="text-center">Total</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            @foreach (var item in Model)
                                             {
-                                                <tr>
-                                                    <td><input type="checkbox" name="selectedDocuments" value="@details!.DocNum" /></td>
-                                                    <td class="text-center">@details.DocNum</td>
-                                                    <td class="text-center">@details.InvoiceSupplier</td>
-                                                    <td>@details.ItemCode</td>
-                                                    <td class="text-center">@details.DocCur</td>
-                                                    <td class="text-end">@string.Format("{0:N2}", details.Quantity)</td>
-                                                    <td class="text-end">@string.Format("{0:C2}", details.Total)</td>
-                                                </tr>
+                                                details = item;
+                                                @if (details.DocNum != 0)
+                                                {
+                                                    <tr>
+                                                        <td><input type="checkbox" name="selectedDocuments" value="@details!.InvoiceSupplier" /></td>
+                                                        <td class="text-center">@details.DocNum</td>
+                                                        <td class="text-center">@details.InvoiceSupplier</td>
+                                                        <td>@details.ItemCode</td>
+                                                        <td class="text-center">@details.DocCur</td>
+                                                        <td class="text-end">@string.Format("{0:N2}", details.Quantity)</td>
+                                                        <td class="text-end">@string.Format("{0:C2}", details.Total)</td>
+                                                    </tr>
+                                                }
                                             }
-                                        }
-                                    </tbody>
-                                </table>
-                                <div>
-                                    <button type="submit" class="btn btn-outline-primary btn-sm" @((decimal)ViewBag.TotalAmount <= (decimal)ViewBag.TotalInvoice ? "disabled" : "")>
+                                        </tbody>
+                                    </table>
+                                    <button type="submit" class="btn btn-outline-primary btn-sm" @((decimal)ViewBag.TotalAmount <= (decimal)ViewBag.TotalInvoices ? "disabled" : "")>
                                         <i class="bi bi-cloud-upload-fill"> Cargar Factura</i>
                                     </button>
-                                    <button class="btn btn-outline-secondary btn-sm" onclick="mostrarDocumentos(@ViewBag.OrderNumber)">
-                                        <i class="bi bi-cloud-download-fill"> Mostrar Factura</i>
-                                    </button>
-                                    <button class="btn btn-outline-danger btn-sm" onclick="cerrarEmbed(@ViewBag.OrderNumber)" style="display: none">
-                                        <i class="bi bi-x-circle-fill"> Cerrar Factura</i>
-                                    </button>
+                                </form>
+                                <button class="btn btn-outline-secondary btn-sm" onclick="mostrarDocumentos(@ViewBag.OrderNumber)">
+                                    <i class="bi bi-cloud-download-fill"> Mostrar Factura</i>
+                                </button>
+                                <button class="btn btn-outline-danger btn-sm" onclick="cerrarEmbed(@ViewBag.OrderNumber)" style="display: none">
+                                    <i class="bi bi-x-circle-fill"> Cerrar Factura</i>
+                                </button>
 
-                                    <div id="embed-container-@ViewBag.OrderNumber" style="display:none;">
-                                        <div id="embed-list-@ViewBag.OrderNumber"></div>
-                                    </div>
+                                <div id="embed-container-@ViewBag.OrderNumber" style="display:none;">
+                                    <div id="embed-list-@ViewBag.OrderNumber"></div>
                                 </div>
-                            </form>
+
+                            </div>
                         }
                         else
                         {
@@ -149,7 +158,25 @@ else
 }
 @section Scripts {
     <script>
-        async function enviarFormulario1(event) {
+        function validarYRedirigir() {
+            // Seleccionar todos los checkboxes con el nombre "selectedDocuments"
+            const checkboxes = document.querySelectorAll('input[name="selectedDocuments"]:checked');
+
+            // Validar si al menos un checkbox está seleccionado
+            if (checkboxes.length === 0) {
+                alert('Por favor, selecciona al menos un documento antes de continuar.');
+                return false; // Evita la redirección
+            }
+
+            // Redirigir a la vista Upload
+            const orderNumber = document.querySelector('input[name="orderNumber"]').value;
+            window.location.href = `/Files/Upload?orderNumber=${orderNumber}`;
+            return true; // Permite la redirección
+        }
+
+    </script>
+    @*     <script>
+        async function enviarFormulario(event) {
             event.preventDefault(); // Evita el envío tradicional del formulario
 
             // Validar que al menos un checkbox esté seleccionado
@@ -177,6 +204,7 @@ else
                     if (result.success) {
                         alert('Documentos cargados exitosamente.');
                         // Realiza cualquier acción adicional, como actualizar la tabla o redirigir
+                         window.location.href = '/Orders/DetailsOrder?orderNumber=' + formData.get('orderNumber');
                     } else {
                         alert('Error: ' + result.message);
                     }
@@ -191,14 +219,14 @@ else
             return false; // Evita el envío tradicional del formulario
         }
     </script>
-    <script>
+ *@    @*<script>
         document.getElementById('selectAll').addEventListener('change', function () {
             const checkboxes = document.querySelectorAll('input[name="selectedDocuments"]');
             checkboxes.forEach(checkbox => {
                 checkbox.checked = this.checked;
             });
         });
-    </script>
+    </script>*@
     <script>
         function mostrarDocumentos(orderNumber) {
             $.ajax({
