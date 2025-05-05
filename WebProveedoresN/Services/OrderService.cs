@@ -1,5 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore;
-using WebProveedoresN.Data;
+﻿using WebProveedoresN.Data;
 using WebProveedoresN.DTOs;
 using WebProveedoresN.Interfaces;
 using WebProveedoresN.Models;
@@ -42,6 +41,16 @@ namespace WebProveedoresN.Services
             return await Task.FromResult(orders.Count);
         }
 
+        public async Task<Order> GetOrderByOrderNumberAsync(int orderNumber)
+        {
+            var order = DBOrders.GetOrderNumber(orderNumber.ToString());
+            if (order == null)
+            {
+                return null!;
+            }
+            return await Task.FromResult(order);
+        }
+
         public async Task<List<OrderDetail>> GetOrderDetailsByOrderNumberAsync(OrderDetailDTO orderDetailDTO)
         {
             var orderDetail = DBOrders.GetOrderDetailsByOrderNumber(orderDetailDTO);
@@ -52,14 +61,34 @@ namespace WebProveedoresN.Services
             return await Task.FromResult(orderDetail);
         }
 
-        public async Task<Order> GetOrderByOrderNumberAsync(int orderNumber)
+        public async Task<List<OrderDetailsOffer>> GetOrderDetailsOfferByOrderNumberAsync(OrderDetailDTO orderDetailDTO)
         {
-            var order = DBOrders.GetOrderNumber(orderNumber.ToString());
-            if (order == null)
+            var orderDetail = DBOrders.GetOrderDetailsOfferByOrderNumber(orderDetailDTO);
+            if (orderDetail == null)
             {
                 return null!;
             }
-            return await Task.FromResult(order);
+            return await Task.FromResult(orderDetail);
+        }
+
+        public async Task<List<DetailsGoodsReceipt>> GetOrderDetailsGoodsReceiptByOrderNumberAsync(OrderDetailDTO orderDetailDTO)
+        {
+            var orderDetail = DBOrders.GetOrderDetailsGoodsReceiptByOrderNumber(orderDetailDTO);
+            if (orderDetail == null)
+            {
+                return null!;
+            }
+            return await Task.FromResult(orderDetail);
+        }
+
+        public async Task<List<OrderInvoicesDTO>> GetOrderInvoicesByOrderNumberAsync(int orderNumber)
+        {
+            var orderInvoices = DBOrders.GetOrderInvoicesByOrderNumber(orderNumber);
+            if (orderInvoices == null)
+            {
+                return null!;
+            }
+            return await Task.FromResult(orderInvoices);
         }
     }
 }

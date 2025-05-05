@@ -2,6 +2,7 @@
 using WebProveedoresN.DTOs;
 using WebProveedoresN.Interfaces;
 using WebProveedoresN.Models;
+using WebProveedoresN.ViewModel;
 
 namespace WebProveedoresN.Controllers
 {
@@ -65,9 +66,6 @@ namespace WebProveedoresN.Controllers
             {
                 return BadRequest("El número de orden no puede estar vacío.");
             }
-            ViewBag.OrderNumber = orderDetailsDTO.OrderNumber;
-            ViewBag.SupplierCode = orderDetailsDTO.SupplierCode;
-            ViewBag.DocumentType = orderDetailsDTO.DocumentType;
 
             var orderDetailDTO = new OrderDetailDTO
             {
@@ -80,28 +78,39 @@ namespace WebProveedoresN.Controllers
             {
                 return BadRequest("El número de orden no puede estar vacío.");
             }
-            var orderDetails = await _orderService.GetOrderDetailsByOrderNumberAsync(orderDetailDTO);
-            if (orderDetails == null)
-            {
-                return NotFound("No se encontró la Orden de Compra especificada.");
-            }
-
             var orders = await _orderService.GetOrderByOrderNumberAsync(orderDetailsDTO.OrderNumber);
-
-            if (orders != null)
+            if (orderDetailsDTO.DocumentType == "Pedido")
             {
-                ViewBag.DocumentType = orders.DocumentType;
-                ViewBag.Property = orders.Property;
-                ViewBag.TotalAmount = orders.TotalAmount;
-                ViewBag.OrderNumber = orders.OrderNumber;
-                ViewBag.Currency = orders.DocCurOrder;
-                ViewBag.OrderDate = orders.OrderDate;
-                ViewBag.Invoices = orders.Invoices;
-                ViewBag.TotalInvoices = orders.TotalInvoice;
+                var orderInvoices = await _orderService.GetOrderInvoicesByOrderNumberAsync(orderDetailsDTO.OrderNumber);
+                var orderDetails = await _orderService.GetOrderDetailsByOrderNumberAsync(orderDetailDTO);
+                var orderDetailsGoodsReceipt = await _orderService.GetOrderDetailsGoodsReceiptByOrderNumberAsync(orderDetailDTO);
+                var viewModel = new CombinedDetailsOrderViewModel
+                {
+                    Orders = orders,
+                    OrderDetails = orderDetails,
+                    OrderDetailsGoodsReceipt = orderDetailsGoodsReceipt,
+                    OrderInvoices = orderInvoices,
+                };
+                if (viewModel == null)
+                {
+                    return NotFound("No se encontró la Orden de Compra especificada.");
+                }
+                return View("DetailsOrder", viewModel);
             }
-
-            //var order = orders.FirstOrDefault();
-            return View(orderDetails);
+            else
+            {
+                var orderDetailsOffer = await _orderService.GetOrderDetailsOfferByOrderNumberAsync(orderDetailDTO);
+                var viewModel = new CombinedDetailsOrderOfferViewModel
+                {
+                    Orders = orders,
+                    OrderDetailsOffer = orderDetailsOffer,
+                };
+                if (viewModel == null)
+                {
+                    return NotFound("No se encontró la Orden de Compra especificada.");
+                }
+                return View("OrderDetailsOffer", viewModel);
+            }
         }
 
         [HttpPost("CloseEmbed")]

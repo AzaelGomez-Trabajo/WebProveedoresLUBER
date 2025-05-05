@@ -67,6 +67,7 @@ namespace WebProveedoresN.Data
                         order = new Order()
                         {
                             DocumentType = dr["DocumentType"].ToString(),
+                            SupplierCode = dr["SupplierCode"].ToString(),
                             OrderNumber = (int)dr["OrderNumber"],
                             OrderDate = (DateTime)dr["OrderDate"],
                             Canceled = dr["Canceled"].ToString(),
@@ -132,6 +133,7 @@ namespace WebProveedoresN.Data
 
         public static List<OrderDetail> GetOrderDetailsByOrderNumber(OrderDetailDTO orderDetailDTO)
         {
+
             var orders = new List<OrderDetail>();
             try
             {
@@ -163,8 +165,42 @@ namespace WebProveedoresN.Data
                             TotalTaxItem = dr["LineaTotalIVA1"] != DBNull.Value ? (decimal)dr["LineaTotalIVA1"] : 0,
                             TotalOrder = dr["Total1"] != DBNull.Value ? (decimal)dr["Total1"] : 0,
                             DocumentType = dr["TipoDocumento2"].ToString() ?? string.Empty,
+                        });
+                    }
+                }
+                conexion.Close();
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+            return orders;
+        }
+
+        public static List<DetailsGoodsReceipt> GetOrderDetailsGoodsReceiptByOrderNumber(OrderDetailDTO orderDetailDTO)
+        {
+
+            var orders = new List<DetailsGoodsReceipt>();
+            try
+            {
+                using var conexion = DBConnectiion.GetConnection();
+                conexion.Open();
+                var storedProcedure = "sp_GetOrderDetailsByOrderNumber";
+                using (var cmd = new SqlCommand(storedProcedure, conexion))
+                {
+                    cmd.Parameters.AddWithValue("@Action", orderDetailDTO.Action);
+                    cmd.Parameters.AddWithValue("@OrderNumber", orderDetailDTO.OrderNumber);
+                    cmd.Parameters.AddWithValue("@SupplierCode", orderDetailDTO.SupplierCode);
+                    cmd.Parameters.AddWithValue("@DocumentType", orderDetailDTO.DocumentType);
+                    cmd.CommandType = CommandType.StoredProcedure;
+                    using var dr = cmd.ExecuteReader();
+                    while (dr.Read())
+                    {
+                        orders.Add(new DetailsGoodsReceipt()
+                        {
                             DocNum = dr["NoDocumento2"] != DBNull.Value ? (int)dr["NoDocumento2"] : 0,
                             InvoiceSupplier = dr["FacturaProveedor2"].ToString() ?? string.Empty,
+                            ItemCode = dr["CodigoArticulo1"].ToString() ?? string.Empty,
                             CardCode = dr["CodigoProveedor2"].ToString() ?? string.Empty,
                             CardName = dr["NombreProveedor2"].ToString() ?? string.Empty,
                             DocStatus = dr["Status2"].ToString() ?? string.Empty,
@@ -182,5 +218,85 @@ namespace WebProveedoresN.Data
             }
             return orders;
         }
+
+        public static List<OrderDetailsOffer> GetOrderDetailsOfferByOrderNumber(OrderDetailDTO orderDetailDTO)
+        {
+
+            var orders = new List<OrderDetailsOffer>();
+            try
+            {
+                using var conexion = DBConnectiion.GetConnection();
+                conexion.Open();
+                var storedProcedure = "sp_GetOrderDetailsByOrderNumber";
+                using (var cmd = new SqlCommand(storedProcedure, conexion))
+                {
+                    cmd.Parameters.AddWithValue("@Action", orderDetailDTO.Action);
+                    cmd.Parameters.AddWithValue("@OrderNumber", orderDetailDTO.OrderNumber);
+                    cmd.Parameters.AddWithValue("@SupplierCode", orderDetailDTO.SupplierCode);
+                    cmd.Parameters.AddWithValue("@DocumentType", orderDetailDTO.DocumentType);
+                    cmd.CommandType = CommandType.StoredProcedure;
+                    using var dr = cmd.ExecuteReader();
+                    while (dr.Read())
+                    {
+                        orders.Add(new OrderDetailsOffer()
+                        {
+                            DocumentType = dr["TipoDocumento1"].ToString() ?? string.Empty,
+                            OrderNumber = dr["NoDocumento1"] != DBNull.Value ? (int)dr["NoDocumento1"] : 0,
+                            OrderDate = dr["Fecha1"] != DBNull.Value ? (DateTime)dr["Fecha1"] : DateTime.MinValue,
+                            Canceled = dr["Canceled1"].ToString() ?? string.Empty,
+                            Status = dr["Status1"].ToString() ?? string.Empty,
+                            TotalAmount = dr["Total1"] != DBNull.Value ? (decimal)dr["Total1"] : 0,
+                            DocCurOrder = dr["Moneda1"].ToString() ?? string.Empty,
+                            LineNum = dr["NoLinea1"] != DBNull.Value ? (int)dr["NoLinea1"] : 0,
+                            ItemCode = dr["CodigoArticulo1"].ToString() ?? string.Empty,
+                            Quantity = dr["Cantidad1"] != DBNull.Value ? (decimal)dr["Cantidad1"] : 0,
+                            OpenQty = dr["CantidadPendiente1"] != DBNull.Value ? (decimal)dr["CantidadPendiente1"] : 0,
+                            Price = dr["PrecioxArticulo1"] != DBNull.Value ? (decimal)dr["PrecioxArticulo1"] : 0,
+                            Tax = dr["Impuesto1"] != DBNull.Value ? (decimal)dr["Impuesto1"] : 0,
+                            TotalItem = dr["LineaTotal1"] != DBNull.Value ? (decimal)dr["LineaTotal1"] : 0,
+                            TotalTax = dr["LineaTotalIVA1"] != DBNull.Value ? (decimal)dr["LineaTotalIVA1"] : 0,
+                        });
+                    }
+                }
+                conexion.Close();
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+            return orders;
+        }
+
+        public static List<OrderInvoicesDTO> GetOrderInvoicesByOrderNumber(int orderNumber)
+        {
+            var invoices = new List<OrderInvoicesDTO>();
+            try
+            {
+                using var conexion = DBConnectiion.GetConnection();
+                conexion.Open();
+                var storedProcedure = "sp_GetOrderInvoicesByOrderNumber";
+                using (var cmd = new SqlCommand(storedProcedure, conexion))
+                {
+                    cmd.Parameters.AddWithValue("@OrderNumber", orderNumber);
+                    cmd.CommandType = CommandType.StoredProcedure;
+                    using var dr = cmd.ExecuteReader();
+                    while (dr.Read())
+                    {
+                        invoices.Add(new OrderInvoicesDTO()
+                        {
+                            Invoices = dr["Invoices"] != DBNull.Value ? dr["Invoices"].ToString() : string.Empty,
+                            TotalInvoice = dr["TotalInvoices"] != DBNull.Value ? (decimal)dr["TotalInvoices"] : 0,
+                        });
+                    }
+                }
+                conexion.Close();
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+            return invoices;
+        }
+
     }
 }

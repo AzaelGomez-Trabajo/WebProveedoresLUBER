@@ -12,45 +12,20 @@
                 <h3 class="text-center">
                     Subir Factura para la Orden de Compra @Model.OrderNumber
                 </h3>
-                <p><strong>Facturas Seleccionadas:</strong></p>
-                @if (ViewBag.SelectedDocuments != null || ViewBag.SelectedDocuments.Any())
-                {
-                    <ul>
-                        @foreach (var doc in Model.SelectedDocuments)
-                        {
-                            <li>@doc</li>
-                        }
-                    </ul>
-                    <input type="hidden" name="selectedDocuments" value="@string.Join(",", Model.SelectedDocuments)" />
-                }
-                <input type="hidden" name="orderNumber" value="@ViewBag.OrderNumber" />
+                <input type="hidden" name="orderNumber" value="@Model.OrderNumber" />
             </div>
             <div class="card-body">
-                <form asp-action="UploadSaves" method="post" enctype="multipart/form-data">
+                <form asp-action="UploadOffer" method="post" enctype="multipart/form-data">
                     @Html.AntiForgeryToken()
                     <div class="mb-3">
-                        <label class="form-label">Facturas Seleccionados</label>
-                        <div id="selectedDocuments">
-                            @foreach (var doc in ViewBag.SelectedDocuments)
-                            {
-                                <div class="form-check">
-                                    <input class="form-check-input" type="radio" id="doc-@doc" name="SelectedDocuments" value="@doc" />
-                                    <label class="form-check-label" for="doc-@doc">
-                                        @doc
-                                    </label>
-                                </div>
-                            }
-                        </div>
-                    </div>
-                    <div class="mb-3">
                         <label asp-for="FilePDF" class="form-label">Archivo PDF</label>
-                        <input asp-for="FilePDF" class="form-control" type="file" accept=".pdf" required />
+                        <input asp-for="FilePDF" class="form-control" type="file" accept=".pdf"  />
                         <span asp-validation-for="FilePDF" class="text-danger"></span>
                     </div>
                     <br />
                     <div class="mb-3">
                         <label asp-for="FileXML" class="form-label">Archivo XML</label>
-                        <input asp-for="FileXML" class="form-control" type="file" accept=".xml" required />
+                        <input asp-for="FileXML" class="form-control" type="file" accept=".xml"  />
                         <span asp-validation-for="FileXML" class="text-danger"></span>
                     </div>
 
@@ -64,7 +39,6 @@
                     <div class="mb-3" style="text-align:center">
                         <div class="d-grid">
                             <input type="hidden" asp-for="OrderNumber" />
-                            <input type="hidden" name="SelectedDocuments" value="@string.Join(",", ViewBag.SelectedDocuments)" />
                             <button type="submit" class="btn btn-outline-primary">
                                 <i class="bi bi-floppy"></i> Guardar
                             </button>
@@ -155,4 +129,3 @@
                 }
     </script>
 }
-

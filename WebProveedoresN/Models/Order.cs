@@ -17,12 +17,16 @@ namespace WebProveedoresN.Models
         public string? SupplierName { get; set; }
 
         [Required]
+        [DisplayName("Codigo del proveedor")]
+        public string? SupplierCode { get; set; }
+
+        [Required]
         [DisplayName("Fecha de orden")]
         public DateTime OrderDate { get; set; }
 
         [Required]
         [DisplayName("Monto Total")]
-        public decimal TotalAmount { get; set; }
+        public decimal TotalAmount { get; set; } = 0;
 
         [DisplayName("Estado")]
         public string? IdEstatus { get; set; }
@@ -32,7 +36,7 @@ namespace WebProveedoresN.Models
 
         public string? Canceled { get; set; }
         public int Invoices { get; set; }
-        public decimal TotalInvoice { get; set; }
+        public decimal TotalInvoice { get; set; } = 0;
         public string? DocumentType { get; set; }
         public string? Property { get; set; }
     }
