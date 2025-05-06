@@ -11,11 +11,11 @@ namespace WebProveedoresN.Interfaces
 
         Task<List<DetailsGoodsReceipt>> GetOrderDetailsGoodsReceiptByOrderNumberAsync(OrderDetailDTO orderDetailDTO);
 
-        Task<Order> GetOrderByOrderNumberAsync(int orderNumber);
+        Task<Order> GetOrderByOrderNumberAsync(OrderDetailDTO orderDetailDTO);
 
         Task<List<OrderInvoicesDTO>> GetOrderInvoicesByOrderNumberAsync(int orderNumber);
 
-        Task<List<Order>> GetOrdersAsync(OrderDetailDTO orderDetailDTO, string searchString, int pageNumber, int pageSize);
+        Task<List<Order>> GetOrdersAsync(OrderDetailDTO orderDetailDTO, string searchString);
 
         Task<int> GetTotalOrdersAsync(OrderDetailDTO orderDetailDTO, string searchString);
     }

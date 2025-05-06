@@ -26,7 +26,6 @@ namespace WebProveedoresN.Controllers
         {
             int pageSize = 10;
             var supplierCode = User.FindFirst("SupplierCode")!.Value;
-            ViewBag.SupplierCode = supplierCode;
 
             var orderDetailDTO = new OrderDetailDTO
             {
@@ -36,7 +35,7 @@ namespace WebProveedoresN.Controllers
                 DocumentType = ""
             };
 
-            var orders = await _orderService.GetOrdersAsync(orderDetailDTO, searchString, pageNumber, pageSize);
+            var orders = await _orderService.GetOrdersAsync(orderDetailDTO, searchString);
             if (!orders.Any() && pageNumber > 1)
             {
                 return RedirectToAction("ListOrders", new { pageNumber = 1, searchString });
@@ -52,13 +51,6 @@ namespace WebProveedoresN.Controllers
             return View(PaginationDTO<Order>.CreatePagination(orders, pageNumber, pageSize));
         }
 
-        //GET: Orders/Details/5
-        [HttpGet("Details")]
-        public IActionResult Details()
-        {
-            return View();
-        }
-
         [HttpPost("DetailsOrder")]
         public async Task<ActionResult> DetailsOrder(OrderDetailsDTO orderDetailsDTO)
         {
@@ -71,17 +63,17 @@ namespace WebProveedoresN.Controllers
             {
                 Action = 3,
                 OrderNumber = orderDetailsDTO.OrderNumber,
-                SupplierCode = orderDetailsDTO.SupplierCode,
+                SupplierCode = User.FindFirst("SupplierCode")!.Value,
                 DocumentType = orderDetailsDTO.DocumentType
             };
             if (orderDetailDTO is null)
             {
                 return BadRequest("El número de orden no puede estar vacío.");
             }
-            var orders = await _orderService.GetOrderByOrderNumberAsync(orderDetailsDTO.OrderNumber);
+            var orders = await _orderService.GetOrderByOrderNumberAsync(orderDetailDTO);
             if (orderDetailsDTO.DocumentType == "Pedido")
             {
-                var orderInvoices = await _orderService.GetOrderInvoicesByOrderNumberAsync(orderDetailsDTO.OrderNumber);
+                var orderInvoices = await _orderService.GetOrderInvoicesByOrderNumberAsync(orderDetailDTO.OrderNumber);
                 var orderDetails = await _orderService.GetOrderDetailsByOrderNumberAsync(orderDetailDTO);
                 var orderDetailsGoodsReceipt = await _orderService.GetOrderDetailsGoodsReceiptByOrderNumberAsync(orderDetailDTO);
                 var viewModel = new CombinedDetailsOrderViewModel

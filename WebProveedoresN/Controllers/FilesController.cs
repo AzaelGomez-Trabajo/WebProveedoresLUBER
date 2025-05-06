@@ -269,7 +269,8 @@ namespace WebProveedoresN.Controllers
             // Pasar los datos a la vista
             var model = new LoadFile
             {
-                OrderNumber = int.Parse(orderNumber),
+                //OrderNumber = int.Parse(orderNumber),
+                OrderNumber = int.Parse(ViewBag.OrderNumber),
                 SelectedDocuments = ViewBag.SelectedDocuments,
             };
 
@@ -388,7 +389,7 @@ namespace WebProveedoresN.Controllers
                     return View(model);
                 }
 
-                if (!rfcReceptor.Equals("CIN041008173"))
+                if (!rfcReceptor.Equals("DAM960116H65"))
                 {
                     ViewBag.Message = "La factura no es para LUBER Lubricantes.";
                     return View(model);

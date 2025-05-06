@@ -13,11 +13,8 @@ namespace WebProveedoresN.Models
         [Display(Name = "Código de Artículo")]
         public string ItemCode { get; set; } = null!;
 
-        [Display(Name = "Número de Proveedor")]
-        public string? CardCode { get; set; }
-
-        [Display(Name = "Nombre de Proveedor")]
-        public string? CardName { get; set; }
+        [Display(Name = "Cantidad faltante")]
+        public decimal OpenQty { get; set; } = 0;
 
         [Display(Name = "Estado del Documento")]
         public string? DocStatus { get; set; }

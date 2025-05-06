@@ -7,7 +7,7 @@ namespace WebProveedoresN.Services
 {
     public class OrderService : IOrderService
     {
-        public async Task<List<Order>> GetOrdersAsync(OrderDetailDTO orderDetailDTO, string searchString, int pageNumber, int pageSize)
+        public async Task<List<Order>> GetOrdersAsync(OrderDetailDTO orderDetailDTO, string searchString)
         {
             // Obtener todos los registros desde la base de datos
             var orders = DBOrders.ListOrders(orderDetailDTO);
@@ -18,13 +18,7 @@ namespace WebProveedoresN.Services
                 orders = orders.Where(o => o.OrderNumber.ToString()!.Contains(searchString)).ToList();
             }
 
-            // Aplicar la paginación en memoria
-            var paginatedOrders = orders
-                .Skip((pageNumber - 1) * pageSize)
-                .Take(pageSize)
-                .ToList();
-
-            return await Task.FromResult(paginatedOrders);
+            return await Task.FromResult(orders);
         }
 
         public async Task<int> GetTotalOrdersAsync(OrderDetailDTO orderDetailDTO, string searchString)
@@ -41,9 +35,11 @@ namespace WebProveedoresN.Services
             return await Task.FromResult(orders.Count);
         }
 
-        public async Task<Order> GetOrderByOrderNumberAsync(int orderNumber)
+        public async Task<Order> GetOrderByOrderNumberAsync(OrderDetailDTO orderDetailDTO)
         {
-            var order = DBOrders.GetOrderNumber(orderNumber.ToString());
+            //var order = DBOrders.GetOrderByOrderNumber2(orderDetailDTO);
+            // Obtener todos los registros desde la base de datos
+            var order = DBOrders.GetOrderByOrderNumber(orderDetailDTO.OrderNumber);
             if (order == null)
             {
                 return null!;

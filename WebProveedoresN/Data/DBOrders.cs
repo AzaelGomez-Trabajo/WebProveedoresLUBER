@@ -49,7 +49,7 @@ namespace WebProveedoresN.Data
             return orders;
         }
 
-        public static Order GetOrderNumber(string orderNumber)
+        public static Order GetOrderByOrderNumber(int orderNumber)
         {
             var order = new Order();
             try
@@ -89,7 +89,50 @@ namespace WebProveedoresN.Data
             return order;
         }
 
-        public static bool ValidateOrderNumberInDatabase(Order model)
+        public static Order GetOrderByOrderNumber2(OrderDetailDTO orderDetailDTO)
+        {
+            var order = new Order();
+            try
+            {
+                using var conexion = DBConnectiion.GetConnection();
+                conexion.Open();
+                var storedProcedure = "sp_GetOrderByOrderNumber_2";
+                using (var cmd = new SqlCommand(storedProcedure, conexion))
+                {
+                    cmd.Parameters.AddWithValue("@Parameter1", orderDetailDTO.Action);
+                    cmd.Parameters.AddWithValue("@Parameter2", orderDetailDTO.OrderNumber);
+                    cmd.Parameters.AddWithValue("@Parameter3", orderDetailDTO.SupplierCode);
+                    cmd.Parameters.AddWithValue("@Parameter4", orderDetailDTO.DocumentType);
+                    cmd.CommandType = CommandType.StoredProcedure;
+                    using var dr = cmd.ExecuteReader();
+                    if (dr.Read())
+                    {
+                        order = new Order()
+                        {
+                            DocumentType = dr["DocumentType"].ToString(),
+                            OrderDate = (DateTime)dr["OrderDate"],
+                            Canceled = dr["Canceled"].ToString(),
+                            IdEstatus = dr["IdEstatus"].ToString(),
+                            TotalAmount = (decimal)dr["TotalAmount"],
+                            DocCurOrder = dr["Currency"].ToString()!,
+                            Property = dr["Property"].ToString() ?? string.Empty,
+                            Invoices = (int)dr["Invoices"],
+                            TotalInvoice = (decimal)dr["TotalInvoice"],
+                        };
+                    }
+                }
+                conexion.Close();
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+            return order;
+        }
+
+
+
+        public static bool ValidateOrderNumberInDatabase(ValidateOrderNumberDTO model)
         {
             bool isValid = false;
 
@@ -111,24 +154,6 @@ namespace WebProveedoresN.Data
                 }
             }
             return isValid;
-        }
-
-        public static int ObtenerOrderNumber(string orderNumber)
-        {
-            var orderNumberId = 0;
-            using (var connection = DBConnectiion.GetConnection())
-            {
-                string query = "SELECT IdOrder FROM Orders WHERE OrderNumber = @OrderNumber";
-                using (var cmd = new SqlCommand(query, connection))
-                {
-                    cmd.Parameters.AddWithValue("@OrderNumber", orderNumber);
-                    cmd.CommandType = CommandType.Text;
-                    connection.Open();
-                    orderNumberId = (int)cmd.ExecuteScalar();
-                    connection.Close();
-                }
-            }
-            return orderNumberId;
         }
 
         public static List<OrderDetail> GetOrderDetailsByOrderNumber(OrderDetailDTO orderDetailDTO)
@@ -201,8 +226,7 @@ namespace WebProveedoresN.Data
                             DocNum = dr["NoDocumento2"] != DBNull.Value ? (int)dr["NoDocumento2"] : 0,
                             InvoiceSupplier = dr["FacturaProveedor2"].ToString() ?? string.Empty,
                             ItemCode = dr["CodigoArticulo1"].ToString() ?? string.Empty,
-                            CardCode = dr["CodigoProveedor2"].ToString() ?? string.Empty,
-                            CardName = dr["NombreProveedor2"].ToString() ?? string.Empty,
+                            OpenQty = dr["CantidadPendiente1"] != DBNull.Value ? (decimal)dr["CantidadPendiente1"] : 0,
                             DocStatus = dr["Status2"].ToString() ?? string.Empty,
                             DocCur = dr["Moneda2"].ToString() ?? string.Empty,
                             Quantity = dr["Cantidad2"] != DBNull.Value ? (decimal)dr["Cantidad2"] : 0,
