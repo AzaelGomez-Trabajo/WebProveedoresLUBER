@@ -6,7 +6,12 @@
     ViewData["Title"] = "Órdenes de Compra";
 }
 @Html.AntiForgeryToken()
-<Loading />
+@if(Model is null)
+{
+    <Loading />
+}
+else
+{
 <div class="card">
     <div class="mb-3">
         <div class="card-header">
@@ -39,7 +44,7 @@
                         </tr>
                     </thead>
                     <tbody>
-                        @foreach (var item in Model)
+                        @foreach (var item in Model!)
                         {
                             <tr>
                                 <td>@item.OrderNumber.ToString()</td>
@@ -51,7 +56,7 @@
                                 <td>
                                     <form asp-action="DetailsOrder" method="post" style="display:inline">
                                         <input type="hidden" name="orderNumber" value="@item.OrderNumber" />
-                                        <input type="hidden" name="supplierCode" value="@ViewBag.SupplierCode" />
+                                        <input type="hidden" name="supplierCode" value="@item.SupplierCode" />
                                         <input type="hidden" name="documentType" value="@item.DocumentType" />
                                         <button type="submit" class="btn btn-outline-info btn-sm">
                                             <i class="bi bi-ticket-detailed-fill"> Detalles</i>
@@ -80,3 +85,4 @@
         </div>
     </div>
 </div>
+}

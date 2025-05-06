@@ -94,7 +94,8 @@ else
                                             <th>@*<input type="checkbox" id="selectAll" />*@</th>
                                             <th class="text-center">#</th>
                                             <th class="text-center">Factura</th>
-                                            <th class="text-center">Codigo producto</th>
+                                            <th class="text-center">Codigo del Artículo</th>
+                                            <th class="text-center">Estatus</th>
                                             <th class="text-center">Moneda</th>
                                             <th class="text-center">Cantidad</th>
                                             <th class="text-center">Total</th>
@@ -107,10 +108,11 @@ else
                                             {
                                                 <tr>
                                                     <td><input type="checkbox" name="selectedDocuments" value="@item!.InvoiceSupplier"
-                                                        @((item.DocStatus! != "O" || item.DocNum == null) ? "disabled" : "")/></td>
+                                                        @((item.DocStatus! != "O" || item.OpenQty  != 0) ? "disabled" : "")/></td>
                                                     <td class="text-center">@item.DocNum</td>
                                                     <td class="text-center">@item.InvoiceSupplier</td>
                                                     <td>@item.ItemCode</td>
+                                                    <td class="text-center">@item.DocStatus</td>
                                                     <td class="text-center">@item.DocCur</td>
                                                     <td class="text-end">@string.Format("{0:N2}", item.Quantity)</td>
                                                     <td class="text-end">@string.Format("{0:C2}", item.Total)</td>
