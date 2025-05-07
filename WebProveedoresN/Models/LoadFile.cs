@@ -6,13 +6,13 @@ namespace WebProveedoresN.Models
 	public class LoadFile
 	{
         [Required(ErrorMessage = "El campo {0} es obligatorio.")]
-        [DisplayName("Archivo PDF")]
+        [Display(Name = "Archivo PDF")]
         //[FileExtensions(Extensions = ".pdf", ErrorMessage = "Por favor, suba un archivo PDF.")]
         [FileSize(2 * 1024 * 1024)]
         public IFormFile FilePDF { get; set; } = null!;
         
         [Required(ErrorMessage = "El campo {0} es obligatorio.")]
-        [DisplayName("Archivo XML")]
+        [Display(Name = "Archivo XML")]
         //[FileExtensions(Extensions = ".xml", ErrorMessage = "Por favor, suba un archivo XML.")]
         public IFormFile FileXML { get; set; } = null!;
 

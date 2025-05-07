@@ -7,12 +7,12 @@ namespace WebProveedoresN.Models
     {
         [Required(ErrorMessage = "El campo {0} es obligatorio.")]
         [MaxLength(100, ErrorMessage = "El campo {0} no puede tener más de {1} caracteres")]
-        [DisplayName("Codigo de Proveedor")]
+        [DisplayName("Codigo del Proveedor")]
         public string Code { get; set; } = null!;
 
         [Required(ErrorMessage = "El campo {0} es obligatorio.")]
         [MaxLength(100, ErrorMessage = "El campo {0} no puede tener más de {1} caracteres")]
-        [DisplayName("Proveedor")]
+        [DisplayName("Nombre del Proveedor")]
         public string Name { get; set; } = null!;
 
     }

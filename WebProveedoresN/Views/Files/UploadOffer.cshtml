@@ -18,13 +18,13 @@
                 <form asp-action="UploadOffer" method="post" enctype="multipart/form-data">
                     @Html.AntiForgeryToken()
                     <div class="mb-3">
-                        <label asp-for="FilePDF" class="form-label">Archivo PDF</label>
+                        <label asp-for="FilePDF" class="form-label">@Html.DisplayNameFor(model => model.FilePDF):</label>
                         <input asp-for="FilePDF" class="form-control" type="file" accept=".pdf"  />
                         <span asp-validation-for="FilePDF" class="text-danger"></span>
                     </div>
                     <br />
                     <div class="mb-3">
-                        <label asp-for="FileXML" class="form-label">Archivo XML</label>
+                        <label asp-for="FileXML" class="form-label">@Html.DisplayNameFor(model => model.FileXML):</label>
                         <input asp-for="FileXML" class="form-control" type="file" accept=".xml"  />
                         <span asp-validation-for="FileXML" class="text-danger"></span>
                     </div>

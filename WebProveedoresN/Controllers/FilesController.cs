@@ -447,7 +447,8 @@ namespace WebProveedoresN.Controllers
                     //ViewBag.UserIpAddress = ipAddress;
                     return View(model);
                 }
-                // TO DO
+
+                // TO DO Separate saving of the invoice to the new view
                 // Guardar los datos del XML en la base de datos
                 var result = XmlServicio.SaveXmlDataInDatabase(datos, ordenCompra.ToString(), supplierName!, idUsuario!, ipAddress);
 
@@ -480,14 +481,14 @@ namespace WebProveedoresN.Controllers
                     xmlFile.CopyTo(xmlStream);
                 }
 
-                var pdfName = Path.GetFileNameWithoutExtension(pdfFileName);
-                var xmlName = Path.GetFileNameWithoutExtension(xmlFileName);
+                var pdfName = Path.GetFileNameWithoutExtension(Path.GetFileName(pdfFile.FileName));
+                var xmlName = Path.GetFileNameWithoutExtension(Path.GetFileName(xmlFile.FileName));
                 var xmlConverted = XmlServicio.ConvertXmlToPdf(xmlContent, Path.Combine(folderPath, $"{timestamp}_1_{xmlName}.pdf"));
                 var archivos = new List<FileDTO>
                             {
-                                new() { OrderNumber = model.OrderNumber, Name = pdfFile.FileName, Route = folderPath, DateTime = timestamp, Extension = ".pdf", Converted = false },
-                                new() { OrderNumber = model.OrderNumber, Name = xmlFile.FileName, Route = folderPath, DateTime = timestamp, Extension = ".xml", Converted = false },
-                                new() { OrderNumber = model.OrderNumber, Name = xmlFile.FileName, Route = folderPath, DateTime = timestamp, Extension = ".pdf", Converted = true }
+                                new() { OrderNumber = model.OrderNumber, Name = pdfName, Route = folderPath, DateTime = timestamp, Extension = ".pdf", Converted = false },
+                                new() { OrderNumber = model.OrderNumber, Name = xmlName, Route = folderPath, DateTime = timestamp, Extension = ".xml", Converted = false },
+                                new() { OrderNumber = model.OrderNumber, Name = xmlName, Route = folderPath, DateTime = timestamp, Extension = ".pdf", Converted = true }
                             };
                 XmlServicio.SaveFilesToDatabase(archivos);
 
@@ -531,7 +532,8 @@ namespace WebProveedoresN.Controllers
             return RedirectToAction("Details", new { orderNumber });
         }
 
-        public async Task<IActionResult> ObtenerDocumentos(string orderNumber)
+        [HttpGet]
+        public async Task<IActionResult> ObtenerDocumentos(int orderNumber)
         {
             var documents = await DBFiles.ObtenerDocumentosAsync(orderNumber);
             if (documents != null && documents.Count > 0)

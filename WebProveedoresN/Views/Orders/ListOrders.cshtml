@@ -34,13 +34,13 @@ else
                     <table class="table table-striped table-hover">
                         <thead class="table-dark">
                             <tr>
-                                <th>Numero de Orden</th>
-                                <th>Fecha</th>
-                                <th>Importe Total</th>
-                                <th>Moneda</th>
-                                <th># Factura(s)</th>
-                                <th>Monto factura(s)</th>
-                                <th></th>
+                                <th>@Html.DisplayNameFor(model => model.First().OrderNumber)</th>
+                                <th>@Html.DisplayNameFor(model => model.First().OrderDate)</th>
+                                <th>@Html.DisplayNameFor(model => model.First().TotalAmount)</th>
+                                <th>@Html.DisplayNameFor(model => model.First().DocCurOrder)</th>
+                                <th>@Html.DisplayNameFor(model => model.First().Invoices)</th>
+                                <th>@Html.DisplayNameFor(model => model.First().TotalInvoice)</th>
+                                <th>Acciones</th>
                             </tr>
                         </thead>
                         <tbody>

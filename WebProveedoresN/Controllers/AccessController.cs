@@ -18,6 +18,7 @@ namespace WebProveedoresN.Controllers
         [HttpPost]
         public async Task<IActionResult> Login(LoginDTO loginDTO)
         {
+            ViewBag.Message = null;
             if (!ModelState.IsValid)
             {
                 return View(loginDTO);
@@ -32,6 +33,10 @@ namespace WebProveedoresN.Controllers
                 else if (usuario.Restablecer)
                 {
                     ViewBag.Message = $"Se ha solicitado restablecer su cuenta, favor revise su bandeja del correo {usuario.Correo}.";
+                }
+                else if (usuario.IdStatus != 1)
+                {
+                    ViewBag.Message = $"Cuenta bloqueada, comuniquese con su administrador.";
                 }
                 else
                 {

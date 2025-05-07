@@ -24,6 +24,7 @@ namespace WebProveedoresN.Models
 
         [Required(ErrorMessage = "El campo {0} es obligatorio.")]
         [MaxLength(100, ErrorMessage = "El campo {0} no puede tener más de {1} caracteres")]
+        [Display(Name = "Correo")]
         public string Correo { get; set; } = null!;
 
         [Required(ErrorMessage = "El campo {0} es obligatorio.")]
@@ -32,13 +33,17 @@ namespace WebProveedoresN.Models
         public string Clave { get; set; } = null!;
 
         public bool Restablecer { get; set; }
+
+        [Display(Name = "Confirmado")]
         public bool Confirmado { get; set; }
         public string Token { get; set; } = null!;
 
         [Required(ErrorMessage = "El campo {0} es obligatorio.")]
+        [Display(Name = "Estatus")]
         public int IdStatus { get; set; }
 
         [Required(ErrorMessage = "El campo {0} es obligatorio.")]
+        [Display(Name = "Roles")]
         public List<string> Roles { get; set; } = [];
     }
 }

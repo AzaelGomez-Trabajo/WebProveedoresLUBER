@@ -21,22 +21,22 @@ namespace WebProveedoresN.Models
         [Display(Name = "Cantidad")]
         public decimal QuantityOrder { get; set; } = 0;
 
-        [Display(Name = "Cantidad faltante")]
+        [Display(Name = "Cantidad Faltante")]
         public decimal OpenQty { get; set; } = 0;
 
         [DisplayName("Moneda")]
         public string DocCurOrder { get; set; } = null!;
 
-        [Display(Name = "Impuesto")]
+        [Display(Name = "IVA")]
         public decimal Tax { get; set; } = 0;
 
-        [Display(Name = "Precio por Artículo")]
+        [Display(Name = "Precio Unitario")]
         public decimal PricePerItem { get; set; }
 
         [Display(Name = "Total por Artículo")]
         public decimal TotalItem { get; set; }
 
-        [Display(Name = "Total/Impuesto/Artículo")]
+        [Display(Name = "Total")]
         public decimal TotalTaxItem { get; set; }
 
         [Display(Name = "Faltante")]

@@ -2,12 +2,11 @@
 @{
     ViewData["Title"] = "Editar";
     Layout = "~/Views/Shared/_Layout.cshtml";
-    var message = TempData["Message"] as string;
     var status = ViewBag.Status as List<StatusDTO>;
 }
 <div class="card">
     <div class="card-header">
-        <h3>Editar Usuario</h3>
+        <H2>Editar Usuario</H2>
     </div>
     <div class="card-body">
         <form asp-action="Editar" asp-controller="Start" method="post">
@@ -19,27 +18,27 @@
             <input asp-for="Restablecer" type="hidden" class="form-control" />
             <input asp-for="Roles" type="hidden" class="form-control" />
             <input asp-for="SupplierCode" type="hidden" class="form-control" />
-            @if (!string.IsNullOrEmpty(message))
+            @if (ViewBag.Message != null)
             {
                 <div class="alert alert-info">
-                    @message
+                    @ViewBag.Message
                 </div>
             }
             <div class="mb-3">
-                <label class="form-label">Nombre Completo </label>
+                <label class="form-label">@Html.DisplayNameFor(model => model.Nombre): </label>
                 <input asp-for="Nombre" type="text" class="form-control">
                 <span asp-validation-for="Nombre" class="text-danger"></span>
             </div>
             <div class="mb-3">
-                <label class="form-label">Correo</label>
+                <label class="form-label">@Html.DisplayNameFor(model => model.Correo):</label>
                 <input asp-for="Correo" type="email" class="form-control">
                 <span asp-validation-for="Correo" class="text-danger"></span>
             </div>
             <div class="mb-3">
-                <label for="Esta">Estatus</label>
+                <label for="Esta">@Html.DisplayNameFor(model => model.IdStatus)</label>
                 <select asp-for="IdStatus" class="form-select" id="Esta">
                     <option selected>Seleccione de estatus</option>
-                    @foreach (var items in status)
+                    @foreach (var items in status!)
                     {
                         <option value="@items.IdStatus">@items.Status</option>
                     }
@@ -49,8 +48,8 @@
 
             <button type="submit" class="btn btn-outline-primary btn-sm">
                 <i class="bi bi-floppy2-fill"> Guardar</i>
-            </button> |
-            <a asp-action="Listar" asp-controller="Start" class="btn btn-outline-info btn-sm">
+            </button>  
+            <a asp-action="Listar" class="btn btn-outline-info btn-sm fs-7">
                 <i class="bi bi-arrow-left-circle"> Regresar</i>
             </a>
         </form>

@@ -31,12 +31,12 @@ else
             <div class="row">
                 <div class="col-4">
                     <div class="mb-1">
-                        <p><strong>Número de Orden:</strong> @Model.Orders.OrderNumber.ToString()</p>
-                        <p><strong>Fecha:</strong> @(Model.Orders.OrderDate.ToString() != null ? ((DateTime)Model.Orders.OrderDate).ToShortDateString() : "No disponible")</p>
-                        <p><strong>Importe Total:</strong> @(Model.Orders.TotalAmount.ToString() != null ? ((decimal)Model.Orders.TotalAmount).ToString("C") : "No disponible")</p>
-                        <p><strong>Moneda:</strong> @(Model.Orders.DocCurOrder ?? "No disponible")</p>
-                        <p><strong># Factura(s):</strong> @(Model.Orders.Invoices.ToString() ?? "0")</p>
-                        <p><strong>Monto factura(s):</strong> @(Model.Orders.TotalInvoice.ToString() != null ? ((decimal)Model.Orders.TotalInvoice).ToString("C") : "0")</p>
+                        <p><strong>@Html.DisplayNameFor(model => model.Orders!.OrderNumber):</strong> @Model.Orders.OrderNumber.ToString()</p>
+                        <p><strong>@Html.DisplayNameFor(model => model.Orders!.OrderDate):</strong> @(Model.Orders.OrderDate.ToString() != null ? ((DateTime)Model.Orders.OrderDate).ToShortDateString() : "No disponible")</p>
+                        <p><strong>@Html.DisplayNameFor(model => model.Orders!.TotalAmount):</strong> @(Model.Orders.TotalAmount.ToString() != null ? ((decimal)Model.Orders.TotalAmount).ToString("C") : "No disponible")</p>
+                        <p><strong>@Html.DisplayNameFor(model => model.Orders!.DocCurOrder):</strong> @(Model.Orders.DocCurOrder ?? "No disponible")</p>
+                        <p><strong>@Html.DisplayNameFor(model => model.Orders!.Invoices):</strong> @(Model.Orders.Invoices.ToString() ?? "0")</p>
+                        <p><strong>@Html.DisplayNameFor(model => model.Orders!.TotalInvoice):</strong> @(Model.Orders.TotalInvoice.ToString() != null ? ((decimal)Model.Orders.TotalInvoice).ToString("C") : "0")</p>
                     </div>
                 </div>
                 <div class="col-8 ms-auto">
@@ -44,13 +44,13 @@ else
                         <table class="table-striped table-hover" style="border: 2px solid black; border-collapse:collapse; width: 100%;">
                             <thead class="table-dark">
                                 <tr style="border: 1px solid black">
-                                    <th class="text-center">Código del Artículo</th>
-                                    <th class="text-center">Cantidad </th>
-                                    <th class="text-center">Faltante</th>
-                                    <th class="text-center">Precio Unitario</th>
-                                    <th class="text-center">Importe </th>
-                                    <th class="text-center">IVA</th>
-                                    <th class="text-center">Importe Total</th>
+                                    <th>@Html.DisplayNameFor(model => model.OrderDetails!.First().ItemCode) </th>
+                                    <th class="text-center">@Html.DisplayNameFor(model => model.OrderDetails!.First().QuantityOrder)</th>
+                                    <th class="text-center">@Html.DisplayNameFor(model => model.OrderDetails!.First().OpenQty)</th>
+                                    <th class="text-center">@Html.DisplayNameFor(model => model.OrderDetails!.First().PricePerItem)</th>
+                                    <th class="text-center">@Html.DisplayNameFor(model => model.OrderDetails!.First().TotalItem)</th>
+                                    <th class="text-center">@Html.DisplayNameFor(model => model.OrderDetails!.First().Tax)</th>
+                                    <th class="text-center">@Html.DisplayNameFor(model => model.OrderDetails!.First().TotalTaxItem)</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -86,37 +86,37 @@ else
                     @if (Model.OrderDetailsGoodsReceipt != null && Model.OrderDetailsGoodsReceipt.Any(x => x.DocNum != 0))
                     {
                         <div class="table-responsive">
-                                <input type="hidden" name="orderNumber" value="@Model.Orders.OrderNumber" />
-                                <table class="table table-striped">
-                                    <thead class="table-dark">
-                                        <tr>
-                                            <th class="text-center">#</th>
-                                            <th class="text-center">Factura</th>
-                                            <th class="text-center">Codigo del Artículo</th>
-                                            <th class="text-center">Estatus</th>
-                                            <th class="text-center">Moneda</th>
-                                            <th class="text-center">Cantidad</th>
-                                            <th class="text-center">Total</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        @foreach (var item in Model.OrderDetailsGoodsReceipt)
+                            <input type="hidden" name="orderNumber" value="@Model.Orders.OrderNumber" />
+                            <table class="table table-striped">
+                                <thead class="table-dark">
+                                    <tr>
+                                        <th class="text-center">@Html.DisplayNameFor(model => model.OrderDetailsGoodsReceipt!.First().DocNum)</th>
+                                        <th class="text-center">@Html.DisplayNameFor(model => model.OrderDetailsGoodsReceipt!.First().InvoiceSupplier)</th>
+                                        <th class="text-center">@Html.DisplayNameFor(model => model.OrderDetailsGoodsReceipt!.First().ItemCode)</th>
+                                        <th class="text-center">@Html.DisplayNameFor(model => model.OrderDetailsGoodsReceipt!.First().DocStatus)</th>
+                                        <th class="text-center">@Html.DisplayNameFor(model => model.OrderDetailsGoodsReceipt!.First().DocCur)</th>
+                                        <th class="text-center">@Html.DisplayNameFor(model => model.OrderDetailsGoodsReceipt!.First().Quantity)</th>
+                                        <th class="text-center">@Html.DisplayNameFor(model => model.OrderDetailsGoodsReceipt!.First().Total)</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach (var item in Model.OrderDetailsGoodsReceipt)
+                                    {
+                                        @if (item.DocNum != 0)
                                         {
-                                            @if (item.DocNum != 0)
-                                            {
-                                                <tr>
-                                                    <td class="text-center">@item.DocNum</td>
-                                                    <td class="text-center">@item.InvoiceSupplier</td>
-                                                    <td>@item.ItemCode</td>
-                                                    <td class="text-center">@item.DocStatus</td>
-                                                    <td class="text-center">@item.DocCur</td>
-                                                    <td class="text-end">@string.Format("{0:N2}", item.Quantity)</td>
-                                                    <td class="text-end">@string.Format("{0:C2}", item.Total)</td>
-                                                </tr>
-                                            }
+                                            <tr>
+                                                <td class="text-center">@item.DocNum</td>
+                                                <td class="text-center">@item.InvoiceSupplier</td>
+                                                <td>@item.ItemCode</td>
+                                                <td class="text-center">@item.DocStatus</td>
+                                                <td class="text-center">@item.DocCur</td>
+                                                <td class="text-end">@string.Format("{0:N2}", item.Quantity)</td>
+                                                <td class="text-end">@string.Format("{0:C2}", item.Total)</td>
+                                            </tr>
                                         }
-                                    </tbody>
-                                </table>
+                                    }
+                                </tbody>
+                            </table>
                             <button class="btn btn-outline-secondary btn-sm" @(Model.Orders.Invoices == 0 ? "disabled" : "") onclick="mostrarDocumentos(@Model.Orders.OrderNumber)">
                                 <i class="bi bi-cloud-download-fill"> Mostrar Factura</i>
                             </button>
@@ -125,7 +125,8 @@ else
                             </button>
 
                             <div id="embed-container-@Model.Orders.OrderNumber" style="display:none;">
-                                <div id="embed-list-@Model.Orders.OrderNumber"></div>
+                                <div id="embed-list-@Model.Orders.OrderNumber" style="display: flex; justify-content: center; align-items: center; width: 100%; height: auto; max-height: 80vh; overflow: auto;">
+                                </div>
                             </div>
                         </div>
                     }
@@ -154,11 +155,11 @@ else
                         if (response.documents.length > 0) {
                             response.documents.forEach(function (document) {
                                 var embedElement = $('<embed>', {
-                                    src: '/UploadedFiles/' + document.name + document.extension,
+                                    src: '/UploadedFiles/' + document.dateTime + '_' + document.orderNumber + '_' + document.name + document.extension,
                                     type: 'application/pdf',
-                                    width: '100%',
+                                    width: '90%',
                                     height: '500px',
-                                    class: 'mb-2'
+                                    class: 'mb-2',
                                 });
                                 embedList.append(embedElement);
                             });

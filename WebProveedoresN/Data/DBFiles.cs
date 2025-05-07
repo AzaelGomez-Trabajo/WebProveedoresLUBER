@@ -141,7 +141,7 @@ namespace WebProveedoresN.Data
             return isValid!;
         }
 
-        public static async Task<List<FileDTO>> ObtenerDocumentosAsync(string orderNumber)
+        public static async Task<List<FileDTO>> ObtenerDocumentosAsync(int orderNumber)
         {
             var documents = new List<FileDTO>();
 
@@ -160,10 +160,11 @@ namespace WebProveedoresN.Data
                     {
                         documents.Add(new FileDTO
                         {
-                            Name = reader["Name"].ToString(),
+                            Name = reader["Name"].ToString()!,
+                            OrderNumber = Convert.ToInt32(reader["OrderNumber"]),
                             Extension = ".pdf",
-                            Route = reader["Route"].ToString(),
-                            DateTime = reader["DateTime"].ToString(),
+                            Route = reader["Route"].ToString()!,
+                            DateTime = reader["DateTime"].ToString()!,
                         });
                     }
                 }

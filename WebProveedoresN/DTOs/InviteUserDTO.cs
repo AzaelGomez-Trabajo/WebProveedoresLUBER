@@ -9,7 +9,7 @@ namespace WebProveedoresN.DTOs
         [Required(ErrorMessage = "El campo {0} es obligatorio.")]
         public string Email { get; set; } = null!;
 
-        [Display(Name = "Nombre")]
+        [Display(Name = "Nombre Completo")]
         [Required(ErrorMessage = "El campo {0} es obligatorio.")]
         public string Name { get; set; } = null!;
 

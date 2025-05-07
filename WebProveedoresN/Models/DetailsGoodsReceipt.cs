@@ -4,10 +4,10 @@ namespace WebProveedoresN.Models
 {
     public class DetailsGoodsReceipt
     {
-        [Display(Name = "Número de Documento")]
+        [Display(Name = "Número de Entrada")]
         public int? DocNum { get; set; }
 
-        [Display(Name = "Factura proveedor")]
+        [Display(Name = "Factura")]
         public string InvoiceSupplier { get; set; } = null!;
 
         [Display(Name = "Código de Artículo")]
@@ -16,16 +16,16 @@ namespace WebProveedoresN.Models
         [Display(Name = "Cantidad faltante")]
         public decimal OpenQty { get; set; } = 0;
 
-        [Display(Name = "Estado del Documento")]
+        [Display(Name = "Estado")]
         public string? DocStatus { get; set; }
 
         [Display(Name = "Moneda")]
         public string? DocCur { get; set; }
 
-        [Display(Name = "Cantidad Cubierta")]
+        [Display(Name = "Cantidad")]
         public decimal? Quantity { get; set; } = 0;
 
-        [Display(Name = "Faltante")]
+        [Display(Name = "Importe")]
         public decimal? Total { get; set; } = 0;
 
     }

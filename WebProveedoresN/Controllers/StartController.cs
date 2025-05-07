@@ -115,9 +115,9 @@ namespace WebProveedoresN.Controllers
             {
                 SupplierName = TempData["SupplierName"]?.ToString() ?? string.Empty,
                 SupplierCode = TempData["SupplierCode"]?.ToString() ?? string.Empty,
-                Nombre = registerDTO.Nombre,
-                Correo = registerDTO.Correo,
-                Clave = registerDTO.Clave,
+                Nombre = registerDTO.Name,
+                Correo = registerDTO.Email,
+                Clave = registerDTO.Password,
                 //Roles = new List<string> { "Proveedor" }
             };
             if (model.Clave != null)
@@ -157,12 +157,32 @@ namespace WebProveedoresN.Controllers
             return RedirectToAction("Guardar");
         }
 
-        [Authorize(Roles = "Administrador")]
-        public IActionResult Editar(string token)
+        [HttpPost("Editar2")]
+        public IActionResult Editar2(string token)
         {
+            if(string.IsNullOrEmpty(token))
+            {
+                return BadRequest("Faltan datos necesarios para procesar la solicitud.");
+            }
+            TempData["Token"] = token;
+            try
+            {
+                return Redirect("/Start/Editar");
+            }
+            catch (Exception ex)
+            {
+                return BadRequest($"Error en la redireccion: {ex.Message}");
+            }
+        }
+
+        [Authorize(Roles = "Administrador")]
+        [HttpGet]
+        public IActionResult Editar()
+        {
+            var token = TempData["Token"] as string;
             // Metodo solo devuelve la vista
             ViewBag.Status = StatusService.GetStatus() ?? [];
-            var usuario = DBStart.GetUserByToken(token);
+            var usuario = DBStart.GetUserByToken(token!);
 
             return View(usuario);
         }
@@ -171,13 +191,14 @@ namespace WebProveedoresN.Controllers
         [Authorize(Roles = "Administrador")]
         public IActionResult Editar(Usuario model)
         {
+            ViewBag.Message = null;
             if (!ModelState.IsValid)
             {
                 ViewBag.Status = StatusService.GetStatus() ?? [];
                 return View();
             }
             var respuesta = DBStart.Editar(model);
-            TempData["Message"] = respuesta;
+            ViewBag.Message = respuesta;
             if (respuesta.Contains("exitosamente"))
             {
                 return RedirectToAction("Listar");

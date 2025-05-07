@@ -31,12 +31,12 @@
                         <form action="@Url.Action("Register","Start")" method="post">
                             @Html.AntiForgeryToken()
                              <div class="mb-3">
-                                <label>Empresa</label>
+                                <label>@Html.DisplayNameFor(model => model.Name)</label>
                                 <input type="text" class="form-control" name="Name" />
                                 <span asp-validation-for="Name" class="text-danger"></span>
                             </div>
                             <div class="mb-3">
-                                <label>Codigo</label>
+                                <label>@Html.DisplayNameFor(model => model.Code)</label>
                                 <input type="text" class="form-control" name="Code" />
                                 <span asp-validation-for="Code" class="text-danger"></span>
                             </div>

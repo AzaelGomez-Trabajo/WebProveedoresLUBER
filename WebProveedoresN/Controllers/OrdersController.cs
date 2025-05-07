@@ -113,33 +113,6 @@ namespace WebProveedoresN.Controllers
             }
         }
 
-        [HttpGet]
-        public async Task<IActionResult> ObtenerDocumentos(int orderNumber)
-        {
-            // Simulación de obtención de documentos desde la base de datos
-            var documents = await DBFiles.ObtenerDocumentosAsync(orderNumber);
-
-            if (documents != null && documents.Count > 0)
-            {
-                // Retornar los documentos en formato JSON
-                return Json(new
-                {
-                    success = true,
-                    documents = documents.Select(doc => new
-                    {
-                        name = doc.Name,
-                        extension = doc.Extension
-                    })
-                });
-            }
-
-            // Si no se encuentran documentos, retornar un mensaje de error
-            return Json(new
-            {
-                success = false,
-                message = "No se encontraron documentos para esta orden."
-            });
-        }
 
         [HttpPost("CloseEmbed")]
         public IActionResult CloseEmbed()

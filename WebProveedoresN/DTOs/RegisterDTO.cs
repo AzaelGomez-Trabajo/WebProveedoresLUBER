@@ -5,15 +5,18 @@ namespace WebProveedoresN.DTOs
     public class RegisterDTO
     {
         [Required(ErrorMessage = "El campo {0} es obligatorio.")]
-        public string Nombre { get; set; } = null!;
+        [Display(Name = "Nombre Completo")]
+        public string Name { get; set; } = null!;
 
         [Required(ErrorMessage = "El campo {0} es obligatorio.")]
         [DataType(DataType.EmailAddress)]
-        public string Correo { get; set; } = null!;
+        [Display(Name = "Correo")]
+        public string Email { get; set; } = null!;
 
         [Required(ErrorMessage = "El campo {0} es obligatorio.")]
         [DataType(DataType.Password)]
-        public string Clave { get; set; } = null!;
+        [Display(Name = "Contraseña")]
+        public string Password { get; set; } = null!;
 
     }
 }
