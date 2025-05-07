@@ -110,6 +110,7 @@ namespace WebProveedoresN.Data
                         order = new Order()
                         {
                             DocumentType = dr["DocumentType"].ToString(),
+                            OrderNumber = (int)dr["OrderNumber"],
                             OrderDate = (DateTime)dr["OrderDate"],
                             Canceled = dr["Canceled"].ToString(),
                             IdEstatus = dr["IdEstatus"].ToString(),
@@ -129,8 +130,6 @@ namespace WebProveedoresN.Data
             }
             return order;
         }
-
-
 
         public static bool ValidateOrderNumberInDatabase(ValidateOrderNumberDTO model)
         {

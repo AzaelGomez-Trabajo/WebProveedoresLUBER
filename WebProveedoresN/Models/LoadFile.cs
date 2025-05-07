@@ -10,16 +10,14 @@ namespace WebProveedoresN.Models
         //[FileExtensions(Extensions = ".pdf", ErrorMessage = "Por favor, suba un archivo PDF.")]
         [FileSize(2 * 1024 * 1024)]
         public IFormFile FilePDF { get; set; } = null!;
+        
         [Required(ErrorMessage = "El campo {0} es obligatorio.")]
         [DisplayName("Archivo XML")]
         //[FileExtensions(Extensions = ".xml", ErrorMessage = "Por favor, suba un archivo XML.")]
-        public IFormFile? FileXML { get; set; } = null!;
+        public IFormFile FileXML { get; set; } = null!;
 
-        [Required]
-        [DisplayName("Número de Orden de Compra")]
         public int OrderNumber { get; set; }
 
-        public List<int> SelectedDocuments { get; set; } = [];
     }
     public class FileSizeAttribute : ValidationAttribute
     {

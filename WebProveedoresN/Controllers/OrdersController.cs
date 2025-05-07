@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using WebProveedoresN.Data;
 using WebProveedoresN.DTOs;
 using WebProveedoresN.Interfaces;
 using WebProveedoresN.Models;
@@ -70,7 +71,14 @@ namespace WebProveedoresN.Controllers
             {
                 return BadRequest("El número de orden no puede estar vacío.");
             }
-            var orders = await _orderService.GetOrderByOrderNumberAsync(orderDetailDTO);
+            var order = new OrderDetailDTO
+            {
+                Action = 2,
+                OrderNumber = orderDetailsDTO.OrderNumber,
+                SupplierCode = User.FindFirst("SupplierCode")!.Value,
+                DocumentType = ""
+            };
+            var orders = await _orderService.GetOrderByOrderNumberAsync(order);
             if (orderDetailsDTO.DocumentType == "Pedido")
             {
                 var orderInvoices = await _orderService.GetOrderInvoicesByOrderNumberAsync(orderDetailDTO.OrderNumber);
@@ -103,6 +111,34 @@ namespace WebProveedoresN.Controllers
                 }
                 return View("OrderDetailsOffer", viewModel);
             }
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> ObtenerDocumentos(int orderNumber)
+        {
+            // Simulación de obtención de documentos desde la base de datos
+            var documents = await DBFiles.ObtenerDocumentosAsync(orderNumber);
+
+            if (documents != null && documents.Count > 0)
+            {
+                // Retornar los documentos en formato JSON
+                return Json(new
+                {
+                    success = true,
+                    documents = documents.Select(doc => new
+                    {
+                        name = doc.Name,
+                        extension = doc.Extension
+                    })
+                });
+            }
+
+            // Si no se encuentran documentos, retornar un mensaje de error
+            return Json(new
+            {
+                success = false,
+                message = "No se encontraron documentos para esta orden."
+            });
         }
 
         [HttpPost("CloseEmbed")]

@@ -37,9 +37,9 @@ namespace WebProveedoresN.Services
 
         public async Task<Order> GetOrderByOrderNumberAsync(OrderDetailDTO orderDetailDTO)
         {
-            //var order = DBOrders.GetOrderByOrderNumber2(orderDetailDTO);
+            var order = DBOrders.GetOrderByOrderNumber2(orderDetailDTO);
             // Obtener todos los registros desde la base de datos
-            var order = DBOrders.GetOrderByOrderNumber(orderDetailDTO.OrderNumber);
+            //var order = DBOrders.GetOrderByOrderNumber(orderDetailDTO.OrderNumber);
             if (order == null)
             {
                 return null!;

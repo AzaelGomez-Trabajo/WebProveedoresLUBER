@@ -86,12 +86,10 @@ else
                     @if (Model.OrderDetailsGoodsReceipt != null && Model.OrderDetailsGoodsReceipt.Any(x => x.DocNum != 0))
                     {
                         <div class="table-responsive">
-                            <form id="uploadForm" asp-action="Upload" asp-controller="Files" method="post" style="display:inline;" onsubmit="return validarYRedirigir()">
                                 <input type="hidden" name="orderNumber" value="@Model.Orders.OrderNumber" />
                                 <table class="table table-striped">
                                     <thead class="table-dark">
                                         <tr>
-                                            <th>@*<input type="checkbox" id="selectAll" />*@</th>
                                             <th class="text-center">#</th>
                                             <th class="text-center">Factura</th>
                                             <th class="text-center">Codigo del Artículo</th>
@@ -107,8 +105,6 @@ else
                                             @if (item.DocNum != 0)
                                             {
                                                 <tr>
-                                                    <td><input type="checkbox" name="selectedDocuments" value="@item!.InvoiceSupplier"
-                                                        @((item.DocStatus! != "O" || item.OpenQty  != 0) ? "disabled" : "")/></td>
                                                     <td class="text-center">@item.DocNum</td>
                                                     <td class="text-center">@item.InvoiceSupplier</td>
                                                     <td>@item.ItemCode</td>
@@ -121,10 +117,6 @@ else
                                         }
                                     </tbody>
                                 </table>
-                                <button type="submit" class="btn btn-outline-primary btn-sm" @((decimal)Model.Orders.TotalAmount <= (decimal)Model.Orders.TotalInvoice ? "disabled" : "")>
-                                    <i class="bi bi-cloud-upload-fill"> Cargar Factura</i>
-                                </button>
-                            </form>
                             <button class="btn btn-outline-secondary btn-sm" @(Model.Orders.Invoices == 0 ? "disabled" : "") onclick="mostrarDocumentos(@Model.Orders.OrderNumber)">
                                 <i class="bi bi-cloud-download-fill"> Mostrar Factura</i>
                             </button>
@@ -147,32 +139,6 @@ else
     </div>
 }
 @section Scripts {
-    <script>
-        function validarYRedirigir() {
-            // Seleccionar todos los checkboxes con el nombre "selectedDocuments"
-            const checkboxes = document.querySelectorAll('input[name="selectedDocuments"]:checked');
-
-            // Validar si al menos un checkbox está seleccionado
-            if (checkboxes.length === 0) {
-                alert('Por favor, selecciona al menos un documento antes de continuar.');
-                return false; // Evita la redirección
-            }
-
-            // Redirigir a la vista Upload
-            const orderNumber = document.querySelector('input[name="orderNumber"]').value;
-            window.location.href = `/Files/Upload?orderNumber=${orderNumber}`;
-            return true; // Permite la redirección
-        }
-
-    </script>
-    <script>
-        document.getElementById('selectAll').addEventListener('change', function () {
-            const checkboxes = document.querySelectorAll('input[name="selectedDocuments"]');
-            checkboxes.forEach(checkbox => {
-                checkbox.checked = this.checked;
-            });
-        });
-    </script>
     <script>
         function mostrarDocumentos(orderNumber) {
             $.ajax({
