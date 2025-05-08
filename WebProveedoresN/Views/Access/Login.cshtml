@@ -19,22 +19,22 @@
                 <div class="card-header"><h3 class="text-center">Login</h3></div>
                 <div class="card-body">
 
-                    <form asp-action ="Login" asp-controller="Access" method="post">
-
+                    <form asp-action="Login" asp-controller="Access" method="post">
+                        @Html.AntiForgeryToken()
                         <div class="mb-3">
-                            <label class="form-label">@Html.DisplayNameFor(model => model.Email):</label>
-                            <input type="email" class="form-control" asp-for="Email" />
-                            <span asp-validation-for="Email" class="text-danger"></span>
+                            @Html.LabelFor(model => model.Email, htmlAttributes: new { @class = "control-label" })
+                            @Html.TextBoxFor(model => model.Email, new { @class = "form-control", type = "email" })
+                            @Html.ValidationMessageFor(model => model.Email, "", new { @class = "text-danger" })
                         </div>
                         <div class="mb-3">
-                            <label class="form-label">@Html.DisplayNameFor(model => model.Password):</label>
-                            <input type="password" class="form-control" asp-for="Password" />
-                            <span asp-validation-for="Password" class="text-danger"></span>
+                            @Html.LabelFor(model => model.Password, htmlAttributes: new { @class = "control-label" })
+                            @Html.PasswordFor(model => model.Password, new { @class = "form-control" })
+                            @Html.ValidationMessageFor(model => model.Password, "", new { @class = "text-danger" })
                         </div>
                         @if (ViewBag.Message != null)
                         {
                             <div class="alert alert-danger">
-                                @ViewBag.Message
+                                @Html.Encode(ViewBag.Message)
                             </div>
                         }
 

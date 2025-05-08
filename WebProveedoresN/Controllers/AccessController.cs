@@ -4,12 +4,20 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
 using WebProveedoresN.DTOs;
+using WebProveedoresN.Repositories.Interfaces;
 using WebProveedoresN.Services;
 
 namespace WebProveedoresN.Controllers
 {
     public class AccessController : Controller
     {
+        private readonly IUserRepository _userRepository;
+
+        public AccessController(IUserRepository userRepository)
+        {
+            _userRepository = userRepository;
+        }
+
         public IActionResult Login()
         {
             return View();
@@ -23,18 +31,18 @@ namespace WebProveedoresN.Controllers
             {
                 return View(loginDTO);
             }
-            var usuario = StartService.ValidateUser(loginDTO.Email, UtilityService.ConvertirSHA256(loginDTO.Password));
-            if (usuario != null && usuario.Nombre != null)
+            var user = await _userRepository.ValidateUserAsync(loginDTO.Email, UtilityService.ConvertirSHA256(loginDTO.Password));
+            if (user != null && user.FullName != null)
             {
-                if (!usuario.Confirmado)
+                if (!user.Confirmado)
                 {
-                    ViewBag.Message = $"Falta confirmar su cuenta, favor revise su bandeja del correo {usuario.Correo}.";
+                    ViewBag.Message = $"Falta confirmar su cuenta, favor revise su bandeja del correo {user.Email}.";
                 }
-                else if (usuario.Restablecer)
+                else if (user.Restablecer)
                 {
-                    ViewBag.Message = $"Se ha solicitado restablecer su cuenta, favor revise su bandeja del correo {usuario.Correo}.";
+                    ViewBag.Message = $"Se ha solicitado restablecer su cuenta, favor revise su bandeja del correo {user.Email}.";
                 }
-                else if (usuario.IdStatus != 1)
+                else if (user.IdStatus != 1)
                 {
                     ViewBag.Message = $"Cuenta bloqueada, comuniquese con su administrador.";
                 }
@@ -43,15 +51,15 @@ namespace WebProveedoresN.Controllers
                     // crear las claims para el usuario con las cookies
                     var claims = new List<Claim>
                     {
-                        new(ClaimTypes.Name, usuario.Nombre),
-                        new(ClaimTypes.Email, usuario.Correo),
-                        new("SupplierCode", usuario.SupplierCode),
-                        new("SupplierName", usuario.SupplierName),
-                        new("IdUsuario", usuario.IdUsuario.ToString()),
+                        new(ClaimTypes.Name, user.FullName),
+                        new(ClaimTypes.Email, user.Email),
+                        new("SupplierCode", user.SupplierCode),
+                        new("SupplierName", user.SupplierName),
+                        new("Token", user.Token.ToString()),
                     };
 
                     // agregar los roles del usuario
-                    foreach (var rol in usuario.Roles)
+                    foreach (var rol in user.Roles)
                     {
                         claims.Add(new Claim(ClaimTypes.Role, rol));
                     }

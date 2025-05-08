@@ -5,9 +5,9 @@ namespace WebProveedoresN.ViewModel
 {
     public class CombinedDetailsOrderViewModel
     {
-        public Order? Orders { get; set; }
-        public List<OrderDetail>? OrderDetails { get; set; }
-        public List<DetailsGoodsReceipt>? OrderDetailsGoodsReceipt { get; set; }
+        public OrderModel? Orders { get; set; }
+        public List<OrderDetailModel>? OrderDetails { get; set; }
+        public List<DetailsGoodsReceiptModel>? OrderDetailsGoodsReceipt { get; set; }
         public List<OrderInvoicesDTO>? OrderInvoices { get; set; }
     }
 }

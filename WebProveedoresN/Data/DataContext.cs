@@ -10,15 +10,15 @@ namespace WebProveedoresN.Data
                 
         }
 
-        public DbSet<Order> Orders { get; set; }
+        public DbSet<OrderModel> Orders { get; set; }
         
-        public DbSet<Supplier> Suppliers { get; set; }
+        public DbSet<SupplierModel> Suppliers { get; set; }
         
-        public DbSet<Usuario> Usuarios { get; set; }
+        public DbSet<UserModel> Usuarios { get; set; }
 
-        public DbSet<FileDTO> Files { get; set; }
+        public DbSet<FileModel> Files { get; set; }
         
-        public DbSet<StatusDTO> Status { get; set; }
+        public DbSet<StatusModel> Status { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

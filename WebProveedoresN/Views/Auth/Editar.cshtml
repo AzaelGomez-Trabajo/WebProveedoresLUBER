@@ -1,0 +1,51 @@
+﻿@using WebProveedoresN.DTOs
+@model UpdateUserDTO
+@{
+    ViewData["Title"] = "Editar";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    var status = ViewBag.Status as List<StatusModel>;
+}
+<div class="card">
+    <div class="card-header">
+        <H2>Editar Usuario</H2>
+    </div>
+    <div class="card-body">
+        <form asp-action="Editar" asp-controller="Auth" method="post">
+            <input asp-for="Token" type="hidden" class="form-control" />
+            @if (ViewBag.Message != null)
+            {
+                <div class="alert alert-info">
+                    @ViewBag.Message
+                </div>
+            }
+            <div class="mb-3">
+                <label class="form-label">@Html.DisplayNameFor(model => model.FullName): </label>
+                <input asp-for="FullName" type="text" class="form-control">
+                <span asp-validation-for="FullName" class="text-danger"></span>
+            </div>
+            <div class="mb-3">
+                <label class="form-label">@Html.DisplayNameFor(model => model.Email):</label>
+                <input asp-for="Email" type="email" class="form-control">
+                <span asp-validation-for="Email" class="text-danger"></span>
+            </div>
+            <div class="mb-3">
+                <label for="Esta">@Html.DisplayNameFor(model => model.StatusId)</label>
+                <select asp-for="StatusId" class="form-select" id="Esta">
+                    <option selected>Seleccione de estatus</option>
+                    @foreach (var items in status!)
+                    {
+                        <option value="@items.IdStatus">@items.Status</option>
+                    }
+                </select>
+                <span asp-validation-for="StatusId" class="text-danger"></span>
+            </div>
+
+            <button type="submit" class="btn btn-outline-primary btn-sm">
+                <i class="bi bi-floppy2-fill"> Guardar</i>
+            </button>  
+            <a asp-action="Index" class="btn btn-outline-info btn-sm fs-7">
+                <i class="bi bi-arrow-left-circle"> Regresar</i>
+            </a>
+        </form>
+    </div>
+</div>

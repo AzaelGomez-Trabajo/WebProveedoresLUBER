@@ -5,10 +5,10 @@ namespace WebProveedoresN.Data
 {
     public class DBStatus
     {
-        public static List<StatusDTO> GetStatus()
+        public static List<StatusModel> GetStatus()
         {
-            var status = new List<StatusDTO>();
-            using (var conexion = DBConnectiion.GetConnection())
+            var status = new List<StatusModel>();
+            using (var conexion = DBConnection.GetConnection())
             {
                 conexion.Open();
                 var query = "SELECT Id, Name FROM Status";
@@ -18,7 +18,7 @@ namespace WebProveedoresN.Data
                     {
                         while (dr.Read())
                         {
-                            status.Add(new StatusDTO
+                            status.Add(new StatusModel
                             {
                                 IdStatus = Convert.ToInt32(dr["Id"]),
                                 Status = dr["Name"].ToString()

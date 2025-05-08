@@ -3,8 +3,8 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.FileProviders;
 using SW.Services;
 using WebProveedoresN.Data;
-using WebProveedoresN.Interfaces;
-using WebProveedoresN.Services;
+using WebProveedoresN.Repositories.Implementations;
+using WebProveedoresN.Repositories.Interfaces;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -33,8 +33,9 @@ builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationSc
 builder.Services.AddHttpContextAccessor();
 
 //Registrar IIPService
-builder.Services.AddScoped<IIPService, IPService>();
-builder.Services.AddScoped<IOrderService, OrderService>();
+builder.Services.AddScoped<IIPRepository, IPRepository>();
+builder.Services.AddScoped<IOrderRepository, OrderRepository>();
+builder.Services.AddScoped<IUserRepository, UserRepository>();
 
 var app = builder.Build();
 

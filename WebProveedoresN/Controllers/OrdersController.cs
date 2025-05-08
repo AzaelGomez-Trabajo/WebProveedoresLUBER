@@ -1,17 +1,17 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using WebProveedoresN.Data;
 using WebProveedoresN.DTOs;
-using WebProveedoresN.Interfaces;
 using WebProveedoresN.Models;
+using WebProveedoresN.Repositories.Interfaces;
 using WebProveedoresN.ViewModel;
 
 namespace WebProveedoresN.Controllers
 {
     public class OrdersController : Controller
     {
-        private readonly IOrderService _orderService;
+        private readonly IOrderRepository _orderService;
 
-        public OrdersController(IOrderService orderService)
+        public OrdersController(IOrderRepository orderService)
         {
             _orderService = orderService;
         }
@@ -49,7 +49,7 @@ namespace WebProveedoresN.Controllers
             ViewBag.PageNumber = pageNumber;
             ViewBag.SearchString = searchString;
 
-            return View(PaginationDTO<Order>.CreatePagination(orders, pageNumber, pageSize));
+            return View(PaginationDTO<OrderModel>.CreatePagination(orders, pageNumber, pageSize));
         }
 
         [HttpPost("DetailsOrder")]

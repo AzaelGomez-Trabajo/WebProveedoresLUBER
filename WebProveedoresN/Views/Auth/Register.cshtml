@@ -1,0 +1,78 @@
+﻿@model SupplierModel
+@{
+    ViewData["Title"] = "Register";
+    Layout = null;
+    var message = TempData["Message"] as string;
+    ViewBag.Message = message;
+}
+<!DOCTYPE html>
+
+<html>
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <title>Registar Empresa</title>
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+</head>
+<body>
+
+    <div class="row justify-content-center mt-5">
+        <div class="col-5">
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="text-center">
+                        Registrar Empresa
+                    </h3>
+                </div>
+                <div class="card-body">
+
+                    @if (ViewBag.Creado == null)
+                    {
+                        
+                        <form action="@Url.Action("Register","Start")" method="post">
+                            @Html.AntiForgeryToken()
+                             <div class="mb-3">
+                                <label>@Html.DisplayNameFor(model => model.Name)</label>
+                                <input type="text" class="form-control" name="Name" />
+                                <span asp-validation-for="Name" class="text-danger"></span>
+                            </div>
+                            <div class="mb-3">
+                                <label>@Html.DisplayNameFor(model => model.Code)</label>
+                                <input type="text" class="form-control" name="Code" />
+                                <span asp-validation-for="Code" class="text-danger"></span>
+                            </div>
+
+                            @if (ViewBag.Message != null)
+                            {
+                                <div class="alert alert-danger">
+                                    @ViewBag.Message
+                                </div>
+                            } 
+
+                            <div class="mb-3">
+                                <div class="d-grid">
+                                    <button class="btn btn-outline-primary btn-sm" type="submit"><i class="bi bi-floppy"/> Registrarse </button>
+                                    <a class="btn btn-link" href="@Url.Action("Login","Access")">Ya tienes una cuenta? Inicia sesion</a>
+                                </div>
+                            </div>
+
+
+                        </form>
+
+                    }
+                    else
+                    {
+                        <div class="alert alert-success">
+                            <p>@ViewBag.Message</p>
+                            <a class="btn btn-outline-success" href="@Url.Action("Login","Access")">Ingresar</a>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validation/1.19.3/jquery.validate.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validation-unobtrusive/3.2.12/jquery.validate.unobtrusive.min.js"></script>
+</body>
+</html>

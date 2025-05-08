@@ -3,9 +3,9 @@ using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
 using WebProveedoresN.Data;
 using WebProveedoresN.DTOs;
-using WebProveedoresN.Interfaces;
 using WebProveedoresN.Models;
-using WebProveedoresN.Services;
+using WebProveedoresN.Repositories.Implementations;
+using WebProveedoresN.Repositories.Interfaces;
 
 namespace WebProveedoresN.Controllers
 {
@@ -13,10 +13,10 @@ namespace WebProveedoresN.Controllers
     public class FilesController : Controller
     {
         private readonly IWebHostEnvironment _webHostEnvironment;
-        private readonly IIPService _ipService;
-        private readonly IOrderService _orderService;
+        private readonly IIPRepository _ipService;
+        private readonly IOrderRepository _orderService;
 
-        public FilesController(IWebHostEnvironment webHostEnvironment, IIPService ipService, IOrderService orderService)
+        public FilesController(IWebHostEnvironment webHostEnvironment, IIPRepository ipService, IOrderRepository orderService)
         {
             _webHostEnvironment = webHostEnvironment;
             _ipService = ipService;
@@ -54,7 +54,7 @@ namespace WebProveedoresN.Controllers
             ViewBag.OrderNumber = orderNumber;
             ViewBag.SupplierCode = User.FindFirst("SupplierCode")?.Value;
             // Pasar los datos a la vista
-            var model = new LoadFile
+            var model = new LoadFileModel
             {
                 OrderNumber = int.Parse(orderNumber),
             };
@@ -62,7 +62,7 @@ namespace WebProveedoresN.Controllers
         }
 
         [HttpPost("UploadOffer")]
-        public IActionResult UploadOffer(LoadFile model)
+        public IActionResult UploadOffer(LoadFileModel model)
         {
             if (!ModelState.IsValid)
             {
@@ -131,7 +131,7 @@ namespace WebProveedoresN.Controllers
                 // Leer el contenido del archivo XML
                 var rfcReceptor = string.Empty;
                 var invoice = string.Empty;
-                var datos = XmlServicio.GetDataFromXml(xmlContent);
+                var datos = XmlRepository.GetDataFromXml(xmlContent);
                 foreach (var dato in datos)
                 {
                     dato.SupplierCode = supplierCode;
@@ -145,14 +145,14 @@ namespace WebProveedoresN.Controllers
                     return View(model);
                 }
 
-                var facturaUnica = XmlServicio.SearchInvoice(datos[0].UUID);
+                var facturaUnica = XmlRepository.SearchInvoice(datos[0].UUID);
                 if (facturaUnica)
                 {
                     ViewBag.Message = $"La factura ya ha sido cargada.";
                     return View(model);
                 }
 
-                var estadoCFDI = XmlServicio.GetCFDIStatus(datos[0].EmisorRfc, datos[0].ReceptorRfc, datos[0].Total.ToString(), datos[0].UUID, datos[0].Sello);
+                var estadoCFDI = XmlRepository.GetCFDIStatus(datos[0].EmisorRfc, datos[0].ReceptorRfc, datos[0].Total.ToString(), datos[0].UUID, datos[0].Sello);
                 var estado = string.Empty;
                 foreach (var xml in estadoCFDI)
                 {
@@ -165,7 +165,7 @@ namespace WebProveedoresN.Controllers
                     return View(model);
                 }
                 // Guardar los datos del XML en la base de datos
-                var result = XmlServicio.SaveXmlDataInDatabase(datos, orderNumber.ToString(), supplierName!, idUsuario!, ipAddress);
+                var result = XmlRepository.SaveXmlDataInDatabase(datos, orderNumber.ToString(), supplierName!, idUsuario!, ipAddress);
 
                 if (result != "OK")
                 {
@@ -198,26 +198,26 @@ namespace WebProveedoresN.Controllers
 
                 var pdfName = Path.GetFileNameWithoutExtension(pdfFileName);
                 var xmlName = Path.GetFileNameWithoutExtension(xmlFileName);
-                var xmlConverted = XmlServicio.ConvertXmlToPdf(xmlContent, Path.Combine(folderPath, $"{timestamp}_1_{xmlName}.pdf"));
-                var archivos = new List<FileDTO>
+                var xmlConverted = XmlRepository.ConvertXmlToPdf(xmlContent, Path.Combine(folderPath, $"{timestamp}_1_{xmlName}.pdf"));
+                var archivos = new List<FileModel>
                             {
                                 new() { OrderNumber = orderNumber, Name = pdfName, Route = folderPath, DateTime = timestamp, Extension = ".pdf", Converted = false },
                                 new() { OrderNumber = orderNumber, Name = xmlName, Route = folderPath, DateTime = timestamp, Extension = ".xml", Converted = false },
                                 new() { OrderNumber = orderNumber, Name = xmlName, Route = folderPath, DateTime = timestamp, Extension = ".pdf", Converted = true }
                             };
-                XmlServicio.SaveFilesToDatabase(archivos);
+                XmlRepository.SaveFilesToDatabase(archivos);
 
                 // Enviar correo de confirmación
                 var userEmail = User.FindFirst(ClaimTypes.Email)?.Value!;
                 var nombre = User.FindFirst(ClaimTypes.Name)?.Value!;
-                var correo = new EmalDTO
+                var correo = new EmailModel
                 {
                     Para = userEmail,
                     CCO = "noeazael77@hotmail.com",
                     Asunto = "Documentos guardados correctamente",
                     Contenido = $"Hola, {nombre}<br><br>Las facturas: <br><br> {pdfFile.FileName} y <br> {xmlFile.FileName}. <br><br> Para la orden de compra {orderNumber} de la Empresa {supplierName} se han guardado correctamente.<br><br>Saludos,<br>El equipo de LUBER Lubricantes"
                 };
-                CorreoServicio.EnviarCorreo(correo, nombre);
+                EmailRepository.EnviarCorreo(correo, nombre);
 
                 // Redirigir a la lista de órdenes
                 return RedirectToAction("Index", "Lecturaxml", new { xmlContent });
@@ -265,7 +265,7 @@ namespace WebProveedoresN.Controllers
             ViewBag.SupplierCode = User.FindFirst("SupplierCode")?.Value;
 
             // Pasar los datos a la vista
-            var model = new LoadFile
+            var model = new LoadFileModel
             {
                 //OrderNumber = int.Parse(orderNumber),
                 OrderNumber = int.Parse(ViewBag.OrderNumber),
@@ -276,7 +276,7 @@ namespace WebProveedoresN.Controllers
 
         // POST: Files/UploadSaves
         [HttpPost("UploadSaves")]
-        public async Task<IActionResult> UploadSaves(LoadFile model)
+        public async Task<IActionResult> UploadSaves(LoadFileModel model)
         {
             ViewBag.Message = null;
             if (!ModelState.IsValid)
@@ -394,7 +394,7 @@ namespace WebProveedoresN.Controllers
                 var rfcReceptor = string.Empty;
                 var invoice = string.Empty;
                 var serie = string.Empty;
-                var datos = XmlServicio.GetDataFromXml(xmlContent);
+                var datos = XmlRepository.GetDataFromXml(xmlContent);
                 foreach (var dato in datos)
                 {
                     dato.SupplierCode = supplierCode;
@@ -424,7 +424,7 @@ namespace WebProveedoresN.Controllers
                     return View(model);
                 }
                 //Valida que no se haya cargado la factura anteriormente
-                var facturaUnica = XmlServicio.SearchInvoice(datos[0].UUID);
+                var facturaUnica = XmlRepository.SearchInvoice(datos[0].UUID);
                 if (facturaUnica)
                 {
                     ViewBag.Message = $"La factura {serie}{invoice}, ya ha sido cargada.";
@@ -433,7 +433,7 @@ namespace WebProveedoresN.Controllers
                     return View(model);
                 }
 
-                var estadoCFDI = XmlServicio.GetCFDIStatus(datos[0].EmisorRfc, datos[0].ReceptorRfc, datos[0].Total.ToString(), datos[0].UUID, datos[0].Sello);
+                var estadoCFDI = XmlRepository.GetCFDIStatus(datos[0].EmisorRfc, datos[0].ReceptorRfc, datos[0].Total.ToString(), datos[0].UUID, datos[0].Sello);
                 var estado = string.Empty;
                 foreach (var xml in estadoCFDI)
                 {
@@ -450,7 +450,7 @@ namespace WebProveedoresN.Controllers
 
                 // TO DO Separate saving of the invoice to the new view
                 // Guardar los datos del XML en la base de datos
-                var result = XmlServicio.SaveXmlDataInDatabase(datos, ordenCompra.ToString(), supplierName!, idUsuario!, ipAddress);
+                var result = XmlRepository.SaveXmlDataInDatabase(datos, ordenCompra.ToString(), supplierName!, idUsuario!, ipAddress);
 
                 if (result != "OK")
                 {
@@ -483,26 +483,26 @@ namespace WebProveedoresN.Controllers
 
                 var pdfName = Path.GetFileNameWithoutExtension(Path.GetFileName(pdfFile.FileName));
                 var xmlName = Path.GetFileNameWithoutExtension(Path.GetFileName(xmlFile.FileName));
-                var xmlConverted = XmlServicio.ConvertXmlToPdf(xmlContent, Path.Combine(folderPath, $"{timestamp}_1_{xmlName}.pdf"));
-                var archivos = new List<FileDTO>
+                var xmlConverted = XmlRepository.ConvertXmlToPdf(xmlContent, Path.Combine(folderPath, $"{timestamp}_1_{xmlName}.pdf"));
+                var archivos = new List<FileModel>
                             {
                                 new() { OrderNumber = model.OrderNumber, Name = pdfName, Route = folderPath, DateTime = timestamp, Extension = ".pdf", Converted = false },
                                 new() { OrderNumber = model.OrderNumber, Name = xmlName, Route = folderPath, DateTime = timestamp, Extension = ".xml", Converted = false },
                                 new() { OrderNumber = model.OrderNumber, Name = xmlName, Route = folderPath, DateTime = timestamp, Extension = ".pdf", Converted = true }
                             };
-                XmlServicio.SaveFilesToDatabase(archivos);
+                XmlRepository.SaveFilesToDatabase(archivos);
 
                 // Enviar correo de confirmación
                 var userEmail = User.FindFirst(ClaimTypes.Email)?.Value!;
                 var nombre = User.FindFirst(ClaimTypes.Name)?.Value!;
-                var correo = new EmalDTO
+                var correo = new EmailModel
                 {
                     Para = userEmail,
                     CCO = "programador1@luberoil.com",
                     Asunto = "Documentos guardados correctamente",
                     Contenido = $"Hola, {nombre}<br><br>Las facturas: <br><br> {pdfFile.FileName} y <br> {xmlFile.FileName}. <br><br> Para la orden de compra {ordenCompra} de la Empresa {supplierName} se han guardado correctamente.<br><br>Saludos,<br>El equipo de LUBER Lubricantes"
                 };
-                CorreoServicio.EnviarCorreo(correo, nombre);
+                EmailRepository.EnviarCorreo(correo, nombre);
 
                 // Redirigir a la lista de órdenes
                 return RedirectToAction("Index", "Lecturaxml", new { xmlContent });

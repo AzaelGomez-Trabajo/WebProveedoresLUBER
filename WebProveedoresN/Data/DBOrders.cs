@@ -7,54 +7,67 @@ namespace WebProveedoresN.Data
 {
     public class DBOrders
     {
-        public static List<Order> ListOrders(OrderDetailDTO orderDetailDTO)
+        private readonly DBConnection _dBConnection;
+
+        public DBOrders(DBConnection dBConnection)
         {
-            var orders = new List<Order>();
+            _dBConnection = dBConnection;
+        }
+
+        public async Task<List<OrderModel>> ListOrdersAsync(OrderDetailDTO orderDetailDTO)
+        {
+            var orders = new List<OrderModel>();
+            const string storedProcedure = "sp_GetOrders";
             try
             {
-                using var conexion = DBConnectiion.GetConnection();
-                conexion.Open();
-                var storedProcedure = "sp_GetOrders";
-                using (var cmd = new SqlCommand(storedProcedure, conexion))
+                await using var conexion = await _dBConnection.GetConnectionAsync();
+                await using var cmd = new SqlCommand(storedProcedure, conexion)
                 {
-                    cmd.Parameters.AddWithValue("@Parameter1", orderDetailDTO.Action);
-                    cmd.Parameters.AddWithValue("@Parameter2", orderDetailDTO.OrderNumber);
-                    cmd.Parameters.AddWithValue("@Parameter3", orderDetailDTO.SupplierCode);
-                    cmd.Parameters.AddWithValue("@Parameter4", orderDetailDTO.DocumentType);
-                    cmd.CommandType = CommandType.StoredProcedure;
-                    using var dr = cmd.ExecuteReader();
-                    while (dr.Read())
+                    CommandType = CommandType.StoredProcedure;
+                };
+
+                cmd.Parameters.AddWithValue("@Parameter1", orderDetailDTO.Action);
+                cmd.Parameters.AddWithValue("@Parameter2", orderDetailDTO.OrderNumber);
+                cmd.Parameters.AddWithValue("@Parameter3", orderDetailDTO.SupplierCode ?? (object)DBNull.Value);
+                cmd.Parameters.AddWithValue("@Parameter4", orderDetailDTO.DocumentType ?? (object)DBNull.Value);
+
+                await conexion.OpenAsync();
+
+                await using var reader = cmd.ExecuteReader();
+                while (await reader.ReadAsync())
+                {
+                    orders.Add(new OrderModel()
                     {
-                        orders.Add(new Order()
-                        {
-                            DocumentType = dr["DocumentType"].ToString(),
-                            OrderNumber = (int)dr["OrderNumber"],
-                            OrderDate = (DateTime)dr["OrderDate"],
-                            Canceled = dr["Canceled"].ToString(),
-                            TotalAmount = (decimal)dr["TotalAmount"],
-                            IdEstatus = dr["IdEstatus"].ToString(),
-                            DocCurOrder = dr["Currency"].ToString()!,
-                            Property = dr["Property"].ToString(),
-                            Invoices = (int)dr["Invoices"],
-                            TotalInvoice = (decimal)dr["TotalInvoice"],
-                        });
-                    }
+                        DocumentType = reader["DocumentType"].ToString(),
+                        OrderNumber = reader["OrderNumber"] != DBNull.Value ? (int)reader["OrderNumber"] : 0,
+                        OrderDate = reader["OrderDate"] != DBNull.Value ? (DateTime)reader["OrderDate"] : DateTime.MinValue,
+                        Canceled = reader["Canceled"].ToString(),
+                        TotalAmount = reader["TotalAmount"] != DBNull.Value ? (decimal)reader["TotalAmount"] : 0,
+                        IdEstatus = reader["IdEstatus"].ToString(),
+                        DocCurOrder = reader["Currency"].ToString() ?? string.Empty,
+                        Property = reader["Property"].ToString() ?? string.Empty,
+                        Invoices = reader["Invoices"] != DBNull.Value ? (int)reader["Invoices"] : 0,
+                        TotalInvoice = reader["TotalInvoice"] != DBNull.Value ? (decimal)reader["TotalInvoice"] : 0,
+                    });
                 }
-                conexion.Close();
             }
-            catch (Exception)
+            catch (SqlException ex)
             {
-                throw;
+                throw new Exception($"Error al listar órdenes: {ex.Message}", ex);
+            }
+            catch (Exception ex)
+            {
+                throw new Exception($"Error inesperado al listar órdenes: {ex.Message}", ex);
             }
             return orders;
         }
 
-        public static Order GetOrderByOrderNumber(int orderNumber)
+        public async Task<OrderModel> GetOrderByOrderNumber(int orderNumber)
         {
-            var order = new Order();
+            var order = new OrderModel();
             try
             {
-                using var conexion = DBConnectiion.GetConnection();
+                using var conexion = await _dBConnection.GetConnectionAsync();
                 conexion.Open();
                 var storedProcedure = "sp_GetOrderByOrderNumber";
                 using (var cmd = new SqlCommand(storedProcedure, conexion))
@@ -64,7 +77,7 @@ namespace WebProveedoresN.Data
                     using var dr = cmd.ExecuteReader();
                     if (dr.Read())
                     {
-                        order = new Order()
+                        order = new OrderModel()
                         {
                             DocumentType = dr["DocumentType"].ToString(),
                             SupplierCode = dr["SupplierCode"].ToString(),
@@ -89,12 +102,12 @@ namespace WebProveedoresN.Data
             return order;
         }
 
-        public static Order GetOrderByOrderNumber2(OrderDetailDTO orderDetailDTO)
+        public async Task<OrderModel> GetOrderByOrderNumber2(OrderDetailDTO orderDetailDTO)
         {
-            var order = new Order();
+            var order = new OrderModel();
             try
             {
-                using var conexion = DBConnectiion.GetConnection();
+                using var conexion = await _dBConnection.GetConnectionAsync();
                 conexion.Open();
                 var storedProcedure = "sp_GetOrderByOrderNumber_2";
                 using (var cmd = new SqlCommand(storedProcedure, conexion))
@@ -107,7 +120,7 @@ namespace WebProveedoresN.Data
                     using var dr = cmd.ExecuteReader();
                     if (dr.Read())
                     {
-                        order = new Order()
+                        order = new OrderModel()
                         {
                             DocumentType = dr["DocumentType"].ToString(),
                             OrderNumber = (int)dr["OrderNumber"],
@@ -131,13 +144,13 @@ namespace WebProveedoresN.Data
             return order;
         }
 
-        public static bool ValidateOrderNumberInDatabase(ValidateOrderNumberDTO model)
+        public async Task<bool> ValidateOrderNumberInDatabaseAsync(ValidateOrderNumberDTO model)
         {
             bool isValid = false;
 
-            using (SqlConnection connection = DBConnectiion.GetConnection())
+            using (SqlConnection connection = await _dBConnection.GetConnectionAsync())
             {
-                string storedProcedure = "sp_ValidateOrderNumber";
+                const string storedProcedure = "sp_ValidateOrderNumber";
                 using (var cmd = new SqlCommand(storedProcedure, connection))
                 {
                     cmd.Parameters.AddWithValue("@NumeroOrden", model.OrderNumber);
@@ -155,13 +168,12 @@ namespace WebProveedoresN.Data
             return isValid;
         }
 
-        public static List<OrderDetail> GetOrderDetailsByOrderNumber(OrderDetailDTO orderDetailDTO)
+        public async Task<List<OrderDetailModel>> GetOrderDetailsByOrderNumberAsync(OrderDetailDTO orderDetailDTO)
         {
-
-            var orders = new List<OrderDetail>();
+            var orders = new List<OrderDetailModel>();
             try
             {
-                using var conexion = DBConnectiion.GetConnection();
+                using var conexion = await _dBConnection.GetConnectionAsync();
                 conexion.Open();
                 var storedProcedure = "sp_GetOrderDetailsByOrderNumber";
                 using (var cmd = new SqlCommand(storedProcedure, conexion))
@@ -174,7 +186,7 @@ namespace WebProveedoresN.Data
                     using var dr = cmd.ExecuteReader();
                     while (dr.Read())
                     {
-                        orders.Add(new OrderDetail()
+                        orders.Add(new OrderDetailModel()
                         {
                             DocumentTypeOrder = dr["TipoDocumento1"].ToString() ?? string.Empty,
                             OrderNumber = dr["NoDocumento1"] != DBNull.Value ? (int)dr["NoDocumento1"] : 0,
@@ -201,13 +213,12 @@ namespace WebProveedoresN.Data
             return orders;
         }
 
-        public static List<DetailsGoodsReceipt> GetOrderDetailsGoodsReceiptByOrderNumber(OrderDetailDTO orderDetailDTO)
+        public async Task<List<DetailsGoodsReceiptModel>> GetOrderDetailsGoodsReceiptByOrderNumberAsync(OrderDetailDTO orderDetailDTO)
         {
-
-            var orders = new List<DetailsGoodsReceipt>();
+            var orders = new List<DetailsGoodsReceiptModel>();
             try
             {
-                using var conexion = DBConnectiion.GetConnection();
+                using var conexion = await _dBConnection.GetConnectionAsync();
                 conexion.Open();
                 var storedProcedure = "sp_GetOrderDetailsByOrderNumber";
                 using (var cmd = new SqlCommand(storedProcedure, conexion))
@@ -220,7 +231,7 @@ namespace WebProveedoresN.Data
                     using var dr = cmd.ExecuteReader();
                     while (dr.Read())
                     {
-                        orders.Add(new DetailsGoodsReceipt()
+                        orders.Add(new DetailsGoodsReceiptModel()
                         {
                             DocNum = dr["NoDocumento2"] != DBNull.Value ? (int)dr["NoDocumento2"] : 0,
                             InvoiceSupplier = dr["FacturaProveedor2"].ToString() ?? string.Empty,
@@ -242,13 +253,12 @@ namespace WebProveedoresN.Data
             return orders;
         }
 
-        public static List<OrderDetailsOffer> GetOrderDetailsOfferByOrderNumber(OrderDetailDTO orderDetailDTO)
+        public async Task<List<OrderDetailsOfferModel>> GetOrderDetailsOfferByOrderNumber(OrderDetailDTO orderDetailDTO)
         {
-
-            var orders = new List<OrderDetailsOffer>();
+            var orders = new List<OrderDetailsOfferModel>();
             try
             {
-                using var conexion = DBConnectiion.GetConnection();
+                await using var conexion = await _dBConnection.GetConnectionAsync();
                 conexion.Open();
                 var storedProcedure = "sp_GetOrderDetailsByOrderNumber";
                 using (var cmd = new SqlCommand(storedProcedure, conexion))
@@ -261,7 +271,7 @@ namespace WebProveedoresN.Data
                     using var dr = cmd.ExecuteReader();
                     while (dr.Read())
                     {
-                        orders.Add(new OrderDetailsOffer()
+                        orders.Add(new OrderDetailsOfferModel()
                         {
                             DocumentType = dr["TipoDocumento1"].ToString() ?? string.Empty,
                             OrderNumber = dr["NoDocumento1"] != DBNull.Value ? (int)dr["NoDocumento1"] : 0,
@@ -290,12 +300,12 @@ namespace WebProveedoresN.Data
             return orders;
         }
 
-        public static List<OrderInvoicesDTO> GetOrderInvoicesByOrderNumber(int orderNumber)
+        public async Task<List<OrderInvoicesDTO>> GetOrderInvoicesByOrderNumberAsync(int orderNumber)
         {
             var invoices = new List<OrderInvoicesDTO>();
             try
             {
-                using var conexion = DBConnectiion.GetConnection();
+                using var conexion = await _dBConnection.GetConnectionAsync();
                 conexion.Open();
                 var storedProcedure = "sp_GetOrderInvoicesByOrderNumber";
                 using (var cmd = new SqlCommand(storedProcedure, conexion))
@@ -320,6 +330,5 @@ namespace WebProveedoresN.Data
             }
             return invoices;
         }
-
     }
 }

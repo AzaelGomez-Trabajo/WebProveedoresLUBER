@@ -1,6 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-
-using WebProveedoresN.Services;
+using WebProveedoresN.Repositories.Implementations;
 
 namespace WebProveedoresN.Controllers
 {
@@ -14,7 +13,7 @@ namespace WebProveedoresN.Controllers
                 return View();
             }
 
-            var archivos = XmlServicio.GetDataFromXml(xmlContent);
+            var archivos = XmlRepository.GetDataFromXml(xmlContent);
             return View(archivos);
         }
     }

@@ -8,7 +8,7 @@
 @Html.AntiForgeryToken()
 @if (Model.Orders is null)
 {
-    <p>No se encontraron detalles para esta orden.</p>
+    <p class="text-danger">No se encontraron detalles para esta orden.</p>
 }
 else
 {

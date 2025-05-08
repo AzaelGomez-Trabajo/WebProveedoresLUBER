@@ -10,7 +10,7 @@ namespace WebProveedoresN.Data
             var roles = new List<string>();
             try
             {
-                using var conexion = DBConnectiion.GetConnection();
+                using var conexion = DBConnection.GetConnection();
                 conexion.Open();
                 var storedProcedure = "sp_GetRoles";
                 using var cmd = new SqlCommand(storedProcedure, conexion)
