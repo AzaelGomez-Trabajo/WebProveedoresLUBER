@@ -5,7 +5,7 @@
                   CondicionesDePago="Contado" 
                   Exportacion="01" 
                   Fecha="2024-08-01T16:37:14" 
-                  Folio="52" 
+                  Folio="2212" 
                   FormaPago="01" 
                   LugarExpedicion="83116" 
                   MetodoPago="PUE" 
@@ -13,9 +13,9 @@
                   NoCertificado="00001000000513411570" 
                   Sello="WqqB+bfy0UXI09+0BR1tnguXTfLKECm7057zbIVeTTpIKiPkGqZhCLzdeqaHajzsqgCBcqUz5Dy41G1RYbOmVgvRCLW0fDty5FagoFIjK8MF6h4GLzmJz842O0b9phlBzRExcJ/lTbFJ9maT5dQ4g7tUSsxVk84x/NzBXVX9p2jLGVxpy4bqAm0EZZGVRp+y+hvVlgXmXOiRbPcQTMfPqSDUlnAE6TpYhdryqAB9d6HRceW9wGLor67QkPS2I9FFJ1mvdl7NCQSOgCKv5Qoj10STQMoKFRhnhusXlDRVQIyde9BUBnh/M7cmx280hN/nQb4S6Tj28D4fai06byw45A==" 
                   Serie="FAC" 
-                  SubTotal="150.00" 
+                  SubTotal="125940.00" 
                   TipoDeComprobante="I" 
-                  Total="5120.00" 
+                  Total="146090.40" 
                   Version="4.0" 
                   xsi:schemaLocation="http://www.sat.gob.mx/cfd/4 http://www.sat.gob.mx/sitio_internet/cfd/4/cfdv40.xsd">
   <cfdi:Emisor Nombre="MARIO ANTONIO MUÑOZ CAMPOY"
@@ -27,72 +27,36 @@
                  Rfc="CIN041008173" 
                  UsoCFDI="G03"/>
   <cfdi:Conceptos>
-    <cfdi:Concepto Cantidad="1.000000" 
+    <cfdi:Concepto Cantidad="504.000000" 
                    ClaveProdServ="90101501"
                    ClaveUnidad="ACT"
-                   Descripcion="CONSUMO" 
-                   Importe="150.00" 
+                   Descripcion="TARIMAS TAC." 
+                   Importe="137390.00" 
                    ObjetoImp="02"
                    Unidad="Actividad"
-                   ValorUnitario="150.00">
+                   ValorUnitario="235.00">
       <cfdi:Impuestos>
         <cfdi:Traslados>
-          <cfdi:Traslado Base="150.00" 
-                         Importe="24.00" 
+          <cfdi:Traslado Base="137390.00" 
+                         Importe="18950.40" 
                          Impuesto="002" 
                          TasaOCuota="0.160000" 
                          TipoFactor="Tasa"/>
         </cfdi:Traslados>
       </cfdi:Impuestos>
     </cfdi:Concepto>
-	  <cfdi:Concepto Cantidad="3.000000"
+	  <cfdi:Concepto Cantidad="1.000000"
 					 ClaveProdServ="90101501"
 					 ClaveUnidad="ACT"
-					 Descripcion="CONSUMO 2"
-					 Importe="450.00"
+					 Descripcion="SER-PS-247"
+					 Importe="1200.00"
 					 ObjetoImp="02"
 					 Unidad="Actividad"
-					 ValorUnitario="150.00">
+					 ValorUnitario="7500.00">
 		  <cfdi:Impuestos>
 			  <cfdi:Traslados>
-				  <cfdi:Traslado Base="150.00"
-								 Importe="24.00"
-								 Impuesto="002"
-								 TasaOCuota="0.160000"
-								 TipoFactor="Tasa"/>
-			  </cfdi:Traslados>
-		  </cfdi:Impuestos>
-	  </cfdi:Concepto>
-	  <cfdi:Concepto Cantidad="4.000000"
-					 ClaveProdServ="90101501"
-					 ClaveUnidad="ACT"
-					 Descripcion="CONSUMO 2"
-					 Importe="6000.00"
-					 ObjetoImp="02"
-					 Unidad="Actividad"
-					 ValorUnitario="150.00">
-		  <cfdi:Impuestos>
-			  <cfdi:Traslados>
-				  <cfdi:Traslado Base="150.00"
-								 Importe="24.00"
-								 Impuesto="002"
-								 TasaOCuota="0.160000"
-								 TipoFactor="Tasa"/>
-			  </cfdi:Traslados>
-		  </cfdi:Impuestos>
-	  </cfdi:Concepto>
-	  <cfdi:Concepto Cantidad="5.000000"
-					 ClaveProdServ="90101501"
-					 ClaveUnidad="ACT"
-					 Descripcion="CONSUMO 3"
-					 Importe="750.00"
-					 ObjetoImp="02"
-					 Unidad="Actividad"
-					 ValorUnitario="150.00">
-		  <cfdi:Impuestos>
-			  <cfdi:Traslados>
-				  <cfdi:Traslado Base="150.00"
-								 Importe="24.00"
+				  <cfdi:Traslado Base="7500.00"
+								 Importe="1200.00"
 								 Impuesto="002"
 								 TasaOCuota="0.160000"
 								 TipoFactor="Tasa"/>
@@ -100,10 +64,10 @@
 		  </cfdi:Impuestos>
 	  </cfdi:Concepto>
   </cfdi:Conceptos>
-  <cfdi:Impuestos TotalImpuestosTrasladados="24.00">
+  <cfdi:Impuestos TotalImpuestosTrasladados="20150.40">
     <cfdi:Traslados>
-      <cfdi:Traslado Base="150.00" 
-                     Importe="24.00" 
+      <cfdi:Traslado Base="125940.00" 
+                     Importe="20150.40" 
                      Impuesto="002" 
                      TasaOCuota="0.160000" 
                      TipoFactor="Tasa"/>

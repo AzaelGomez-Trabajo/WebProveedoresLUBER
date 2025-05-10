@@ -55,6 +55,7 @@ namespace WebProveedoresN.Controllers
                         new(ClaimTypes.Email, user.Email),
                         new("SupplierCode", user.SupplierCode),
                         new("SupplierName", user.SupplierName),
+                        new("IdUsuario", user.IdUsuario.ToString()),
                         new("Token", user.Token.ToString()),
                     };
 

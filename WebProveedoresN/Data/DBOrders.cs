@@ -23,7 +23,7 @@ namespace WebProveedoresN.Data
                 await using var conexion = await _dBConnection.GetConnectionAsync();
                 await using var cmd = new SqlCommand(storedProcedure, conexion)
                 {
-                    CommandType = CommandType.StoredProcedure;
+                    CommandType = CommandType.StoredProcedure,
                 };
 
                 cmd.Parameters.AddWithValue("@Parameter1", orderDetailDTO.Action);

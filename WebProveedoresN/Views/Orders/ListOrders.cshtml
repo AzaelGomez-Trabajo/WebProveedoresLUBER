@@ -57,7 +57,8 @@ else
                                         <form asp-action="Upload" asp-controller="Files" method="post" style="display:inline">
                                             <input type="hidden" name="orderNumber" value="@item.OrderNumber" />
                                             <input type="hidden" name="supplierCode" value="@item.SupplierCode" />
-                                            <button type="submit" class="btn btn-outline-primary btn-sm">
+                                            <button type="submit" class="btn btn-outline-primary btn-sm"
+                                            @(item.TotalAmount <= item.TotalInvoice ? "disabled" : "")>
                                                 <i class="bi bi-ticket-detailed-fill"> Cargar Factura</i>
                                             </button>
                                         </form>

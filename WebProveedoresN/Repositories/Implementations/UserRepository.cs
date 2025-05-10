@@ -432,5 +432,64 @@ namespace WebProveedoresN.Repositories.Implementations
                 return $"Error inesperado al guardar los datos en SQL Server - {error}";
             }
         }
+
+        public async Task<List<string>> GetRolesAsync()
+        {
+            var roles = new List<string>();
+            const string storedProcedure = "sp_GetRoles";
+            try
+            {
+                await using var connection = await _dBConnection.GetConnectionAsync();
+                await using var cmd = new SqlCommand(storedProcedure, connection)
+                {
+                    CommandType = CommandType.StoredProcedure
+                };
+                await connection.OpenAsync();
+                await using var reader = await cmd.ExecuteReaderAsync();
+                while (await reader.ReadAsync())
+                {
+                    roles.Add(reader["Name"].ToString() ?? string.Empty);
+                }
+            }
+            catch (SqlException ex)
+            {
+                throw new Exception($"Error al obtener los roles desde la base de datos: {ex.Message}", ex);
+            }
+            catch (Exception ex)
+            {
+                throw new Exception($"Error inesperado al obtener los roles: {ex.Message}", ex);
+            }
+            return roles;
+        }
+
+        public async Task<List<StatusModel>> GetStatusAsync()
+        {
+            var statusList = new List<StatusModel>();
+            const string query = "SELECT Id, Name FROM Status";
+            try
+            {
+                await using var connection = await _dBConnection.GetConnectionAsync();
+                await using var cmd = new SqlCommand(query, connection);
+                await connection.OpenAsync();
+                await using var reader = cmd.ExecuteReader();
+                while (await reader.ReadAsync())
+                {
+                    statusList.Add(new StatusModel
+                    {
+                        IdStatus = reader["Id"] != DBNull.Value ? Convert.ToInt32(reader["Id"]) : 0,
+                        Status = reader["Name"].ToString() ?? string.Empty
+                    });
+                }
+            }
+            catch (SqlException ex)
+            {
+                throw new Exception($"Error al obtener los estados desde la base de datos: {ex.Message}", ex);
+            }
+            catch (Exception ex)
+            {
+                throw new Exception($"Error inesperado al obtener los estados: {ex.Message}", ex);
+            }
+            return statusList;
+        }
     }
 }

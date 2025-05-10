@@ -30,5 +30,9 @@ namespace WebProveedoresN.Repositories.Interfaces
         Task<GetUserDTO> GetUserAsync(EmailDTO emailDTO);
 
         Task<string> UpdateProfileAsync(UserProfileDTO userProfileDTO);
+
+        Task<List<string>> GetRolesAsync();
+
+        Task<List<StatusModel>> GetStatusAsync();
     }
 }

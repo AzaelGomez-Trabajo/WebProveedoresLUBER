@@ -1,10 +1,16 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using WebProveedoresN.Repositories.Implementations;
+using WebProveedoresN.Repositories.Interfaces;
 
 namespace WebProveedoresN.Controllers
 {
     public class LecturaXmlController : Controller
     {
+        private readonly IFilesRepository _filesRepository;
+
+        public LecturaXmlController(IFilesRepository filesRepository)
+        {
+            _filesRepository = filesRepository;
+        }
         public ActionResult Index(string xmlContent)
         {
             if (string.IsNullOrEmpty(xmlContent))
@@ -13,7 +19,7 @@ namespace WebProveedoresN.Controllers
                 return View();
             }
 
-            var archivos = XmlRepository.GetDataFromXml(xmlContent);
+            var archivos = _filesRepository.GetDataFromXml(xmlContent);
             return View(archivos);
         }
     }

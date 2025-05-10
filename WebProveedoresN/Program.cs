@@ -36,7 +36,10 @@ builder.Services.AddHttpContextAccessor();
 builder.Services.AddScoped<IIPRepository, IPRepository>();
 builder.Services.AddScoped<IOrderRepository, OrderRepository>();
 builder.Services.AddScoped<IUserRepository, UserRepository>();
+builder.Services.AddScoped<IFilesRepository, FilesRepository>();
+builder.Services.AddScoped<IEmailRepository, EmailRepository>();
 
+builder.Services.AddSingleton<DBConnection>();
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.

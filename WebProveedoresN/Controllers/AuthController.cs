@@ -14,11 +14,13 @@ namespace WebProveedoresN.Controllers
     {
         private readonly IWebHostEnvironment _webHostEnvironment;
         private readonly IUserRepository _userRepository;
+        private readonly IEmailRepository _emailRepository;
 
-        public AuthController(IWebHostEnvironment webHostEnvironment, IUserRepository userRepository)
+        public AuthController(IWebHostEnvironment webHostEnvironment, IUserRepository userRepository, IEmailRepository emailRepository)
         {
             _webHostEnvironment = webHostEnvironment;
             _userRepository = userRepository;
+            _emailRepository = emailRepository;
         }
 
         [Authorize(Roles = "Administrador")]
@@ -93,7 +95,7 @@ namespace WebProveedoresN.Controllers
                     Asunto = "Invitación",
                     Contenido = htmlBody
                 };
-                EmailRepository.EnviarCorreo(correoDTO, model.FullName);
+                 _emailRepository.SendEmail(correoDTO, model.FullName);
                 ViewBag.Creado = true;
                 answer = $"Se ha enviado una invitación al correo {model.Email}";
                 TempData["Message"] = answer;
@@ -153,7 +155,7 @@ namespace WebProveedoresN.Controllers
                     Contenido = htmlBody
                 };
 
-                EmailRepository.EnviarCorreo(correoDTO, model.FullName);
+                _emailRepository.SendEmail(correoDTO, model.FullName);
                 ViewBag.Creado = true;
                 ViewBag.Mensaje = $"Su cuenta ha sido creada. Hemos enviado un mensaje al correo {model.Email} para confirmar su cuenta";
 
@@ -186,7 +188,7 @@ namespace WebProveedoresN.Controllers
         {
             var token = TempData["Token"] as string;
             // Metodo solo devuelve la vista
-            ViewBag.Status = StatusRepository.GetStatus() ?? [];
+            ViewBag.Status = await _userRepository.GetStatusAsync() ?? [];
             var user = await _userRepository.GetUserByTokenAsync(token!);
             var updateUserDTO = new UpdateUserDTO
             {
@@ -206,7 +208,7 @@ namespace WebProveedoresN.Controllers
             ViewBag.Message = null;
             if (!ModelState.IsValid)
             {
-                ViewBag.Status = StatusRepository.GetStatus() ?? [];
+                ViewBag.Status = await _userRepository.GetStatusAsync() ?? [];
                 return View();
             }
             var answer = await _userRepository.UpdateUserAsync(model);
@@ -298,7 +300,7 @@ namespace WebProveedoresN.Controllers
                         Contenido = htmlBody
                     };
 
-                    EmailRepository.EnviarCorreo(correoDTO, user.FullName);
+                    _emailRepository.SendEmail(correoDTO, user.FullName);
                     ViewBag.Restablecido = true;
                 }
                 else
